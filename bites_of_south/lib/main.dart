@@ -1,3 +1,4 @@
+import 'package:bites_of_south/View/dashboard.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: DashboardScreen(),
     );
   }
 }
@@ -33,6 +34,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Placeholder();
+    return Scaffold(
+      body: Container(
+        alignment: Alignment.center,
+        child: Text("hello"),
+      ),
+    );
   }
 }
