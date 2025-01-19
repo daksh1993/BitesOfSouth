@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "166943202176",
+    "project_id": "bitesofsouth-1c44f",
+    "storage_bucket": "bitesofsouth-1c44f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:166943202176:android:cd960a790734a15703bf65",
+        "android_client_info": {
+          "package_name": "com.example.bites_of_south"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6S877IoTmYPQfFEiAQdkiwyzb-iOZ7fk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
