@@ -24,9 +24,9 @@ class MenuItem {
       title: data['title'],
       price: data['price'],
       description: data['description'],
-      makingTime: data['making_time'],
+      makingTime: data['makingTime'],
       category: data['category'],
-      imageUrl: data['image_url'],
+      imageUrl: data['image'],
     );
   }
 
@@ -36,9 +36,9 @@ class MenuItem {
       'title': title,
       'price': price,
       'description': description,
-      'making_time': makingTime,
+      'makingTime': makingTime,
       'category': category,
-      'image_url': imageUrl,
+      'image': imageUrl,
     };
   }
 }

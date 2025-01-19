@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Example Flutter app needs access to your </string>
+	<key>NSCameraUsageDescription</key>
+	<string>Example Flutter app needs access to your</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Example Flutter app needs access to your</string>
 </dict>
 </plist>
