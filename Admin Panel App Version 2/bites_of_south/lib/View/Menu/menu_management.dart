@@ -1,5 +1,7 @@
 import 'package:bites_of_south/Controller/menu_provider.dart';
+import 'package:bites_of_south/Modal/menu_item.dart';
 import 'package:bites_of_south/View/Menu/add_item_to_menu.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,15 +11,34 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
+  List<MenuItem> _menuItems = [];
+  bool _isLoading = false;
   @override
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchMenuItems();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false).fetchMenuItems();
+  Future<void> _fetchMenuItems() async {
+    setState(() {
+      _isLoading = true;
     });
+
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('menu').get();
+      setState(() {
+        _menuItems =
+            snapshot.docs.map((doc) => MenuItem.fromFirestore(doc)).toList();
+      });
+    } catch (e) {
+      print("Error fetching items: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -26,13 +47,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       appBar: AppBar(
         title: Text("Menu Management"),
       ),
-      body: Consumer<MenuProvider>(
-        builder: (context, menuProvider, child) {
-          if (menuProvider.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-
-          return menuProvider.menuItems.isEmpty
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _menuItems.isEmpty
               ? Center(child: Text("No items available"))
               : Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -42,67 +59,65 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
-                    itemCount: menuProvider.menuItems.length,
+                    itemCount: _menuItems.length,
                     itemBuilder: (context, index) {
-                      final menuItem = menuProvider.menuItems[index];
+                      final menuItem = _menuItems[index];
                       return GestureDetector(
-                          onTap: () {
-                            // Navigate to details screen (not implemented here)
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                              image: DecorationImage(
-                                image: NetworkImage(menuItem.imageUrl),
-                                fit: BoxFit.cover,
-                              ),
+                        onTap: () {
+                          // Navigate to details screen (not implemented here)
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            image: DecorationImage(
+                              image: NetworkImage(menuItem.imageUrl),
+                              fit: BoxFit.cover,
                             ),
-                            child: GridTile(
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                      top: 10,
-                                      child: Container(
-                                        color: Colors.black.withOpacity(0.5),
-                                        height: 50,
-                                      )),
-                                  Container(
-                                    child: Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            menuItem.title,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                          ),
+                          child: GridTile(
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 10,
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    height: 50,
+                                  ),
+                                ),
+                                Container(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          menuItem.title,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                          Text(
-                                            "₹" + menuItem.price,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                        ),
+                                        Text(
+                                          "₹" + menuItem.price,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ));
+                          ),
+                        ),
+                      );
                     },
                   ),
-                );
-        },
-      ),
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

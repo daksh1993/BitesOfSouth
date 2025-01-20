@@ -227,8 +227,6 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
           SnackBar(content: Text("Item added successfully!")),
         );
 
-        final menuProvider = Provider.of<MenuProvider>(context, listen: false);
-        await menuProvider.addMenuItem(newItem);
         Navigator.pop(context);
 
         // Optionally clear fields and image
