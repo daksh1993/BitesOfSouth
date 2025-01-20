@@ -10,11 +10,6 @@ class MenuManagementScreen extends StatefulWidget {
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
-  void initState() {
-    super.initState();
-    // Fetch menu items from Firestore when the screen is initialized
-  }
-
   @override
   void didChangeDependencies() {
     // TODO: implement didChangeDependencies
@@ -64,18 +59,42 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                               ),
                             ),
                             child: GridTile(
-                              child: Container(
-                                color: Colors.black.withOpacity(0.5),
-                                child: Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text(
-                                    menuItem.title,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                              child: Stack(
+                                children: [
+                                  Positioned(
+                                      top: 10,
+                                      child: Container(
+                                        color: Colors.black.withOpacity(0.5),
+                                        height: 50,
+                                      )),
+                                  Container(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            menuItem.title,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "₹" + menuItem.price,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ));

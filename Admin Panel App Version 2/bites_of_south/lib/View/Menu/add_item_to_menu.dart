@@ -205,7 +205,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
       try {
         final ref = FirebaseStorage.instance
             .ref()
-            .child('images/menuItem/${DateTime.now().toString()}');
+            .child('images/testing/${DateTime.now().toString()}');
         _uploadTask = ref.putFile(_image!);
         final snapshot = await _uploadTask!.whenComplete(() => null);
         final imageUrl = await snapshot.ref.getDownloadURL();

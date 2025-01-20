@@ -37,22 +37,4 @@ class MenuProvider with ChangeNotifier {
       print("Error adding item: $e");
     }
   }
-
-  Future<String> uploadImageToStorage(File image) async {
-    try {
-      print("Uploading image from path: ${image.path}");
-
-      final fileName = Uuid().v4();
-      final ref = FirebaseStorage.instance.ref().child('menu_images/$fileName');
-
-      await ref.putFile(image);
-      final downloadUrl = await ref.getDownloadURL();
-
-      print("Download URL: $downloadUrl");
-      return downloadUrl;
-    } catch (e) {
-      print("Error uploading image: $e");
-      throw Exception('Error uploading image: $e');
-    }
-  }
 }
