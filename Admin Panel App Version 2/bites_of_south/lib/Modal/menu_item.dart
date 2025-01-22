@@ -6,6 +6,7 @@ class MenuItem {
   final String description;
   final String makingTime;
   final String category;
+  final String rating;
   final String imageUrl;
 
   MenuItem({
@@ -14,6 +15,7 @@ class MenuItem {
     required this.description,
     required this.makingTime,
     required this.category,
+    required this.rating,
     required this.imageUrl,
   });
 
@@ -27,6 +29,7 @@ class MenuItem {
       makingTime: data['makingTime'],
       category: data['category'],
       imageUrl: data['image'],
+      rating: data['rating'],
     );
   }
 
@@ -39,6 +42,7 @@ class MenuItem {
       'makingTime': makingTime,
       'category': category,
       'image': imageUrl,
+      'rating': rating,
     };
   }
 }

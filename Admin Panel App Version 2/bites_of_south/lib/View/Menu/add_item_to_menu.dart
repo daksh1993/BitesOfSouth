@@ -180,6 +180,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
   final _descriptionController = TextEditingController();
   final _makingTimeController = TextEditingController();
   final _categoryController = TextEditingController();
+  final _ratingController = TextEditingController();
   File? _image;
   UploadTask? _uploadTask;
   final _dbServices = DatabaseServicesMenu();
@@ -216,6 +217,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
             price: _priceController.text,
             description: _descriptionController.text,
             makingTime: _makingTimeController.text,
+            rating: _ratingController.text,
             category: _categoryController.text,
             imageUrl: imageUrl);
 
@@ -318,6 +320,17 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                   }
                   if (int.tryParse(value) == null) {
                     return "Please enter a valid number.";
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                decoration: InputDecoration(labelText: "Rating"),
+                controller: _ratingController,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Please enter a Rating.";
                   }
                   return null;
                 },
