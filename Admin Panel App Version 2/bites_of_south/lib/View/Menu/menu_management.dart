@@ -1,9 +1,8 @@
-import 'package:bites_of_south/Controller/menu_provider.dart';
-import 'package:bites_of_south/Modal/menu_item.dart';
+import 'package:bites_of_south/Modal/item_details.dart';
 import 'package:bites_of_south/View/Menu/add_item_to_menu.dart';
+import 'package:bites_of_south/View/Menu/item_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   @override
@@ -11,7 +10,7 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
-  List<MenuItem> _menuItems = [];
+  List<ItemDetailsModal> _itemDetails = [];
   bool _isLoading = false;
   @override
   void initState() {
@@ -29,8 +28,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       final snapshot =
           await FirebaseFirestore.instance.collection('menu').get();
       setState(() {
-        _menuItems =
-            snapshot.docs.map((doc) => MenuItem.fromFirestore(doc)).toList();
+        _itemDetails = snapshot.docs
+            .map((doc) => ItemDetailsModal.fromFirestore(doc))
+            .toList();
       });
     } catch (e) {
       print("Error fetching items: $e");
@@ -49,7 +49,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         ),
         body: _isLoading
             ? Center(child: CircularProgressIndicator())
-            : _menuItems.isEmpty
+            : _itemDetails.isEmpty
                 ? Center(child: Text("No items available"))
                 : Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -59,12 +59,19 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
                       ),
-                      itemCount: _menuItems.length,
+                      itemCount: _itemDetails.length,
                       itemBuilder: (context, index) {
-                        final menuItem = _menuItems[index];
+                        final menuItem = _itemDetails[index];
                         return GestureDetector(
                           onTap: () {
-                            // Navigate to details screen (not implemented here)
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ItemDetail(
+                                    itemDetailsModal:
+                                        menuItem), // Pass the document ID here
+                              ),
+                            );
                           },
                           child: Container(
                             decoration: BoxDecoration(

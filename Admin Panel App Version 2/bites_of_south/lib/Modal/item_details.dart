@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MenuItem {
+class ItemDetailsModal {
+  final String id;
   final String title;
   final String price;
   final String description;
@@ -9,7 +10,8 @@ class MenuItem {
   final String rating;
   final String imageUrl;
 
-  MenuItem({
+  ItemDetailsModal({
+    this.id = '',
     required this.title,
     required this.price,
     required this.description,
@@ -19,9 +21,11 @@ class MenuItem {
     required this.imageUrl,
   });
 
-  factory MenuItem.fromFirestore(DocumentSnapshot doc) {
+  // Convert Firestore data to MenuItem object
+  factory ItemDetailsModal.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
-    return MenuItem(
+    return ItemDetailsModal(
+      id: doc.id,
       title: data['title'],
       price: data['price'],
       description: data['description'],
