@@ -1,4 +1,4 @@
-import 'package:bites_of_south/Modal/item_details.dart';
+import 'package:bites_of_south/Modal/item_details_modal.dart';
 import 'package:bites_of_south/View/Menu/add_item_to_menu.dart';
 import 'package:bites_of_south/View/Menu/item_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ItemDetailsModal {
   final String id;
-  final String title;
-  final String price;
-  final String description;
-  final String makingTime;
-  final String category;
-  final String rating;
-  final String imageUrl;
+  String title;
+  String price;
+  String description;
+  String makingTime;
+  String category;
+  String rating;
+  String imageUrl;
 
   ItemDetailsModal({
     this.id = '',
