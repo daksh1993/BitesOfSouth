@@ -25,8 +25,9 @@ class _ItemDetailState extends State<ItemDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // ignore: unnecessary_null_comparison
               _itemData.imageUrl != null
-                  ? Image.network(_itemData.imageUrl!,
+                  ? Image.network(_itemData.imageUrl,
                       height: MediaQuery.of(context).size.height * 0.45,
                       width: double.infinity,
                       fit: BoxFit.cover)
@@ -37,18 +38,18 @@ class _ItemDetailState extends State<ItemDetail> {
                     ),
               const SizedBox(height: 16),
               Text(
-                _itemData.title ?? 'No Title',
+                _itemData.title,
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                "₹${_itemData.price ?? '0'}",
+                "₹${_itemData.price}",
                 style: const TextStyle(fontSize: 20, color: Colors.green),
               ),
               const SizedBox(height: 16),
               Text(
-                _itemData.description ?? 'No Description',
+                _itemData.description,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
