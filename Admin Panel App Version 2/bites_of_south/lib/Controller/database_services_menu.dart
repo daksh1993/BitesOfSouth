@@ -6,6 +6,7 @@ class DatabaseServicesMenu {
 
   create(MenuItem item) async {
     try {
+      print("In database Services");
       await _firestore.collection('menu').add(item.toMap());
       print("Item added successfully from database_services_menu.dart");
     } catch (e) {

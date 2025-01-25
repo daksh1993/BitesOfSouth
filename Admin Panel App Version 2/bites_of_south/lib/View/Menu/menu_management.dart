@@ -68,6 +68,20 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    _fetchMenuItems();
+  }
+
+  @override
+  void didUpdateWidget(covariant MenuManagementScreen oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    _fetchMenuItems();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -75,21 +89,47 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         actions: [
           if (_isSelectionMode)
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: Icon(Icons.delete_forever),
               onPressed: _selectedItems.isEmpty
                   ? null
                   : () {
                       _deleteSelectedItems();
                     },
             ),
-          IconButton(
-            icon: Icon(_isSelectionMode ? Icons.close : Icons.select_all),
-            onPressed: () {
-              setState(() {
-                _isSelectionMode = !_isSelectionMode;
-                if (!_isSelectionMode) _selectedItems.clear();
-              });
-            },
+          // IconButton(
+          //   icon: Icon(_isSelectionMode ? Icons.close : Icons.select_all),
+          //   onPressed: () {
+          //     setState(() {
+          //       _isSelectionMode = !_isSelectionMode;
+          //       if (!_isSelectionMode) _selectedItems.clear();
+          //     });
+          //   },
+          // ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _isSelectionMode
+                ? IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      setState(() {
+                        _isSelectionMode = false;
+                        _selectedItems.clear();
+                      });
+                    },
+                  )
+                : GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isSelectionMode = true;
+                      });
+                    },
+                    child: Text(
+                      "Select",
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: MediaQuery.of(context).size.width * 0.038),
+                    ),
+                  ),
           ),
         ],
       ),
