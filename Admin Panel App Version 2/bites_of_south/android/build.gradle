@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         // Add this line for Android Gradle Plugin version 8.2.1
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.8.0'
         
         // Other dependencies (e.g., Kotlin or other plugin dependencies)
     }

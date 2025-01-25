@@ -13,7 +13,7 @@ class ItemDetail extends StatefulWidget {
 class _ItemDetailState extends State<ItemDetail> {
   @override
   Widget build(BuildContext context) {
-    ItemDetailsModal _itemData = widget.itemDetailsModal;
+    ItemDetailsModal itemData = widget.itemDetailsModal;
 
     return Scaffold(
       appBar: AppBar(
@@ -26,8 +26,8 @@ class _ItemDetailState extends State<ItemDetail> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ignore: unnecessary_null_comparison
-              _itemData.imageUrl != null
-                  ? Image.network(_itemData.imageUrl,
+              itemData.imageUrl != null
+                  ? Image.network(itemData.imageUrl,
                       height: MediaQuery.of(context).size.height * 0.45,
                       width: double.infinity,
                       fit: BoxFit.cover)
@@ -38,33 +38,33 @@ class _ItemDetailState extends State<ItemDetail> {
                     ),
               const SizedBox(height: 16),
               Text(
-                _itemData.title,
+                itemData.title,
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                "₹${_itemData.price}",
+                "₹${itemData.price}",
                 style: const TextStyle(fontSize: 20, color: Colors.green),
               ),
               const SizedBox(height: 16),
               Text(
-                _itemData.description,
+                itemData.description,
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 16),
               Text(
-                "Category: ${_itemData.category ?? 'Unknown'}",
+                "Category: ${itemData.category ?? 'Unknown'}",
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
-                "Making Time: ${_itemData.makingTime ?? 'Unknown'}",
+                "Making Time: ${itemData.makingTime ?? 'Unknown'}",
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
-                "Rating: ${_itemData.rating ?? '0'}",
+                "Rating: ${itemData.rating ?? '0'}",
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -73,7 +73,7 @@ class _ItemDetailState extends State<ItemDetail> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showEditDialog(context, _itemData);
+          _showEditDialog(context, itemData);
         },
         child: const Icon(Icons.edit),
       ),
@@ -84,15 +84,15 @@ class _ItemDetailState extends State<ItemDetail> {
     final TextEditingController titleController =
         TextEditingController(text: itemData.title);
     final TextEditingController priceController =
-        TextEditingController(text: itemData.price?.toString());
+        TextEditingController(text: itemData.price.toString());
     final TextEditingController descriptionController =
         TextEditingController(text: itemData.description);
     final TextEditingController categoryController =
         TextEditingController(text: itemData.category);
     final TextEditingController makingTimeController =
-        TextEditingController(text: itemData.makingTime?.toString());
+        TextEditingController(text: itemData.makingTime.toString());
     final TextEditingController ratingController =
-        TextEditingController(text: itemData.rating?.toString());
+        TextEditingController(text: itemData.rating.toString());
 
     showDialog(
       context: context,

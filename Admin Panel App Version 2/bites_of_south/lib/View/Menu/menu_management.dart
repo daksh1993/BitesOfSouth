@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class MenuManagementScreen extends StatefulWidget {
+  const MenuManagementScreen({super.key});
+
   @override
   _MenuManagementScreenState createState() => _MenuManagementScreenState();
 }
@@ -13,7 +15,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   List<ItemDetailsModal> _itemDetails = [];
   bool _isLoading = false;
   bool _isSelectionMode = false;
-  Set<String> _selectedItems = {};
+  final Set<String> _selectedItems = {};
 
   @override
   void initState() {
@@ -68,20 +70,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    _fetchMenuItems();
-  }
-
-  @override
-  void didUpdateWidget(covariant MenuManagementScreen oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-    _fetchMenuItems();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -127,7 +115,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       "Select",
                       style: TextStyle(
                           fontWeight: FontWeight.normal,
-                          fontSize: MediaQuery.of(context).size.width * 0.038),
+                          fontSize: MediaQuery.of(context).size.height * 0.02),
                     ),
                   ),
           ),
@@ -216,7 +204,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "₹" + menuItem.price,
+                                      "₹${menuItem.price}",
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

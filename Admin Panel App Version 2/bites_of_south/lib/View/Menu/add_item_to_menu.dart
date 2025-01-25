@@ -23,6 +23,8 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
   File? _image;
   UploadTask? _uploadTask;
   final _dbServices = DatabaseServicesMenu();
+  double _progress = 0.0;
+  bool _isUploading = false;
 
   Future<void> _pickImage() async {
     final picture = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -42,11 +44,24 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
         return;
       }
 
+      setState(() {
+        _isUploading = true; // Start uploading state
+      });
+
       try {
         final ref = FirebaseStorage.instance
             .ref()
             .child('images/testing/${DateTime.now().toString()}');
         _uploadTask = ref.putFile(_image!);
+
+        // Listen to upload progress
+        _uploadTask!.snapshotEvents.listen((event) {
+          final progress = event.bytesTransferred / event.totalBytes;
+          setState(() {
+            _progress = progress; // Update progress
+          });
+        });
+
         final snapshot = await _uploadTask!.whenComplete(() => null);
         final imageUrl = await snapshot.ref.getDownloadURL();
 
@@ -62,15 +77,13 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
 
         _dbServices.create(newItem);
 
-        // Save item details to Firestore or other backend logic here.
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Item added successfully!")),
         );
 
         Navigator.pop(context);
 
-        // Optionally clear fields and image
+        // Clear fields and reset state
         _titleController.clear();
         _priceController.clear();
         _descriptionController.clear();
@@ -78,8 +91,13 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
         _categoryController.clear();
         setState(() {
           _image = null;
+          _isUploading = false;
+          _progress = 0.0;
         });
       } catch (e) {
+        setState(() {
+          _isUploading = false; // End uploading state on error
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error uploading item: $e")),
         );
@@ -93,106 +111,134 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
       appBar: AppBar(
         title: Text("Add New Menu Item"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: _image == null
-                    ? Container(
-                        height: 200,
-                        color: Colors.grey[200],
-                        child: Center(child: Text("Pick Image")),
-                      )
-                    : Image.file(
-                        _image!,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: _image == null
+                        ? Container(
+                            height: 200,
+                            color: Colors.grey[200],
+                            child: Center(child: Text("Pick Image")),
+                          )
+                        : Image.file(
+                            _image!,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Title"),
+                    controller: _titleController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a title.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Price"),
+                    controller: _priceController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a price.";
+                      }
+                      if (double.tryParse(value) == null) {
+                        return "Please enter a valid number.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Description"),
+                    controller: _descriptionController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a description.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration:
+                        InputDecoration(labelText: "Making Time (mins)"),
+                    controller: _makingTimeController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter making time.";
+                      }
+                      if (int.tryParse(value) == null) {
+                        return "Please enter a valid number.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Rating"),
+                    controller: _ratingController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a Rating.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "Category"),
+                    controller: _categoryController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter a category.";
+                      }
+                      return null;
+                    },
+                    enabled: !_isUploading,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _isUploading ? null : _uploadItem,
+                    child: Text("Add Item"),
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Title"),
-                controller: _titleController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a title.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Price"),
-                controller: _priceController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a price.";
-                  }
-                  if (double.tryParse(value) == null) {
-                    return "Please enter a valid number.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Description"),
-                controller: _descriptionController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a description.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Making Time (mins)"),
-                controller: _makingTimeController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter making time.";
-                  }
-                  if (int.tryParse(value) == null) {
-                    return "Please enter a valid number.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Rating"),
-                controller: _ratingController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a Rating.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                decoration: InputDecoration(labelText: "Category"),
-                controller: _categoryController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Please enter a category.";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _uploadItem,
-                child: Text("Add Item"),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (_isUploading)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: _progress,
+                    strokeWidth: 6.0,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "${(_progress * 100).toStringAsFixed(0)}%",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }
