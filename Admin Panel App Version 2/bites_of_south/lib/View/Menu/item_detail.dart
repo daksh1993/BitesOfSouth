@@ -54,17 +54,17 @@ class _ItemDetailState extends State<ItemDetail> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Category: ${itemData.category ?? 'Unknown'}",
+                "Category: ${itemData.category}",
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
-                "Making Time: ${itemData.makingTime ?? 'Unknown'}",
+                "Making Time: ${itemData.makingTime}",
                 style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 8),
               Text(
-                "Rating: ${itemData.rating ?? '0'}",
+                "Rating: ${itemData.rating}",
                 style: const TextStyle(fontSize: 16),
               ),
             ],

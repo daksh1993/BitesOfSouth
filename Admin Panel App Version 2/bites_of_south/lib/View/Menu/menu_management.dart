@@ -3,6 +3,7 @@ import 'package:bites_of_south/View/Menu/add_item_to_menu.dart';
 import 'package:bites_of_south/View/Menu/item_detail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
@@ -122,7 +123,13 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.2,
+                width: MediaQuery.of(context).size.height * 0.2,
+                child: Lottie.asset('assets/loadin.json'),
+              ),
+            )
           : _itemDetails.isEmpty
               ? Center(child: Text("No items available"))
               : Padding(
@@ -162,10 +169,13 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(19),
+                                    topRight: Radius.circular(18)),
                                 image: DecorationImage(
-                                  image: NetworkImage(menuItem.imageUrl),
+                                  image: NetworkImage(
+                                    menuItem.imageUrl,
+                                  ),
                                   fit: BoxFit.cover,
                                 ),
                               ),
