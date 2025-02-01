@@ -19,12 +19,23 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
   final _priceController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _makingTimeController = TextEditingController();
-  final _categoryController = TextEditingController();
   final _ratingController = TextEditingController();
   File? _image;
   UploadTask? _uploadTask;
   final _dbServices = DatabaseServicesMenu();
   bool _isLoading = false;
+
+  // Category options for the dropdown
+  List<String> _categories = [
+    'Dosa',
+    'Uttapam',
+    'Idli & Vada',
+    'Thali',
+    'Special Dosa',
+    'Rasam Rice',
+    'Beverage'
+  ];
+  String? _selectedCategory;
 
   Future<void> _pickImage() async {
     final picture = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -62,12 +73,11 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
             description: _descriptionController.text,
             makingTime: _makingTimeController.text,
             rating: _ratingController.text,
-            category: _categoryController.text,
+            category:
+                _selectedCategory ?? 'Uncategorized', // Use selected category
             imageUrl: imageUrl);
 
         _dbServices.create(newItem);
-
-        // Save item details to Firestore or other backend logic here.
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Item added successfully!")),
@@ -75,12 +85,11 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
 
         Navigator.pop(context);
 
-        // Optionally clear fields and image
         _titleController.clear();
         _priceController.clear();
         _descriptionController.clear();
         _makingTimeController.clear();
-        _categoryController.clear();
+        _ratingController.clear();
         setState(() {
           _image = null;
         });
@@ -104,10 +113,14 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
       ),
       body: _isLoading
           ? Center(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.2,
-                width: MediaQuery.of(context).size.height * 0.2,
-                child: Lottie.asset('assets/loadin.json'),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    width: MediaQuery.of(context).size.height * 0.2,
+                    child: Lottie.asset('assets/loadin.json'),
+                  ),
+                ],
               ),
             )
           : Padding(
@@ -198,22 +211,32 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                       enabled: !_isLoading,
                     ),
                     SizedBox(height: 16),
-                    TextFormField(
+                    // Dropdown for category
+                    DropdownButtonFormField<String>(
                       decoration: InputDecoration(labelText: "Category"),
-                      controller: _categoryController,
+                      value: _selectedCategory,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedCategory = newValue;
+                        });
+                      },
+                      items: _categories
+                          .map((category) => DropdownMenuItem(
+                                value: category,
+                                child: Text(category),
+                              ))
+                          .toList(),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return "Please enter a category.";
+                          return "Please select a category.";
                         }
                         return null;
                       },
-                      enabled: !_isLoading,
+                      enableFeedback: !_isLoading,
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : _uploadItem, // Disable button during upload
+                      onPressed: _isLoading ? null : _uploadItem,
                       child: Text("Add Item"),
                     ),
                   ],

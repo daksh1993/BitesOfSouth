@@ -32,7 +32,6 @@ class MenuItem {
     );
   }
 
-  // Convert MenuItem object to Firestore data
   Map<String, dynamic> toMap() {
     return {
       'title': title,

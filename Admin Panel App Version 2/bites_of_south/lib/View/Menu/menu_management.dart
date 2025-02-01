@@ -14,14 +14,23 @@ class MenuManagementScreen extends StatefulWidget {
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
   List<ItemDetailsModal> _itemDetails = [];
+  List<ItemDetailsModal> _filteredItems = [];
   bool _isLoading = false;
   bool _isSelectionMode = false;
   final Set<String> _selectedItems = {};
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchMenuItems();
+    _searchController.addListener(_filterItems);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchMenuItems() async {
@@ -36,6 +45,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         _itemDetails = snapshot.docs
             .map((doc) => ItemDetailsModal.fromFirestore(doc))
             .toList();
+        _filteredItems = List.from(_itemDetails);
       });
     } catch (e) {
       print("Error fetching items: $e");
@@ -44,6 +54,16 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  void _filterItems() {
+    setState(() {
+      _filteredItems = _itemDetails
+          .where((item) => item.title
+              .toLowerCase()
+              .contains(_searchController.text.toLowerCase()))
+          .toList();
+    });
   }
 
   Future<void> _deleteSelectedItems() async {
@@ -85,15 +105,6 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       _deleteSelectedItems();
                     },
             ),
-          // IconButton(
-          //   icon: Icon(_isSelectionMode ? Icons.close : Icons.select_all),
-          //   onPressed: () {
-          //     setState(() {
-          //       _isSelectionMode = !_isSelectionMode;
-          //       if (!_isSelectionMode) _selectedItems.clear();
-          //     });
-          //   },
-          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: _isSelectionMode
@@ -121,6 +132,25 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                   ),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(56.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: "Search menu items...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+        ),
       ),
       body: _isLoading
           ? Center(
@@ -130,7 +160,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                 child: Lottie.asset('assets/loadin.json'),
               ),
             )
-          : _itemDetails.isEmpty
+          : _filteredItems.isEmpty
               ? Center(child: Text("No items available"))
               : Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -140,9 +170,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
                     ),
-                    itemCount: _itemDetails.length,
+                    itemCount: _filteredItems.length,
                     itemBuilder: (context, index) {
-                      final menuItem = _itemDetails[index];
+                      final menuItem = _filteredItems[index];
                       final isSelected = _selectedItems.contains(menuItem.id);
 
                       return GestureDetector(
