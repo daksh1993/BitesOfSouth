@@ -1,4 +1,5 @@
 import 'package:bites_of_south/Modal/item_details_modal.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -27,10 +28,24 @@ class _ItemDetailState extends State<ItemDetail> {
             children: [
               // ignore: unnecessary_null_comparison
               itemData.imageUrl != null
-                  ? Image.network(itemData.imageUrl,
-                      height: MediaQuery.of(context).size.height * 0.45,
-                      width: double.infinity,
-                      fit: BoxFit.cover)
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: CachedNetworkImage(
+                        imageUrl: itemData.imageUrl,
+                        height: MediaQuery.of(context).size.height * 0.45,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: MediaQuery.of(context).size.height * 0.45,
+                          width: double.infinity,
+                          color: Colors.grey[300],
+                          child: Center(child: Text("Image Load Failed")),
+                        ),
+                      ),
+                    )
                   : Container(
                       height: 200,
                       color: Colors.grey[300],
