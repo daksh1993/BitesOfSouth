@@ -105,8 +105,22 @@ class _ItemDetailState extends State<ItemDetail> {
         TextEditingController(text: itemData.price.toString());
     final TextEditingController descriptionController =
         TextEditingController(text: itemData.description);
-    final TextEditingController categoryController =
-        TextEditingController(text: itemData.category);
+    List<String> categories = [
+      'Default',
+      'Dosa',
+      'Uttapam',
+      'Idli & Vada',
+      'Thali',
+      'Special Dosa',
+      'Rasam Rice',
+      'Beverage'
+    ];
+
+    String selectedCategory =
+        categories.contains(itemData.category) ? itemData.category : 'Default';
+
+    // final TextEditingController categoryController =
+    //     TextEditingController(text: itemData.category);
     final TextEditingController makingTimeController =
         TextEditingController(text: itemData.makingTime.toString());
     final TextEditingController ratingController =
@@ -134,9 +148,18 @@ class _ItemDetailState extends State<ItemDetail> {
                   controller: descriptionController,
                   decoration: const InputDecoration(labelText: "Description"),
                 ),
-                TextField(
-                  controller: categoryController,
-                  decoration: const InputDecoration(labelText: "Category"),
+                DropdownButtonFormField<String>(
+                  value: selectedCategory,
+                  items: categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    selectedCategory = value!;
+                  },
+                  decoration: InputDecoration(labelText: "Category"),
                 ),
                 TextField(
                   controller: makingTimeController,
@@ -163,7 +186,7 @@ class _ItemDetailState extends State<ItemDetail> {
                   'title': titleController.text,
                   'price': (priceController.text),
                   'description': descriptionController.text,
-                  'category': categoryController.text,
+                  'category': selectedCategory ?? 'Default',
                   'makingTime': (makingTimeController.text),
                   'rating': (ratingController.text),
                 };
