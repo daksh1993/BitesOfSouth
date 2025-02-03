@@ -142,6 +142,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
+                hintStyle: TextStyle(fontSize: 14),
                 hintText: "Search menu items...",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
@@ -254,7 +255,8 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                               menuItem.title,
                                               style: TextStyle(
                                                 fontSize: 18,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.w500,
+                                                fontWeight: FontWeight.normal,
                                               ),
                                             ),
                                             Text(
@@ -262,7 +264,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey,
-                                                fontWeight: FontWeight.bold,
+                                                // fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ],
