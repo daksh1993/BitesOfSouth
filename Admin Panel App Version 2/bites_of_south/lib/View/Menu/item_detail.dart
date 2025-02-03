@@ -17,7 +17,9 @@ class _ItemDetailState extends State<ItemDetail> {
     ItemDetailsModal itemData = widget.itemDetailsModal;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text("Item Detail"),
       ),
       body: Padding(
@@ -87,6 +89,7 @@ class _ItemDetailState extends State<ItemDetail> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.grey[100],
         onPressed: () {
           _showEditDialog(context, itemData);
         },

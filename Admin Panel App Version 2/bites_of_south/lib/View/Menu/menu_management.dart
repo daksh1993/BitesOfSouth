@@ -96,7 +96,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        // backgroundColor: Colors.white,
         title: Text("Menu Management"),
         actions: [
           if (_isSelectionMode)
@@ -144,7 +144,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               decoration: InputDecoration(
                 hintStyle: TextStyle(fontSize: 14),
                 hintText: "Search menu items...",
-                prefixIcon: Icon(Icons.search),
+                suffixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(18.0),
                   borderSide: BorderSide.none,
