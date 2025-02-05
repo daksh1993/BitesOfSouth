@@ -5,7 +5,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
+// MenuManagementScreen is a StatefulWidget that manages the menu items.
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({super.key});
 
@@ -14,22 +16,36 @@ class MenuManagementScreen extends StatefulWidget {
 }
 
 class _MenuManagementScreenState extends State<MenuManagementScreen> {
+  // List to store all menu items fetched from Firestore.
   List<ItemDetailsModal> _itemDetails = [];
+
+  // Map to group menu items by their category.
   Map<String, List<ItemDetailsModal>> _groupedItems = {};
+
+  // Boolean to track if data is being loaded.
   bool _isLoading = false;
+
+  // Boolean to track if the selection mode is active (for deleting items).
   bool _isSelectionMode = false;
+
+  // Set to store the IDs of selected items for deletion.
   final Set<String> _selectedItems = {};
+
+  // Controller for the search text field.
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    // Fetch menu items when the widget is initialized.
     _fetchMenuItems();
+    // Add a listener to the search controller to filter items based on search text.
     _searchController.addListener(_filterItems);
   }
 
   @override
   void dispose() {
+    // Dispose the search controller to avoid memory leaks.
     _searchController.dispose();
     super.dispose();
   }
@@ -37,21 +53,26 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchMenuItems(); // Automatically refreshes when returning to this page
+    // Fetch menu items again when dependencies change.
+    _fetchMenuItems();
   }
 
+  // Function to fetch menu items from Firestore.
   Future<void> _fetchMenuItems() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
+      // Fetch all documents from the 'menu' collection in Firestore.
       final snapshot =
           await FirebaseFirestore.instance.collection('menu').get();
       setState(() {
+        // Convert Firestore documents to ItemDetailsModal objects.
         _itemDetails = snapshot.docs
             .map((doc) => ItemDetailsModal.fromFirestore(doc))
             .toList();
+        // Group the items by their category.
         _groupItemsByCategory();
       });
     } catch (e) {
@@ -63,6 +84,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     }
   }
 
+  // Function to group menu items by their category.
   void _groupItemsByCategory() {
     _groupedItems.clear();
     for (var item in _itemDetails) {
@@ -74,11 +96,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     }
   }
 
+  // Function to filter menu items based on the search text.
   void _filterItems() {
     setState(() {
       if (_searchController.text.isEmpty) {
+        // If the search text is empty, show all items grouped by category.
         _groupItemsByCategory();
       } else {
+        // Otherwise, filter items that match the search text.
         _groupedItems.clear();
         for (var item in _itemDetails) {
           if (item.title
@@ -95,18 +120,21 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     });
   }
 
+  // Function to delete selected items from Firestore.
   Future<void> _deleteSelectedItems() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
+      // Delete each selected item from Firestore.
       for (String itemId in _selectedItems) {
         await FirebaseFirestore.instance
             .collection('menu')
             .doc(itemId)
             .delete();
       }
+      // Clear the selected items set and refresh the menu items.
       _selectedItems.clear();
       _fetchMenuItems();
     } catch (e) {
@@ -126,6 +154,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       appBar: AppBar(
         title: Text("Menu Management"),
         actions: [
+          // Show delete button if in selection mode.
           if (_isSelectionMode)
             IconButton(
               icon: Icon(Icons.delete_forever),
@@ -135,6 +164,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                       _deleteSelectedItems();
                     },
             ),
+          // Show close button if in selection mode, otherwise show select button.
           _isSelectionMode
               ? IconButton(
                   icon: Icon(Icons.close),
@@ -198,6 +228,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Display the category name.
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
@@ -208,6 +239,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                             ),
                           ),
                         ),
+                        // Display the items in a grid view.
                         GridView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -229,6 +261,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                             return GestureDetector(
                               onTap: _isSelectionMode
                                   ? () {
+                                      // Toggle selection of the item.
                                       setState(() {
                                         if (isSelected) {
                                           _selectedItems.remove(menuItem.id);
@@ -238,6 +271,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                       });
                                     }
                                   : () async {
+                                      // Navigate to the item detail screen.
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -258,6 +292,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        // Display the item image.
                                         Expanded(
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.only(
@@ -290,17 +325,30 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                             ),
                                           ),
                                         ),
+                                        // Display the item title and price.
+
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                menuItem.title,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.normal,
+                                              SizedBox(
+                                                height:
+                                                    25, // Fixed height to keep image height consistent
+                                                child: AutoSizeText(
+                                                  menuItem.title,
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        18, // Default size
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                  maxLines: 1,
+                                                  minFontSize:
+                                                      16, // Minimum size to shrink to
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                               Text(
@@ -316,6 +364,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                                       ],
                                     ),
                                   ),
+                                  // Show a selection indicator if in selection mode.
                                   if (_isSelectionMode)
                                     Positioned(
                                       top: 10,
@@ -341,6 +390,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
                     );
                   }).toList(),
                 ),
+      // Floating action button to add a new item to the menu.
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () {

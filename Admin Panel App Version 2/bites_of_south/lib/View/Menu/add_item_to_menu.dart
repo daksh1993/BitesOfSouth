@@ -61,7 +61,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
       try {
         final ref = FirebaseStorage.instance
             .ref()
-            .child('images/testing/${DateTime.now().toString()}');
+            .child('images/menu/${DateTime.now().toString()}');
         _uploadTask = ref.putFile(_image!);
         final snapshot = await _uploadTask!.whenComplete(() => null);
         final imageUrl = await snapshot.ref.getDownloadURL();
@@ -114,12 +114,15 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
       body: _isLoading
           ? Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.2,
                     width: MediaQuery.of(context).size.height * 0.2,
                     child: Lottie.asset('assets/loadin.json'),
                   ),
+                  Text("Adding Item..."),
                 ],
               ),
             )
@@ -157,6 +160,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                     ),
                     SizedBox(height: 16),
                     TextFormField(
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(labelText: "Price"),
                       controller: _priceController,
                       validator: (value) {
@@ -172,6 +176,8 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                     ),
                     SizedBox(height: 16),
                     TextFormField(
+                      minLines: 2,
+                      maxLines: 4,
                       decoration: InputDecoration(labelText: "Description"),
                       controller: _descriptionController,
                       validator: (value) {
@@ -184,6 +190,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                     ),
                     SizedBox(height: 16),
                     TextFormField(
+                      keyboardType: TextInputType.number,
                       decoration:
                           InputDecoration(labelText: "Making Time (mins)"),
                       controller: _makingTimeController,
@@ -200,6 +207,8 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                     ),
                     SizedBox(height: 16),
                     TextFormField(
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
                       decoration: InputDecoration(labelText: "Rating"),
                       controller: _ratingController,
                       validator: (value) {

@@ -106,7 +106,6 @@ class _ItemDetailState extends State<ItemDetail> {
     final TextEditingController descriptionController =
         TextEditingController(text: itemData.description);
     List<String> categories = [
-      'Default',
       'Dosa',
       'Uttapam',
       'Idli & Vada',
