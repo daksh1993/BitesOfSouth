@@ -1,0 +1,229 @@
+*{
+    padding: 0px;
+    margin: 0px;
+    align-items: center;    
+    
+
+}
+
+.MTitle{
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    margin-top: 35px;
+}
+.MTitle img{
+    width: 25px;
+    height: 25px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.SearchBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 30px;
+}
+.SearchBtn input{
+    align-items: center;
+    text-align: center;
+    background-color: rgb(234, 234, 234);
+    color: gray;
+    cursor: pointer;
+    border: 0px solid transparent;
+    border-radius: 11px;
+    width: 750px;
+    height: 40px;
+}
+.SearchBtn i{
+    margin-left: 10px;
+    color: gray;
+}
+/* .line{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 0.5px;
+    background-color:  rgba(2, 6, 12, 0.15);;
+    width: 50%;
+    margin-top: 25px;
+} */
+
+.line {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 0.5px;
+    background-color: rgba(2, 6, 12, 0.15);
+    width: 50%;
+    margin-top: 25px;
+    margin: 30px auto; /* Center the line */
+}/* General Styles */
+.DishItems {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    margin: 20px auto;
+    max-width: 700px;
+}
+
+.DishItmesPlacement {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+
+}
+
+.LSidePlacement {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0px;
+}
+.ItemType {
+    margin: 0px;
+    padding: 0px;
+}
+.ItemType img {
+    width: 15px;
+    height: 15px;
+}
+
+.itemTitle h3 {
+    font-size: 19px;
+    color: #414448;
+    margin: 0;
+}
+
+.itemPrice h4{
+    font-size: 16px;
+    color: #414448;
+    margin: 0;
+}
+.itemRatings{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+.itemRatings p{
+    margin-left: 5px;
+    color: #414448;
+}
+.itemRatings img {
+
+    width: 15px;
+    height: 15px;
+}
+.itemDescription{
+    margin-top: 5px;
+    max-width: 450px;
+}
+.itemDescription h5 {
+    font-size: 16px;
+    font-weight: 200;
+    color: #666;
+    margin: 0;
+}
+
+.RSidePlacement {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.ItemsImgs img {
+    border-radius: 12px;
+    width: 200px;
+    /* height: 135px; */
+
+}
+
+.AddToCart button {
+    position: absolute;
+    top: 125px;
+    left: 50px;
+    box-shadow: rgba(40, 44, 63, 0.08) 0px 3px 8px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgba(2, 6, 12, 0.15);
+    color: #1BA672;
+    font-weight: 700;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.AddToCart button:hover {
+    background-color: #D9D9DA;
+}
+
+@media (max-width: 768px) {
+    .line{
+        width: 90%;
+    }
+    .DishItmesPlacement{
+        padding: 15px;
+    }
+    .MTitle h3 {
+        font-size: 17px; /* Smaller font size for mobile */
+    }
+    .itemPrice h4{
+        font-size: 15px;
+    }
+    .itemDescription h5 {
+        font-size: 11px;
+
+    }
+    .itemDescription{
+        max-width: 180px;
+    }
+    .SearchBtn{
+        margin-top: 10px;
+        padding: 15px;
+        padding-top: 0px;
+
+    }
+    .SearchBtn input{
+        width: 100%; /* Full width for mobile */
+        font-size: 14px; /* Smaller font size for mobile */
+    }
+
+
+    .LSidePlacement {
+        width: 100%; /* Full width for mobile */
+    }
+
+    .RSidePlacement {
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .ItemsImgs img {
+        max-width: 100%; /* Full width for mobile */
+        width: 250px; /* Full width for mobile */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .AddToCart button {
+        position: absolute; /* Reset position for mobile */
+        /* transform: none; */
+        top: 70px;
+        left: 25px;
+        margin-top: 10px; /* Add spacing for mobile */
+        /* width: 100%; Full width for mobile */
+    }
+}
