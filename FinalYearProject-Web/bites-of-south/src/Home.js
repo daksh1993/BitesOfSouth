@@ -86,7 +86,7 @@ const Home = () => {
           <h3 className="carousel-title">Inspiration for your first order</h3>
           <div className="carousel">
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-pizza">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -98,7 +98,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-biryani">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -110,7 +110,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-chicken">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -122,7 +122,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-burger">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -134,7 +134,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-fried-rice">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -146,7 +146,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/mumbai/delivery/dish-idli">
+              <a className="food-link" href="">
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -184,22 +184,22 @@ const Home = () => {
         <div className="footer-links">
             <ul className="company-links">
                 <li className="link-item"><div className="section-title">Company</div></li>
-                <li className="link-item"><a href="https://www.swiggy.com/about" target="_blank">About Us</a></li>
-                <li className="link-item"><a href="https://www.swiggy.com/support" target="_blank">Help & Support</a></li>
-                <li className="link-item"><a href="https://partner-with-us.swiggy.com/onboard#/swiggy" target="_blank" rel="nofollow noopener">Partner with Us</a></li>
-                <li className="link-item"><a href="https://ride.swiggy.com" target="_blank" rel="nofollow noopener">Contact US</a></li>
+                <li className="link-item"><a href="" target="_blank">About Us</a></li>
+                <li className="link-item"><a href="" target="_blank">Help & Support</a></li>
+                <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Partner with Us</a></li>
+                <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Contact US</a></li>
             </ul>
 
             <ul className="legal-links">
                 <li className="link-item"><div className="section-title">Legal</div></li>
-                <li className="link-item"><a href="https://www.swiggy.com/terms-and-conditions" target="_blank">Terms & Conditions</a></li>
-                <li className="link-item"><a href="https://www.swiggy.com/cookie-policy" target="_blank">Cookie Policy</a></li>
-                <li className="link-item"><a href="https://www.swiggy.com/privacy-policy" target="_blank">Privacy Policy</a></li>
+                <li className="link-item"><a href="" target="_blank">Terms & Conditions</a></li>
+                <li className="link-item"><a href="" target="_blank">Cookie Policy</a></li>
+                <li className="link-item"><a href="" target="_blank">Privacy Policy</a></li>
             </ul>
 
             <ul className="location-links">
                 <li className="link-item"><div className="section-title">Available at:</div></li>
-                <li className="link-item"><a href="/city/bangalore">Mumbai</a></li>
+                <li className="link-item"><a href="">Mumbai</a></li>
             </ul>
 
 
@@ -212,19 +212,19 @@ const Home = () => {
 
             
             <div className="social-links">
-                <a href="https://www.linkedin.com/company/swiggy-in/" target="_blank">
+                <a href="" target="_blank">
                     <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Linkedin.svg" alt="LinkedIn" loading="lazy"/>
                 </a>
-                <a href="https://www.instagram.com/swiggyindia/?hl=en" target="_blank">
+                <a href="" target="_blank">
                     <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-instagram.svg" alt="Instagram" loading="lazy"/>
                 </a>
-                <a href="https://www.facebook.com/swiggy.in/" target="_blank">
+                <a href="" target="_blank">
                     <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-facebook.svg" alt="Facebook" loading="lazy"/>
                 </a>
-                <a href="https://in.pinterest.com/swiggyindia/" target="_blank">
+                <a href="" target="_blank">
                     <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-pinterest.svg" alt="Pinterest" loading="lazy"/>
                 </a>
-                <a href="https://twitter.com/Swiggy?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor" target="_blank">
+                <a href="" target="_blank">
                     <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Twitter.svg" alt="Twitter" loading="lazy"/>
                 </a>
             </div>

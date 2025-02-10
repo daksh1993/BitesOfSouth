@@ -40,7 +40,7 @@ function App() {
             <div class="DishItmesPlacement">
                 <div class="LSidePlacement">
                     <div class="ItemType">
-                        <img src="veg-icon.jpeg" alt="">
+                        <img src="/images/veg-icon.jpeg" alt="veg">
                     </div>
                     <div class="itemTitle">
                         <h3>${data.title}</h3>

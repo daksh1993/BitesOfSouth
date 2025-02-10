@@ -223,172 +223,178 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             )
           : _groupedItems.isEmpty
               ? Center(child: Text("No items available"))
-              : ListView(
-                  children: _groupedItems.entries.map((entry) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Display the category name.
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            entry.key,
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
+              : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView(
+                    children: _groupedItems.entries.map((entry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Display the category name.
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              entry.key,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        // Display the items in a grid view.
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio:
-                                MediaQuery.of(context).size.width /
-                                    (MediaQuery.of(context).size.height / 1.8),
-                          ),
-                          itemCount: entry.value.length,
-                          itemBuilder: (context, index) {
-                            final menuItem = entry.value[index];
-                            final isSelected =
-                                _selectedItems.contains(menuItem.id);
+                          // Display the items in a grid view.
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              childAspectRatio: MediaQuery.of(context)
+                                      .size
+                                      .width /
+                                  (MediaQuery.of(context).size.height / 1.8),
+                            ),
+                            itemCount: entry.value.length,
+                            itemBuilder: (context, index) {
+                              final menuItem = entry.value[index];
+                              final isSelected =
+                                  _selectedItems.contains(menuItem.id);
 
-                            return GestureDetector(
-                              onTap: _isSelectionMode
-                                  ? () {
-                                      // Toggle selection of the item.
-                                      setState(() {
-                                        if (isSelected) {
-                                          _selectedItems.remove(menuItem.id);
-                                        } else {
-                                          _selectedItems.add(menuItem.id);
-                                        }
-                                      });
-                                    }
-                                  : () async {
-                                      // Navigate to the item detail screen.
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ItemDetail(
-                                              itemDetailsModal: menuItem),
-                                        ),
-                                      );
-                                      _fetchMenuItems(); // Refresh after coming back
-                                    },
-                              child: Stack(
-                                children: [
-                                  Card(
-                                    elevation: 4,
-                                    color: Colors.white,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        // Display the item image.
-                                        Expanded(
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(8),
-                                              topRight: Radius.circular(8),
-                                            ),
-                                            child: CachedNetworkImage(
-                                              imageUrl: menuItem.imageUrl,
-                                              fit: BoxFit.cover,
-                                              width: double.infinity,
-                                              height: double.infinity,
-                                              placeholder: (context, url) =>
-                                                  Center(
-                                                child: SizedBox(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.2,
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.2,
-                                                  child: Lottie.asset(
-                                                      'assets/loadin.json'),
-                                                ),
-                                              ),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ),
+                              return GestureDetector(
+                                onTap: _isSelectionMode
+                                    ? () {
+                                        // Toggle selection of the item.
+                                        setState(() {
+                                          if (isSelected) {
+                                            _selectedItems.remove(menuItem.id);
+                                          } else {
+                                            _selectedItems.add(menuItem.id);
+                                          }
+                                        });
+                                      }
+                                    : () async {
+                                        // Navigate to the item detail screen.
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ItemDetail(
+                                                itemDetailsModal: menuItem),
                                           ),
-                                        ),
-                                        // Display the item title and price.
-
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                height:
-                                                    25, // Fixed height to keep image height consistent
-                                                child: AutoSizeText(
-                                                  menuItem.title,
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        18, // Default size
-                                                    fontWeight:
-                                                        FontWeight.normal,
+                                        );
+                                        _fetchMenuItems(); // Refresh after coming back
+                                      },
+                                child: Stack(
+                                  children: [
+                                    Card(
+                                      elevation: 4,
+                                      color: Colors.white,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          // Display the item image.
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(8),
+                                                topRight: Radius.circular(8),
+                                              ),
+                                              child: CachedNetworkImage(
+                                                imageUrl: menuItem.imageUrl,
+                                                fit: BoxFit.cover,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                placeholder: (context, url) =>
+                                                    Center(
+                                                  child: SizedBox(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.2,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.2,
+                                                    child: Lottie.asset(
+                                                        'assets/loadin.json'),
                                                   ),
-                                                  maxLines: 1,
-                                                  minFontSize:
-                                                      16, // Minimum size to shrink to
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
                                               ),
-                                              Text(
-                                                "₹${menuItem.price}",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  // Show a selection indicator if in selection mode.
-                                  if (_isSelectionMode)
-                                    Positioned(
-                                      top: 10,
-                                      right: 10,
-                                      child: CircleAvatar(
-                                        backgroundColor: Colors.white,
-                                        child: Icon(
-                                          isSelected
-                                              ? Icons.check_circle
-                                              : Icons.radio_button_unchecked,
-                                          color: isSelected
-                                              ? Colors.green
-                                              : Colors.grey,
-                                        ),
+                                          // Display the item title and price.
+
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height:
+                                                      25, // Fixed height to keep image height consistent
+                                                  child: AutoSizeText(
+                                                    menuItem.title,
+                                                    style: TextStyle(
+                                                      fontSize:
+                                                          18, // Default size
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                    ),
+                                                    maxLines: 1,
+                                                    minFontSize:
+                                                        16, // Minimum size to shrink to
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "₹${menuItem.price}",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                                    // Show a selection indicator if in selection mode.
+                                    if (_isSelectionMode)
+                                      Positioned(
+                                        top: 10,
+                                        right: 10,
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          child: Icon(
+                                            isSelected
+                                                ? Icons.check_circle
+                                                : Icons.radio_button_unchecked,
+                                            color: isSelected
+                                                ? Colors.green
+                                                : Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
       // Floating action button to add a new item to the menu.
       floatingActionButton: FloatingActionButton(
