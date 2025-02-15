@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:bites_of_south/Controller/database_services_menu.dart';
 import 'package:bites_of_south/Modal/menu_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -32,10 +33,28 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
     'Idli & Vada',
     'Thali',
     'Special Dosa',
-    'Rasam Rice',
     'Beverage'
   ];
   String? _selectedCategory;
+
+  Future<void> addAvailabilityToExistingDocuments() async {
+    final CollectionReference menuCollection =
+        FirebaseFirestore.instance.collection('menu');
+
+    try {
+      // Fetch all documents in the menu collection
+      QuerySnapshot querySnapshot = await menuCollection.get();
+
+      for (var doc in querySnapshot.docs) {
+        // Update each document to include the new field
+        await menuCollection.doc(doc.id).update({'availability': true});
+      }
+
+      print("Successfully updated all documents!");
+    } catch (e) {
+      print("Error updating documents: $e");
+    }
+  }
 
   Future<void> _pickImage() async {
     final picture = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -245,6 +264,9 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
                     ),
                     SizedBox(height: 20),
                     ElevatedButton(
+                      // onPressed: (){
+                      //   addAvailabilityToExistingDocuments();
+                      // },
                       onPressed: _isLoading ? null : _uploadItem,
                       child: Text("Add Item"),
                     ),

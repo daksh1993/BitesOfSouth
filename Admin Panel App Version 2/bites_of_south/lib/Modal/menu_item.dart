@@ -8,6 +8,7 @@ class MenuItem {
   final String category;
   final String rating;
   final String imageUrl;
+  final bool availability; // New field
 
   MenuItem({
     required this.title,
@@ -17,6 +18,7 @@ class MenuItem {
     required this.category,
     required this.rating,
     required this.imageUrl,
+     this.availability = true, // Default value
   });
 
   factory MenuItem.fromFirestore(DocumentSnapshot doc) {
@@ -29,6 +31,7 @@ class MenuItem {
       category: data['category'],
       imageUrl: data['image'],
       rating: data['rating'],
+      availability: data['availability'] ?? true, // Handle missing field
     );
   }
 
@@ -41,6 +44,7 @@ class MenuItem {
       'category': category,
       'image': imageUrl,
       'rating': rating,
+      'availability': availability, // Include in Firestore
     };
   }
 }

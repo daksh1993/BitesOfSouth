@@ -12,6 +12,13 @@ class ItemDetail extends StatefulWidget {
 }
 
 class _ItemDetailState extends State<ItemDetail> {
+  late bool isAvailable; // Store current availability status
+  @override
+  void initState() {
+    super.initState();
+    isAvailable = widget.itemDetailsModal.isAvailable;
+  }
+
   @override
   Widget build(BuildContext context) {
     ItemDetailsModal itemData = widget.itemDetailsModal;
@@ -34,7 +41,7 @@ class _ItemDetailState extends State<ItemDetail> {
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         imageUrl: itemData.imageUrl,
-                        height: MediaQuery.of(context).size.height * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.40,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Center(
@@ -84,6 +91,17 @@ class _ItemDetailState extends State<ItemDetail> {
                 "Rating: ${itemData.rating}",
                 style: const TextStyle(fontSize: 16),
               ),
+              SwitchListTile(
+                title: Text("Item Availability"),
+                subtitle: Text(isAvailable ? "Enabled" : "Disabled"),
+                value: isAvailable,
+                activeColor: Colors.green,
+                inactiveThumbColor: Colors.red,
+                contentPadding: const EdgeInsets.all(0),
+                onChanged: (value) {
+                  _confirmAvailabilityChange(context, value);
+                },
+              ),
             ],
           ),
         ),
@@ -96,6 +114,52 @@ class _ItemDetailState extends State<ItemDetail> {
         child: const Icon(Icons.edit),
       ),
     );
+  }
+
+  void _confirmAvailabilityChange(BuildContext context, bool newValue) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Confirm Change"),
+        content: Text(
+            "Are you sure you want to ${newValue ? 'enable' : 'disable'} this item?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context); // Close dialog
+              await _updateAvailability(newValue);
+            },
+            child: Text("Confirm"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Update Firestore
+  Future<void> _updateAvailability(bool newValue) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('menu')
+          .doc(widget.itemDetailsModal.id)
+          .update({'isAvailable': newValue});
+
+      setState(() {
+        isAvailable = newValue; // Update UI
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Availability updated successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error updating availability: $e")),
+      );
+    }
   }
 
   void _showEditDialog(BuildContext context, ItemDetailsModal itemData) {
@@ -111,7 +175,6 @@ class _ItemDetailState extends State<ItemDetail> {
       'Idli & Vada',
       'Thali',
       'Special Dosa',
-      'Rasam Rice',
       'Beverage'
     ];
 

@@ -9,6 +9,7 @@ class ItemDetailsModal {
   String category;
   String rating;
   String imageUrl;
+  bool isAvailable; // New Field
 
   ItemDetailsModal({
     this.id = '',
@@ -19,9 +20,9 @@ class ItemDetailsModal {
     required this.category,
     required this.rating,
     required this.imageUrl,
+    this.isAvailable = true, // Default to true (Available)
   });
 
-  // Convert Firestore data to MenuItem object
   factory ItemDetailsModal.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
     return ItemDetailsModal(
@@ -33,10 +34,10 @@ class ItemDetailsModal {
       category: data['category'],
       imageUrl: data['image'],
       rating: data['rating'],
+      isAvailable: data.containsKey('isAvailable') ? data['isAvailable'] : true,
     );
   }
 
-  // Convert MenuItem object to Firestore data
   Map<String, dynamic> toMap() {
     return {
       'title': title,
@@ -46,6 +47,7 @@ class ItemDetailsModal {
       'category': category,
       'image': imageUrl,
       'rating': rating,
+      'isAvailable': isAvailable, // Add to Firestore
     };
   }
 }
