@@ -1,4 +1,6 @@
 import 'package:bites_of_south/View/Menu/menu_management.dart';
+import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
+import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:bites_of_south/main.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +15,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              // Navigate to profile screen
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      ProfileScreen(), // Replace with your profile screen
+                ),
+              );
+            },
+          )
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -40,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   3,
                   MyHomePage(title: "title"),
                 ),
-                customContainer("Rewards", 4, MyHomePage(title: "title")),
+                customContainer("Rewards", 4, RewardsPanel()),
               ],
             ),
           ],

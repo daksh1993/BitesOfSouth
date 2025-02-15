@@ -146,14 +146,17 @@ class _ItemDetailState extends State<ItemDetail> {
       await FirebaseFirestore.instance
           .collection('menu')
           .doc(widget.itemDetailsModal.id)
-          .update({'isAvailable': newValue});
+          .update({'availability': newValue});
 
       setState(() {
         isAvailable = newValue; // Update UI
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Availability updated successfully!")),
+        SnackBar(
+            content: Text("Availability updated to " +
+                (isAvailable ? "Enabled" : "Disabled") +
+                " successfully!")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
