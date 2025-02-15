@@ -1,5 +1,5 @@
 import 'package:bites_of_south/Controller/menu_provider.dart';
-import 'package:bites_of_south/View/Authentication/emailScreen.dart';
+import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
 import 'package:bites_of_south/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: DashboardScreen(),
-      home: EmailVerification(),
+      home: LoginScreen(),
     );
   }
 }

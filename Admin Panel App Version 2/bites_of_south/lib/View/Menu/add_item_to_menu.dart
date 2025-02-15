@@ -277,3 +277,9 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
     );
   }
 }
+/// This file contains the implementation of a Flutter widget that allows users to add a new item to the menu.
+/// It includes a form with fields for the item's title, price, description, making time, rating, and category.
+/// Users can also pick an image for the item from their gallery.
+/// The form validates the input and uploads the item details along with the image to Firebase Firestore and Firebase Storage.
+/// Additionally, there is a method to update existing documents in the Firestore collection to include an 'availability' field.
+

@@ -1,3 +1,4 @@
+import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -50,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
                   // Add your logout functionality here
                 },
                 child: Text('Logout'),
