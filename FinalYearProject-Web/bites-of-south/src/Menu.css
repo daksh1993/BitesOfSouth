@@ -13,6 +13,16 @@
     justify-content: center;
     margin-top: 35px;
 }
+.MHead{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.MHead a{
+    margin-left: 120px;
+    top: 40px;
+    position: absolute;
+}
 .MTitle img{
     width: 25px;
     height: 25px;

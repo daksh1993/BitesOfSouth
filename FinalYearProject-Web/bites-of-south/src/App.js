@@ -4,6 +4,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./Home"; // Import Home Component
 import Menu from "./Menu" // menu import 
+import Cart from './Cart';
 // import About from "./About"; 
 
 const App = () => {
@@ -13,6 +14,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path='/menu' element={<Menu />} />
+        <Route path='/cart' element={<Cart />} />
         {/* <Route path="/about" element={<About />} /> */}
       </Routes>
     </Router>

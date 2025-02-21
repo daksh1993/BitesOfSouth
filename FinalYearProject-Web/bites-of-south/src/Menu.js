@@ -77,7 +77,8 @@ function App() {
       <div className="MTitle">
         <div className="LArt"></div>
         <div className="MHead">
-          <h3>⤛  Menu  ⤜</h3>
+         <div> <h2>  Menu  </h2></div>
+          <div> <a href='/Cart'><i class="fa-solid fa-cart-shopping"></i></a></div>
         </div>
         <div className="RArt"></div>
       </div>
