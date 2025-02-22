@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import './Cart.css'; // Import your CSS file for styling
 import { getDocs, collection, updateDoc, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+import './Cart.css'; // Import your CSS file for styling
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
@@ -19,7 +18,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -27,31 +25,30 @@ const Cart = () => {
   const [gst, setGst] = useState(0);
   const [serviceCharge, setServiceCharge] = useState(0);
 
+  // Function to update total price, GST, and service charge dynamically
+  useEffect(() => {
+    let itemTotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    let gst = itemTotal * 0.10; // 10% GST
+    let serviceCharge = itemTotal * 0.05; // 5% Service Charge
+    let total = itemTotal + gst + serviceCharge;
+
+    setItemTotal(itemTotal);
+    setGst(gst);
+    setServiceCharge(serviceCharge);
+    setTotalPrice(total);
+  }, [cartItems]);
+
   // Function to load cart items
   const loadCart = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "cart"));
-      const items = [];
-      let totalPrice = 0;
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const itemId = doc.id;
-        const itemTotalPrice = data.price * data.quantity;
-        totalPrice += itemTotalPrice;
-
-        items.push({
-          id: itemId,
-          title: data.title,
-          price: data.price,
-          quantity: data.quantity,
-          totalPrice: itemTotalPrice,
-        });
-      });
+      const items = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        totalPrice: doc.data().price * doc.data().quantity
+      }));
 
       setCartItems(items);
-      setTotalPrice(totalPrice);
-      updateTotalPrice(totalPrice);
     } catch (error) {
       console.error("❌ Error loading cart:", error);
     }
@@ -64,8 +61,7 @@ const Cart = () => {
       const itemSnap = await getDoc(itemRef);
 
       if (itemSnap.exists()) {
-        let currentQuantity = itemSnap.data().quantity;
-        let newQuantity = currentQuantity + change;
+        let newQuantity = itemSnap.data().quantity + change;
 
         if (newQuantity < 1) {
           removeItem(itemId);
@@ -74,12 +70,11 @@ const Cart = () => {
 
         await updateDoc(itemRef, { quantity: newQuantity });
 
-        const updatedItems = cartItems.map(item => 
-          item.id === itemId ? { ...item, quantity: newQuantity, totalPrice: newQuantity * item.price } : item
+        setCartItems(prevItems =>
+          prevItems.map(item =>
+            item.id === itemId ? { ...item, quantity: newQuantity, totalPrice: newQuantity * item.price } : item
+          )
         );
-
-        setCartItems(updatedItems);
-        updateTotalPrice();
       }
     } catch (error) {
       console.error("❌ Error updating quantity:", error);
@@ -90,30 +85,10 @@ const Cart = () => {
   const removeItem = async (itemId) => {
     try {
       await deleteDoc(doc(db, "cart", itemId));
-
-      const updatedItems = cartItems.filter(item => item.id !== itemId);
-      setCartItems(updatedItems);
-      updateTotalPrice();
+      setCartItems(prevItems => prevItems.filter(item => item.id !== itemId));
     } catch (error) {
       console.error("❌ Error removing item:", error);
     }
-  };
-
-  // Function to update total price, GST, and service charge dynamically
-  const updateTotalPrice = () => {
-    let itemTotal = 0;
-    cartItems.forEach(item => {
-      itemTotal += item.price * item.quantity;
-    });
-
-    const gst = itemTotal * 0.10;  // GST is 10%
-    const serviceCharge = itemTotal * 0.05; // Service charge is 5%
-    const totalPrice = itemTotal + gst + serviceCharge;
-
-    setItemTotal(itemTotal);
-    setGst(gst);
-    setServiceCharge(serviceCharge);
-    setTotalPrice(totalPrice);
   };
 
   useEffect(() => {
@@ -148,7 +123,7 @@ const Cart = () => {
           ))
         )}
       </div>
-
+        
       <div className="line"></div>
       <div className="WriteInstruction">
         <i className="fa-regular fa-clipboard" style={{ color: "#b0b0b0" }}></i>
@@ -161,7 +136,7 @@ const Cart = () => {
         </div>
         <div className="DescBox">
           <div className="HeadDesc">
-            <h3>Choose Your Preferred Order Option</h3>
+            <h4>Choose Your Preferred Order Option</h4>
           </div>
           <div className="BodyDesc">
             <p>If you'd prefer to enjoy your order in-store, please select the option. This will help us prepare everything for you to enjoy on-site</p>
@@ -185,26 +160,26 @@ const Cart = () => {
         <h2>Bill details</h2>
         <div className="SummaryItem">
           <div className="SummaryLabel"><p>Item Total:</p></div>
-          <div className="SummaryValue"><p>₹{itemTotal}</p></div>
+          <div className="SummaryValue"><p>₹{itemTotal.toFixed(2)}</p></div>
         </div>
         <div className="SummaryItem">
           <div className="SummaryLabel"><p>GST:</p></div>
-          <div className="SummaryValue"><p>₹{gst}</p></div>
+          <div className="SummaryValue"><p>₹{gst.toFixed(2)}</p></div>
         </div>
         <div className="SummaryItem">
           <div className="SummaryLabel"><p>Service Charge:</p></div>
-          <div className="SummaryValue"><p>₹{serviceCharge}</p></div>
+          <div className="SummaryValue"><p>₹{serviceCharge.toFixed(2)}</p></div>
         </div>
         <div className="SummaryItem Total">
           <div className="SummaryLabel"><p><strong>To Pay:</strong></p></div>
-          <div className="SummaryValue"><div className="TotalPrice">₹{totalPrice}</div></div>
+          <div className="SummaryValue"><div className="TotalPrice">₹{totalPrice.toFixed(2)}</div></div>
         </div>
       </div>
 
       <div className="line" id="lastone"></div>
 
       <div className="CheckoutFixed">
-        <div className="AlmostThere"><p>Almost there! Complete your order by paying now.</p></div>
+        <div className="AlmostThere"><p>Almost there! Complete your order by pay now.</p></div>
         <div className="PayNow">
           <button className="PayNowButton">Pay Now</button>
         </div>

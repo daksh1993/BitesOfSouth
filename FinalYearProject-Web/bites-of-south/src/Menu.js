@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
-import './Menu.css'; // If you're using a separate CSS file
-
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import React, { useEffect } from "react";
+import "./Menu.css";
+import { getDocs, collection, addDoc, getFirestore } from "firebase/firestore";
+import {  updateDoc, query, where, doc } from "firebase/firestore";
+import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
@@ -13,9 +12,8 @@ const firebaseConfig = {
   storageBucket: "bitesofsouth-a38f4.firebasestorage.app",
   messagingSenderId: "65231955877",
   appId: "1:65231955877:web:aab053b6882e9894bdaa4c",
-  measurementId: "G-R9WE265DPN"
+  measurementId: "G-R9WE265DPN",
 };
-
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -60,7 +58,7 @@ function App() {
                         <img src="${data.image}" alt="DosaImg" height="144px" width="156px">
                     </div>   
                     <div class="AddToCart">
-                        <button>Add</button>
+                        <button onclick="addToCart('${doc.id}', '${data.title}', ${data.price})">Add</button>
                     </div>
                 </div>
             </div>
@@ -72,13 +70,51 @@ function App() {
     fetchMenu();
   }, []);
 
+  window.addToCart = async (id, title, price) => {
+    try {
+      const cartRef = collection(db, "cart");
+  
+      // Check if the item already exists in the cart
+      const q = query(cartRef, where("title", "==", title));
+      const querySnapshot = await getDocs(q);
+  
+      if (!querySnapshot.empty) {
+        // Item exists, update its quantity
+        const cartItem = querySnapshot.docs[0]; // First matching item
+        const cartItemRef = doc(db, "cart", cartItem.id);
+        const newQuantity = cartItem.data().quantity + 1;
+  
+        await updateDoc(cartItemRef, { quantity: newQuantity });
+  
+        alert(`✅ Updated quantity to ${newQuantity}!`);
+      } else {
+        // Item does not exist, add it to the cart
+        await addDoc(cartRef, {
+          title: title,
+          price: price,
+          quantity: 1,
+        });
+  
+        alert("✅ Item added to cart successfully!");
+      }
+    } catch (error) {
+      console.error("❌ Error adding item to cart:", error);
+    }
+  };
+
   return (
     <div>
       <div className="MTitle">
         <div className="LArt"></div>
         <div className="MHead">
-         <div> <h2>  Menu  </h2></div>
-          <div> <a href='/Cart'><i class="fa-solid fa-cart-shopping"></i></a></div>
+          <div>
+            <h2> Menu </h2>
+          </div>
+          <div>
+            <a href="/Cart">
+              <i className="fa-solid fa-cart-shopping"></i>
+            </a>
+          </div>
         </div>
         <div className="RArt"></div>
       </div>
