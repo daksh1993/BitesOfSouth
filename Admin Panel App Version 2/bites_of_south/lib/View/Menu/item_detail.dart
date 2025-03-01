@@ -41,7 +41,7 @@ class _ItemDetailState extends State<ItemDetail> {
                       borderRadius: BorderRadius.circular(10),
                       child: CachedNetworkImage(
                         imageUrl: itemData.imageUrl,
-                        height: MediaQuery.of(context).size.height * 0.40,
+                        height: MediaQuery.of(context).size.height * 0.35,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => Center(
@@ -251,7 +251,7 @@ class _ItemDetailState extends State<ItemDetail> {
                   'title': titleController.text,
                   'price': (priceController.text),
                   'description': descriptionController.text,
-                  'category': selectedCategory ?? 'Default',
+                  'category': selectedCategory,
                   'makingTime': (makingTimeController.text),
                   'rating': (ratingController.text),
                 };

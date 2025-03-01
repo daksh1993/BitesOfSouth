@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '65231955877',
     projectId: 'bitesofsouth-a38f4',
     authDomain: 'bitesofsouth-a38f4.firebaseapp.com',
+    databaseURL: 'https://bitesofsouth-a38f4-default-rtdb.firebaseio.com',
     storageBucket: 'bitesofsouth-a38f4.firebasestorage.app',
     measurementId: 'G-R9WE265DPN',
   );
@@ -55,6 +56,7 @@ class DefaultFirebaseOptions {
     appId: '1:65231955877:android:f37a7e1822d0a2dbbdaa4c',
     messagingSenderId: '65231955877',
     projectId: 'bitesofsouth-a38f4',
+    databaseURL: 'https://bitesofsouth-a38f4-default-rtdb.firebaseio.com',
     storageBucket: 'bitesofsouth-a38f4.firebasestorage.app',
   );
 
@@ -63,6 +65,7 @@ class DefaultFirebaseOptions {
     appId: '1:65231955877:ios:6ac5c05503735848bdaa4c',
     messagingSenderId: '65231955877',
     projectId: 'bitesofsouth-a38f4',
+    databaseURL: 'https://bitesofsouth-a38f4-default-rtdb.firebaseio.com',
     storageBucket: 'bitesofsouth-a38f4.firebasestorage.app',
     iosBundleId: 'com.example.bitesOfSouth',
   );
@@ -72,6 +75,7 @@ class DefaultFirebaseOptions {
     appId: '1:65231955877:ios:6ac5c05503735848bdaa4c',
     messagingSenderId: '65231955877',
     projectId: 'bitesofsouth-a38f4',
+    databaseURL: 'https://bitesofsouth-a38f4-default-rtdb.firebaseio.com',
     storageBucket: 'bitesofsouth-a38f4.firebasestorage.app',
     iosBundleId: 'com.example.bitesOfSouth',
   );
@@ -82,7 +86,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '65231955877',
     projectId: 'bitesofsouth-a38f4',
     authDomain: 'bitesofsouth-a38f4.firebaseapp.com',
+    databaseURL: 'https://bitesofsouth-a38f4-default-rtdb.firebaseio.com',
     storageBucket: 'bitesofsouth-a38f4.firebasestorage.app',
     measurementId: 'G-PSLDPGX2Q5',
   );
+
 }

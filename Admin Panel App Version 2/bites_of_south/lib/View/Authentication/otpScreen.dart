@@ -1,8 +1,18 @@
 import 'package:bites_of_south/View/Authentication/emailVerification.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 class OTPVerification extends StatefulWidget {
-  const OTPVerification({super.key});
+  final String verificationId;
+  final User? user;
+  final String phoneNumber; // Add phoneNumber as a parameter
+
+  const OTPVerification({
+    super.key,
+    required this.verificationId,
+    required this.user,
+    required this.phoneNumber, // Initialize phoneNumber
+  });
 
   @override
   State<OTPVerification> createState() => _OTPVerificationState();
@@ -13,28 +23,86 @@ class _OTPVerificationState extends State<OTPVerification> {
       List.generate(6, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
 
-  void _verifyOTP() {
+  late String _currentVerificationId;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentVerificationId = widget.verificationId;
+  }
+
+  void _resendOTP() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Verifying phone number...'),
-        duration: Duration(seconds: 2),
-      ),
+      const SnackBar(content: Text("Resending OTP...")),
     );
 
-    Future.delayed(Duration(seconds: 5), () {
-      try {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => SendEmailConfirmation()),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error navigating to OTP screen: $e'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    });
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: widget.phoneNumber, // Use the passed phone number
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          try {
+            await widget.user!.linkWithCredential(credential);
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Error linking credential: $e")),
+            );
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("OTP Resend Failed: ${e.message}")),
+          );
+        },
+        codeSent: (String newVerificationId, int? resendToken) {
+          setState(() {
+            _currentVerificationId = newVerificationId;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("OTP Resent Successfully!")),
+          );
+        },
+        codeAutoRetrievalTimeout: (String newVerificationId) {
+          setState(() {
+            _currentVerificationId = newVerificationId;
+          });
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
+
+  void _verifyOTP() async {
+    String otp = _otpControllers.map((controller) => controller.text).join();
+    if (otp.isEmpty || otp.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Enter a valid 6-digit OTP")),
+      );
+      return;
+    }
+
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _currentVerificationId,
+        smsCode: otp,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Verified phone number successfully.')),
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SendEmailConfirmation(user: widget.user),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error verifying OTP: $e')),
+      );
+    }
   }
 
   @override
@@ -42,7 +110,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.white,
           ),
@@ -51,7 +119,7 @@ class _OTPVerificationState extends State<OTPVerification> {
           },
         ),
         title: Image(
-          image: AssetImage("assets/round_logo.png"),
+          image: const AssetImage("assets/round_logo.png"),
           fit: BoxFit.cover,
           height: MediaQuery.sizeOf(context).height / 24,
         ),
@@ -62,7 +130,6 @@ class _OTPVerificationState extends State<OTPVerification> {
         scrollDirection: Axis.vertical,
         child: Stack(
           children: [
-            // Curved Background using Container
             Container(
               height: MediaQuery.sizeOf(context).height / 3,
               decoration: BoxDecoration(
@@ -73,8 +140,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                 ),
               ),
             ),
-
-            // Content
             Padding(
               padding:
                   EdgeInsets.only(top: MediaQuery.sizeOf(context).height / 25),
@@ -83,8 +148,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 0),
-
-                  // Title
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -95,7 +158,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                           color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -104,8 +167,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                     ),
                   ),
                   SizedBox(height: MediaQuery.sizeOf(context).height / 15),
-
-                  // OTP Card
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Card(
@@ -119,8 +180,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             const SizedBox(height: 12),
-
-                            // OTP Field
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: List.generate(
@@ -152,28 +211,29 @@ class _OTPVerificationState extends State<OTPVerification> {
                             ),
                             const SizedBox(height: 15),
                             ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  minimumSize: Size(double.infinity, 50),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                onPressed: _verifyOTP,
-                                child: Text(
-                                  "Verify OTP",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                )),
-
-                            // Resend OTP
+                                minimumSize: const Size(double.infinity, 50),
+                              ),
+                              onPressed: _verifyOTP,
+                              child: const Text(
+                                "Verify OTP",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                onPressed: () {},
-                                child: Text("Resend OTP",
-                                    style: TextStyle(color: Colors.blue)),
+                                onPressed: _resendOTP,
+                                child: const Text(
+                                  "Resend OTP",
+                                  style: TextStyle(color: Colors.blue),
+                                ),
                               ),
                             ),
                           ],

@@ -2,7 +2,8 @@
     padding: 0px;
     margin: 0px;
 }
-.itemshow{
+
+.itemshow {
     display: flex;
     flex-direction: column;
     width: 70%;
@@ -38,6 +39,7 @@
     align-items: center;
     margin-left: 300px;
 }
+
 .AddRemov button {
     width: 20px;
     height: 20px;
@@ -45,6 +47,7 @@
 
 .ItemPrice {
     margin-left: 25px;
+    width: 50px;
 }
 
 .line {
@@ -103,7 +106,8 @@
 
 
 .HaveInCheckBox input[type="checkbox"] {
-    width: 20px;  /* Width of the checkbox */
+    width: 20px;
+    /* Width of the checkbox */
     height: 20px;
     margin: 5px;
     margin-left: 10px;
@@ -114,13 +118,14 @@
     color: rgb(64, 63, 63);
 }
 
-.BodyDesc p{
+.BodyDesc p {
     margin-top: 4px;
     color: grey;
 }
 
 .ApplyCoupon {
-    width: 50%; /* Adjust width of the coupon button container */
+    width: 50%;
+    /* Adjust width of the coupon button container */
     text-align: center;
 }
 
@@ -128,35 +133,43 @@
     color: rgb(69, 69, 69);
     /* margin-top: 15px; */
     display: flex;
-    justify-content: space-between; /* Align logo and text across button */
-    align-items: center; /* Vertically align logo and text */
-    gap: 15px; /* Adjust the gap between logo and text */
-    padding: 10px 20px; /* Button padding */
-    width: 100%; /* Full width of the ApplyCoupon div */
-    background-color: #f4f4f4; /* Subtle background */
-    border: none; /* Remove default button border */
-    border-radius: 8px; /* Rounded corners for a modern look */
+    justify-content: space-between;
+    /* Align logo and text across button */
+    align-items: center;
+    /* Vertically align logo and text */
+    gap: 15px;
+    /* Adjust the gap between logo and text */
+    padding: 10px 20px;
+    /* Button padding */
+    width: 100%;
+    /* Full width of the ApplyCoupon div */
+    background-color: #f4f4f4;
+    /* Subtle background */
+    border: none;
+    /* Remove default button border */
+    border-radius: 8px;
+    /* Rounded corners for a modern look */
     transition: 0.3s;
 }
 
 .ApplyCoupon button:hover {
-    background-color: #e0e0e0; 
+    background-color: #e0e0e0;
 }
 
 .Redirectpage {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
-    width: 100%; 
+    align-items: center;
+    width: 100%;
 }
 
 .Redirectpage h4 {
     font-size: 16px;
-    margin: 0; 
+    margin: 0;
 }
 
 .Couponlogo i {
-    font-size: 20px; 
+    font-size: 20px;
 }
 
 .OrderSummary {
@@ -221,18 +234,21 @@
 
 .PayNow {
     width: 90%;
-    max-width: 400px; /* Adjust the button width as per design */
+    max-width: 400px;
+    /* Adjust the button width as per design */
     text-align: center;
 }
 
 .PayNowButton {
     padding: 12px 30px;
     font-size: 18px;
-    background-color: #4CAF50; /* Green color */
+    background-color: #4CAF50;
+    /* Green color */
     color: white;
     border: none;
     border-radius: 8px;
-    width: 100%; /* Make button fill the width */
+    width: 100%;
+    /* Make button fill the width */
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -247,11 +263,13 @@
 @media (max-width: 768px) {
     .ItemsCart {
         /* gap: 100px; */
-        width: 100%; /* Full width for smaller devices */
+        width: 100%;
+        /* Full width for smaller devices */
     }
 
     .OrderSummary {
-        width: 80%; /* Increase width on smaller screens */
+        width: 80%;
+        /* Increase width on smaller screens */
     }
 
     .CheckoutFixed {
@@ -268,7 +286,8 @@
     }
 
     .ApplyCoupon {
-        width: 80%; /* Adjust coupon button for smaller screens */
+        width: 80%;
+        /* Adjust coupon button for smaller screens */
     }
 
     .ApplyCoupon button {
@@ -276,11 +295,13 @@
     }
 
     .line {
-        width: 100%; /* Make lines span full width on small screens */
+        width: 100%;
+        /* Make lines span full width on small screens */
     }
 
     .WriteInstruction input {
-        width: 100%; /* Input field adjusts to screen size */
+        width: 100%;
+        /* Input field adjusts to screen size */
     }
 
     .TakeIntakeAway {
@@ -295,20 +316,23 @@
 
 /* For smartphones (width <= 480px) */
 @media (max-width: 480px) {
-    .itemshow{
+    .itemshow {
         width: 90%;
         text-align: start;
     }
-    .Itemname{
+
+    .Itemname {
         width: 200px;
     }
+
     .AddRemov {
         margin-left: 40px;
     }
 
 
     .OrderSummary {
-        width: 85%; /* Full width for order summary */
+        width: 85%;
+        /* Full width for order summary */
     }
 
     .CheckoutFixed {
@@ -325,15 +349,18 @@
     }
 
     .ApplyCoupon {
-        width: 90%; /* Full width for Apply Coupon on mobile */
+        width: 90%;
+        /* Full width for Apply Coupon on mobile */
     }
-    .WriteInstruction{
+
+    .WriteInstruction {
         display: flex;
         gap: 10px;
         align-items: center;
         text-align: center;
         justify-content: center;
     }
+
     .WriteInstruction input {
         width: 200px;
     }
@@ -342,29 +369,35 @@
         width: 85%;
         justify-content: center;
     }
-    .TakeIntakeAway h3{
+
+    .TakeIntakeAway h3 {
         font-size: 20px;
 
     }
-    .TakeIntakeAway p{
+
+    .TakeIntakeAway p {
         font-size: 14px;
 
     }
+
     .DescBox {
         width: 100%;
     }
-    .seprator{
+
+    .seprator {
         width: 100%;
     }
-    #lastone{
+
+    #lastone {
         margin-top: 60px;
     }
-    .OrderSummary{
-    /* display: flex; */
-    flex-direction: column;
-    justify-content: start;
-    /* width: 50%; */
-    /* margin-top: 20px; */
-    padding: 15px;
+
+    .OrderSummary {
+        /* display: flex; */
+        flex-direction: column;
+        justify-content: start;
+        /* width: 50%; */
+        /* margin-top: 20px; */
+        padding: 15px;
     }
 }

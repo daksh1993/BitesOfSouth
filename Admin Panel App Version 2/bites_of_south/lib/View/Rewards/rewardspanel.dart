@@ -15,6 +15,7 @@ class _RewardsPanelState extends State<RewardsPanel> {
         title: const Text("Rewards"),
       ),
       body: const Center(
+   
         child: Text("Rewards Panel"),
       ),
     );
