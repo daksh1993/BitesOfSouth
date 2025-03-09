@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./Menu.css";
-import { getDocs, collection, addDoc, getFirestore } from "firebase/firestore";
-import {  updateDoc, query, where, doc } from "firebase/firestore";
+import { getDocs, collection, getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
+import { useNavigate } from "react-router-dom"; // For navigation
 
 const firebaseConfig = {
   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
   authDomain: "bitesofsouth-a38f4.firebaseapp.com",
   databaseURL: "https://bitesofsouth-a38f4-default-rtdb.firebaseio.com",
   projectId: "bitesofsouth-a38f4",
-  storageBucket: "bitesofsouth-a38f4.firebasestorage.app",
+  storageBucket: "bitesofsouth-a38f4.appspot.com",
   messagingSenderId: "65231955877",
   appId: "1:65231955877:web:aab053b6882e9894bdaa4c",
   measurementId: "G-R9WE265DPN",
@@ -19,86 +19,92 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-function App() {
+function Menu() {
+  const [cart, setCart] = useState([]);
+  const [showCartPopup, setShowCartPopup] = useState(false);
+  const navigate = useNavigate(); // For redirection
+
   useEffect(() => {
-    const fetchMenu = async () => {
-      const menuContainer = document.querySelector(".DishItems");
-      const querySnapshot = await getDocs(collection(db, "menu"));
-
-      menuContainer.innerHTML = ""; // Clear previous content
-
-      if (querySnapshot.empty) {
-        menuContainer.innerHTML = "<p>No menu items available.</p>";
-        return;
-      }
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const foodItemHTML = `
-            <div class="DishItmesPlacement">
-                <div class="LSidePlacement">
-                    <div class="ItemType">
-                        <img src="/images/veg-icon.jpeg" alt="veg">
-                    </div>
-                    <div class="itemTitle">
-                        <h3>${data.title}</h3>
-                    </div>
-                    <div class="itemPrice">
-                        <h4>₹${data.price}</h4>
-                    </div>
-                    <div class="itemRatings">
-                        <img src="/images/Stars.png" alt="">  <p>${data.rating}</p>
-                    </div>
-                    <div class="itemDescription">
-                        <h5>${data.description}</h5>
-                    </div>
-                </div>
-                <div class="RSidePlacement">
-                    <div class="ItemsImgs">
-                        <img src="${data.image}" alt="DosaImg" height="144px" width="156px">
-                    </div>   
-                    <div class="AddToCart">
-                        <button onclick="addToCart('${doc.id}', '${data.title}', ${data.price})">Add</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        menuContainer.innerHTML += foodItemHTML;
-      });
-    };
-
     fetchMenu();
+    loadCart();
   }, []);
 
-  window.addToCart = async (id, title, price) => {
-    try {
-      const cartRef = collection(db, "cart");
-  
-      // Check if the item already exists in the cart
-      const q = query(cartRef, where("title", "==", title));
-      const querySnapshot = await getDocs(q);
-  
-      if (!querySnapshot.empty) {
-        // Item exists, update its quantity
-        const cartItem = querySnapshot.docs[0]; // First matching item
-        const cartItemRef = doc(db, "cart", cartItem.id);
-        const newQuantity = cartItem.data().quantity + 1;
-  
-        await updateDoc(cartItemRef, { quantity: newQuantity });
-  
-        alert(`✅ Updated quantity to ${newQuantity}!`);
-      } else {
-        // Item does not exist, add it to the cart
-        await addDoc(cartRef, {
-          title: title,
-          price: price,
-          quantity: 1,
-        });
-  
-        alert("✅ Item added to cart successfully!");
-      }
-    } catch (error) {
-      console.error("❌ Error adding item to cart:", error);
+  // Fetch menu from Firebase
+  const fetchMenu = async () => {
+    const menuContainer = document.querySelector(".DishItems");
+    const querySnapshot = await getDocs(collection(db, "menu"));
+
+    menuContainer.innerHTML = ""; // Clear previous content
+
+    if (querySnapshot.empty) {
+      menuContainer.innerHTML = "<p>No menu items available.</p>";
+      return;
+    }
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const foodItemHTML = `
+          <div class="DishItmesPlacement">
+              <div class="LSidePlacement">
+                  <div class="ItemType">
+                      <img src="/images/veg-icon.jpeg" alt="veg">
+                  </div>
+                  <div class="itemTitle">
+                      <h3>${data.title}</h3>
+                  </div>
+                  <div class="itemPrice">
+                      <h4>₹${data.price}</h4>
+                  </div>
+                  <div class="itemRatings">
+                      <img src="/images/Stars.png" alt="">  <p>${data.rating}</p>
+                  </div>
+                  <div class="itemDescription">
+                      <h5>${data.description}</h5>
+                  </div>
+              </div>
+              <div class="RSidePlacement">
+                  <div class="ItemsImgs">
+                      <img src="${data.image}" alt="DosaImg" height="144px" width="156px">
+                  </div>   
+                  <div class="AddToCart">
+                      <button onclick="window.addToCart('${data.title}', ${data.price})">Add</button>
+                  </div>
+              </div>
+          </div>
+      `;
+      menuContainer.innerHTML += foodItemHTML;
+    });
+  };
+
+  // Add item to cart (localStorage)
+  window.addToCart = (title, price) => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let itemIndex = cart.findIndex((item) => item.title === title);
+
+    if (itemIndex !== -1) {
+      cart[itemIndex].quantity += 1;
+    } else {
+      cart.push({ title, price, quantity: 1 });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    setCart(cart);
+    setShowCartPopup(true); // Show popup when item is added
+  };
+
+  // Load cart from localStorage
+  const loadCart = () => {
+    const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCart(storedCart);
+    if (storedCart.length > 0) {
+      setShowCartPopup(true);
+    }
+  };
+
+  // Redirect to cart if items are available
+  const goToCart = () => {
+    if (cart.length > 0) {
+      navigate("/Cart");
     }
   };
 
@@ -107,17 +113,14 @@ function App() {
       <div className="MTitle">
         <div className="LArt"></div>
         <div className="MHead">
-          <div>
-            <h2> Menu </h2>
-          </div>
-          <div>
-            <a href="/Cart">
-              <i className="fa-solid fa-cart-shopping"></i>
-            </a>
-          </div>
+          <h2>Menu</h2>
+          {/* <button onClick={goToCart} className="cartButton">
+            <i className="fa-solid fa-cart-shopping"></i>
+          </button> */}
         </div>
         <div className="RArt"></div>
       </div>
+
       <div className="SearchBtn">
         <input type="text" placeholder="Search for dishes" />
         <i className="fa-solid fa-magnifying-glass"></i>
@@ -128,8 +131,15 @@ function App() {
       <div className="DishItems">
         {/* Content will be inserted here dynamically */}
       </div>
+
+      {/* Floating cart notification */}
+      {showCartPopup && cart.length > 0 && (
+        <div className="cartPopup" onClick={goToCart}>
+          <p> 🛒 {cart.length} items in cart. Go to Cart ➡️</p>
+        </div>
+      )}
     </div>
   );
 }
 
-export default App;
+export default Menu;
