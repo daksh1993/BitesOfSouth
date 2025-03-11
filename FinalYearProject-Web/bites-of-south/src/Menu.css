@@ -2,6 +2,7 @@
     padding: 0px;
     margin: 0px;
     align-items: center;    
+    
     transition: 0.3s;
 
 }
@@ -184,7 +185,7 @@
 }
 
 .AddToCart button {
-    position: absolute;
+    /* position: absolute; */
     top: 125px;
     left: 50px;
     box-shadow: rgba(40, 44, 63, 0.08) 0px 3px 8px;
@@ -244,19 +245,92 @@
         justify-content: space-between;
         position: relative;
     }
+    .ItemsImgs{
+        position: relative;
 
+    }
     .ItemsImgs img {
+        position: relative;
         max-width: 100%; /* Full width for mobile */
         width: 250px; /* Full width for mobile */
+        z-index: -1;
         height: auto; /* Maintain aspect ratio */
     }
 
     .AddToCart button {
-        position: absolute; /* Reset position for mobile */
+        /* position: absolute; */
         /* transform: none; */
-        top: 70px;
-        left: 25px;
-        margin-top: 10px; /* Add spacing for mobile */
+        /* top: 70px; */
+        z-index: 999;
+        left: 30px;
+        margin-top: -20px; /* Add spacing for mobile */
         /* width: 100%; Full width for mobile */
+    }
+}
+
+/* .SortMenu {
+    align-items: center;
+    display: flex;
+    justify-content: start;
+    margin-top: 5px;
+    margin-left: 15PX;
+}
+
+.SortMenu select {
+    width: 90px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 11px;
+    cursor: pointer;
+} */
+.FilterSortContainer {
+    display: flex;
+    justify-content: start;
+    gap: 15px;
+    /* margin-top: 15px; */
+    margin-left: 15px;
+}
+
+.FilterSortContainer select {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    cursor: pointer;
+}
+.Sorting{
+    width: 100px;
+}
+/* Sort & Filter Buttons */
+.sort-filter {
+    display: flex;
+    gap: 10px;
+}
+
+.sort-filter button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.sort-filter button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .menu-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .sort-filter {
+        flex-direction: column;
     }
 }

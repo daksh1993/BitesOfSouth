@@ -11,27 +11,44 @@ const Cart = () => {
   // Load cart items from local storage
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCartItems(storedCart);
+    
+    // Ensure all items have a valid price and quantity
+    const sanitizedCart = storedCart.map(item => ({
+      title: item.title || "Unknown",
+      price: item.price || 0,
+      quantity: item.quantity || 1
+    }));
+
+    setCartItems(sanitizedCart);
   }, []);
 
   // Function to update total price, GST, and service charge dynamically
   useEffect(() => {
-    let itemTotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    if (cartItems.length === 0) {
+      setItemTotal(0);
+      setGst(0);
+      setServiceCharge(0);
+      setTotalPrice(0);
+      return;
+    }
+
+    let validItems = cartItems.filter(item => item.price && item.quantity);
+    let itemTotal = validItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     let gst = itemTotal * 0.10; // 10% GST
     let serviceCharge = itemTotal * 0.05; // 5% Service Charge
     let total = itemTotal + gst + serviceCharge;
 
-    setItemTotal(itemTotal);
-    setGst(gst);
-    setServiceCharge(serviceCharge);
-    setTotalPrice(total);
+    setItemTotal(itemTotal || 0);
+    setGst(gst || 0);
+    setServiceCharge(serviceCharge || 0);
+    setTotalPrice(total || 0);
   }, [cartItems]);
 
   // Function to update quantity
   const updateQuantity = (title, change) => {
     const updatedCart = cartItems.map(item => {
       if (item.title === title) {
-        let newQuantity = item.quantity + change;
+        let newQuantity = (item.quantity || 0) + change;
         if (newQuantity < 1) return null; // Remove item if quantity is 0
         return { ...item, quantity: newQuantity };
       }
@@ -64,7 +81,7 @@ const Cart = () => {
                 <button className="AddQuant" onClick={() => updateQuantity(item.title, 1)}>+</button>
               </div>
               <div className="ItemPrice">
-                <p>₹{item.price * item.quantity}</p>
+                <p>₹{(item.price * item.quantity || 0).toFixed(2)}</p>
               </div>
             </div>
           ))

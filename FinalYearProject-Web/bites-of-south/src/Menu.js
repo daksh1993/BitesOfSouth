@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import "./Menu.css";
 import { getDocs, collection, getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { useNavigate } from "react-router-dom"; // For navigation
+import { useNavigate } from "react-router-dom";
 
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
   authDomain: "bitesofsouth-a38f4.firebaseapp.com",
@@ -22,8 +23,14 @@ const db = getFirestore(app);
 function Menu() {
   const [cart, setCart] = useState([]);
   const [showCartPopup, setShowCartPopup] = useState(false);
-  const navigate = useNavigate(); // For redirection
+  const [menuItems, setMenuItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("");
+  const [category, setCategory] = useState("All");
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
+  // Fetch menu and load cart on component mount
   useEffect(() => {
     fetchMenu();
     loadCart();
@@ -31,68 +38,16 @@ function Menu() {
 
   // Fetch menu from Firebase
   const fetchMenu = async () => {
-    const menuContainer = document.querySelector(".DishItems");
     const querySnapshot = await getDocs(collection(db, "menu"));
+    const menuData = querySnapshot.docs.map((doc) => doc.data());
+    setMenuItems(menuData);
 
-    menuContainer.innerHTML = ""; // Clear previous content
-
-    if (querySnapshot.empty) {
-      menuContainer.innerHTML = "<p>No menu items available.</p>";
-      return;
-    }
-
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const foodItemHTML = `
-          <div class="DishItmesPlacement">
-              <div class="LSidePlacement">
-                  <div class="ItemType">
-                      <img src="/images/veg-icon.jpeg" alt="veg">
-                  </div>
-                  <div class="itemTitle">
-                      <h3>${data.title}</h3>
-                  </div>
-                  <div class="itemPrice">
-                      <h4>₹${data.price}</h4>
-                  </div>
-                  <div class="itemRatings">
-                      <img src="/images/Stars.png" alt="">  <p>${data.rating}</p>
-                  </div>
-                  <div class="itemDescription">
-                      <h5>${data.description}</h5>
-                  </div>
-              </div>
-              <div class="RSidePlacement">
-                  <div class="ItemsImgs">
-                      <img src="${data.image}" alt="DosaImg" height="144px" width="156px">
-                  </div>   
-                  <div class="AddToCart">
-                      <button onclick="window.addToCart('${data.title}', ${data.price})">Add</button>
-                  </div>
-              </div>
-          </div>
-      `;
-      menuContainer.innerHTML += foodItemHTML;
-    });
+    // Extract unique categories
+    const uniqueCategories = [...new Set(menuData.map((item) => item.category))];
+    setCategories(uniqueCategories);
   };
 
-  // Add item to cart (localStorage)
-  window.addToCart = (title, price) => {
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    let itemIndex = cart.findIndex((item) => item.title === title);
-
-    if (itemIndex !== -1) {
-      cart[itemIndex].quantity += 1;
-    } else {
-      cart.push({ title, price, quantity: 1 });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    setCart(cart);
-    setShowCartPopup(true); // Show popup when item is added
-  };
-
-  // Load cart from localStorage
+  // Load cart from local storage
   const loadCart = () => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
@@ -101,38 +56,120 @@ function Menu() {
     }
   };
 
-  // Redirect to cart if items are available
+  // Add item to cart and save to local storage
+  const addToCart = (item) => {
+    const updatedCart = [...cart, item];
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setShowCartPopup(true);
+  };
+
+  // Navigate to cart page
   const goToCart = () => {
     if (cart.length > 0) {
       navigate("/Cart");
     }
   };
 
+  // Filter items based on search and category
+  const filteredMenu = menuItems.filter((item) => {
+    return (
+      item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (category === "All" || item.category === category)
+    );
+  });
+
+  // Sort items based on selected option
+  const sortedMenu = [...filteredMenu].sort((a, b) => {
+    if (sortOption === "priceLowHigh") return a.price - b.price;
+    if (sortOption === "priceHighLow") return b.price - a.price;
+    if (sortOption === "ratingHighLow") return b.rating - a.rating;
+    if (sortOption === "ratingLowHigh") return a.rating - b.rating;
+    return 0;
+  });
+
   return (
     <div>
       <div className="MTitle">
-        <div className="LArt"></div>
         <div className="MHead">
           <h2>Menu</h2>
-          {/* <button onClick={goToCart} className="cartButton">
-            <i className="fa-solid fa-cart-shopping"></i>
-          </button> */}
         </div>
-        <div className="RArt"></div>
       </div>
 
+      {/* Search Input */}
       <div className="SearchBtn">
-        <input type="text" placeholder="Search for dishes" />
+        <input
+          type="text"
+          placeholder="Search for dishes"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
         <i className="fa-solid fa-magnifying-glass"></i>
+      </div>
+
+      {/* Filter and Sort Options */}
+      <div className="FilterSortContainer">
+        {/* Sort Dropdown */}
+        <select className="Sorting" value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+          <option value="">Sort By</option>
+          <option value="priceLowHigh">Price: Low to High</option>
+          <option value="priceHighLow">Price: High to Low</option>
+          <option value="ratingHighLow">Rating: High to Low</option>
+          <option value="ratingLowHigh">Rating: Low to High</option>
+        </select>
+
+        {/* Category Filter */}
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="All">All Categories</option>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="line"></div>
 
+      {/* Display Sorted and Filtered Menu Items */}
       <div className="DishItems">
-        {/* Content will be inserted here dynamically */}
+        {sortedMenu.length > 0 ? (
+          sortedMenu.map((data, index) => (
+            <div className="DishItmesPlacement" key={index}>
+              <div className="LSidePlacement">
+                <div className="ItemType">
+                  <img src="/images/veg-icon.jpeg" alt="veg" />
+                </div>
+                <div className="itemTitle">
+                  <h3>{data.title}</h3>
+                </div>
+                <div className="itemPrice">
+                  <h4>₹{data.price}</h4>
+                </div>
+                <div className="itemRatings">
+                  <img src="/images/Stars.png" alt="rating" />
+                  <p>{data.rating}</p>
+                </div>
+                <div className="itemDescription">
+                  <h5>{data.description}</h5>
+                </div>
+              </div>
+              <div className="RSidePlacement">
+                <div className="ItemsImgs">
+                  <img src={data.image} alt="DishImg" />
+                </div>
+                <div className="AddToCart">
+                  <button onClick={() => addToCart(data)}>Add</button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No menu items available.</p>
+        )}
       </div>
 
-      {/* Floating cart notification */}
+      {/* Floating Cart Notification */}
       {showCartPopup && cart.length > 0 && (
         <div className="cartPopup" onClick={goToCart}>
           <p> 🛒 {cart.length} items in cart. Go to Cart ➡️</p>
