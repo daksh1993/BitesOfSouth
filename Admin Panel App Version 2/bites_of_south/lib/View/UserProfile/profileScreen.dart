@@ -1,41 +1,49 @@
 import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatefulWidget {
-
-
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-// Future<void> FetchProfile() async {
-//   import 'package:cloud_firestore/cloud_firestore.dart';
-//   import 'package:firebase_auth/firebase_auth.dart';
+String name = "Admin Test";
+String email = "admintest@gmail.com";
+String phone = "+91 1234567890";
 
-//   Future<void> FetchProfile() async {
-//     User? user = FirebaseAuth.instance.currentUser;
-//     if (user != null) {
-//       DocumentSnapshot userProfile = await FirebaseFirestore.instance
-//           .collection('users')
-//           .doc(user.uid)
-//           .get();
+Future<void> FetchProfile() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    DocumentSnapshot userProfile = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
 
-//       if (userProfile.exists) {
-//         // Access user data here
-//         String name = userProfile['name'];
-//         String email = userProfile['email'];
-//         String phone = userProfile['phone'];
-//         // Update the UI or state with the fetched data
-//       } else {
-//         // Handle the case where the user profile does not exist
-//       }
-//     } else {
-//       // Handle the case where the user is not logged in
-//     }
-//   }
-// }
+    if (userProfile.exists) {
+      // Access user data here
+      name = userProfile['name'];
+      email = userProfile['email'];
+      phone = userProfile['phone'];
+      // Update the UI or state with the fetched data
+    } else {
+      // Handle the case where the user profile does not exist
+      print("user profile does not exist");
+    }
+  } else {
+    // Handle the case where the user is not logged in
+    print("user not logged in");
+  }
+}
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FetchProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +62,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
           bottom: false,
           child: Column(
             children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        // Add your edit profile functionality here
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               // Header with Profile Pic and Name
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -73,8 +107,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    const Text(
-                      'Daksh Rathod', // Replace with user's name
+                    Text(
+                      name, // Replace with user's name
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -111,14 +145,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildInfoItem(
                         icon: Icons.email_outlined,
                         label: 'Email',
-                        value:
-                            'dakshspammm01@gmail.com', // Replace with user's email
+                        value: email, // Replace with user's email
                       ),
                       const SizedBox(height: 25),
                       _buildInfoItem(
                         icon: Icons.phone_outlined,
                         label: 'Phone',
-                        value: '+91 8356926076', // Replace with user's phone
+                        value: phone, // Replace with user's phone
                       ),
                       const Spacer(),
                       Center(

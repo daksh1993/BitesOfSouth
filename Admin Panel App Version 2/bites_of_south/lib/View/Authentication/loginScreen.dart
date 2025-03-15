@@ -1,9 +1,8 @@
 import 'package:bites_of_south/View/Authentication/phoneScreen.dart';
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lottie/lottie.dart';
+import 'package:email_validator/email_validator.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,52 +22,47 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => isLoading = true);
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
-    if (isLoading) {}
+
+    if (!EmailValidator.validate(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter a valid email")),
+      );
+      setState(() => isLoading = false);
+      return;
+    }
 
     try {
-      print("Attempting to log in with email: $email");
-
-      // Step 1: Authenticate with Firebase Auth
-      UserCredential userCredential = await _auth.signInWithCredential(
-        EmailAuthProvider.credential(
-          email: email,
-          password: password,
-        ),
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      // Step 2: Fetch admin details from Firestore
       QuerySnapshot adminQuery = await _firestore
           .collection('users')
           .where('email', isEqualTo: userCredential.user!.email)
           .get();
 
-      if (adminQuery.docs.isNotEmpty) {
-        DocumentSnapshot adminDoc = adminQuery.docs.first;
-
-        if (adminDoc['role'] == 'admin') {
-          var maskedphone =
-              adminDoc['phone'].substring(adminDoc['phone'].length - 4);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PhoneVerification(
-                user: userCredential.user,
-                maskedPhoneNumber: maskedphone,
-              ),
+      if (adminQuery.docs.isNotEmpty && adminQuery.docs.first['role'] == 'admin') {
+        String docId = adminQuery.docs.first.id;
+        String maskedPhone = adminQuery.docs.first['phone'].substring(
+            adminQuery.docs.first['phone'].length - 4);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhoneNumberVerificationScreen(
+              user: userCredential.user!,
+              docId: docId,
+              maskedPhoneNumber: maskedPhone,
             ),
-          );
-        } else {
-          throw "Unauthorized access";
-        }
+          ),
+        );
       } else {
-        throw "User record not found in Firestore";
+        await _auth.signOut();
+        throw "Unauthorized access: Only admins can log in";
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error logging in: $e"),
-          duration: Duration(seconds: 5),
-        ),
+        SnackBar(content: Text("Error: ${e.toString()}")),
       );
     } finally {
       setState(() => isLoading = false);
@@ -93,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
               centerTitle: true,
               automaticallyImplyLeading: false,
               title: Image(
-                image: AssetImage("assets/round_logo.png"),
+                image: NetworkImage("https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec"),
+                // image: AssetImage("assets/round_logo.png"),
                 fit: BoxFit.cover,
                 height: MediaQuery.sizeOf(context).height / 24,
               ),
@@ -101,10 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
       backgroundColor: Colors.white,
       body: isLoading
-          ? Center(
-              child:
-                  Lottie.asset("assets/loadin.json", width: 150, height: 150),
-            )
+          ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: Stack(
@@ -120,8 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.sizeOf(context).height / 25),
+                    padding: EdgeInsets.only(top: MediaQuery.sizeOf(context).height / 25),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,17 +135,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(fontSize: 18, color: Colors.white),
                           ),
                         ),
-                        SizedBox(
-                            height: MediaQuery.sizeOf(context).height / 15),
+                        SizedBox(height: MediaQuery.sizeOf(context).height / 15),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Card(
                             elevation: 4,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 20, left: 20, right: 20),
+                              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                               child: Form(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -163,16 +151,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                     TextFormField(
                                       controller: _emailController,
                                       decoration: InputDecoration(
-                                        prefixIcon: Icon(
-                                          Icons.email,
-                                          color: Colors.grey,
-                                        ),
+                                        prefixIcon: Icon(Icons.email, color: Colors.grey),
                                         labelText: "Email",
-                                        labelStyle:
-                                            TextStyle(color: Colors.grey),
+                                        labelStyle: TextStyle(color: Colors.grey),
                                         border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
+                                            borderRadius: BorderRadius.circular(10)),
                                       ),
                                     ),
                                     const SizedBox(height: 15),
@@ -180,16 +163,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       controller: _passwordController,
                                       obscureText: true,
                                       decoration: InputDecoration(
-                                          prefixIcon: Icon(
-                                            Icons.lock,
-                                            color: Colors.grey,
-                                          ),
+                                          prefixIcon: Icon(Icons.lock, color: Colors.grey),
                                           labelText: "Password",
-                                          labelStyle:
-                                              TextStyle(color: Colors.grey),
+                                          labelStyle: TextStyle(color: Colors.grey),
                                           border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
+                                              borderRadius: BorderRadius.circular(10)),
                                           errorMaxLines: 4,
                                           errorStyle: TextStyle(height: 1.5)),
                                     ),
@@ -198,11 +176,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Colors.green,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
-                                          minimumSize:
-                                              Size(double.infinity, 50),
+                                          minimumSize: Size(double.infinity, 50),
                                         ),
                                         onPressed: _login,
                                         child: Text(
@@ -216,18 +192,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: TextButton(
                                         onPressed: () {},
                                         child: Text("Forgot Password?",
-                                            style:
-                                                TextStyle(color: Colors.blue)),
+                                            style: TextStyle(color: Colors.blue)),
                                       ),
                                     ),
-                                    if (isLoading)
-                                      Center(
-                                        child: Lottie.asset(
-                                          'assets/loadin.json',
-                                          width: 100,
-                                          height: 100,
-                                        ),
-                                      ),
                                   ],
                                 ),
                               ),

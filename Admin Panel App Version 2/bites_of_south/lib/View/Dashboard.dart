@@ -1,7 +1,10 @@
 import 'package:bites_of_south/View/Menu/menu_management.dart';
 import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
 import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
+import 'package:bites_of_south/View/addAdmin.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -11,12 +14,41 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<int, Widget> _screens = {
     1: const MenuManagementScreen(),
     2: Scaffold(), // Replace with actual Order Screen
     3: Scaffold(), // Replace with actual Analysis Screen
-    4: const RewardsPanel(),
+    4:  RewardScreen(),
   };
+  
+
+  Future<void> _logout() async {
+    try {
+      QuerySnapshot userQuery = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: _auth.currentUser!.email)
+          .get();
+
+      if (userQuery.docs.isNotEmpty) {
+        String docId = userQuery.docs.first.id;
+        await _firestore.collection('users').doc(docId).update({
+          'phoneVerified': false,
+          'isAuthenticated': false,
+          'lastLoginAt': FieldValue.serverTimestamp(),
+          'lastLogoutAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      await _auth.signOut();
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error logging out: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +69,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ProfileScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
               );
             },
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings, color: Colors.white),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddAdminScreen()),
+              );
+            },
+            tooltip: 'Add New Admin',
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout,
+            tooltip: 'Logout',
+          ),
         ],
       ),
       body: Padding(
@@ -80,8 +124,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) =>
-                _screens[index] ??
-                const Scaffold(body: Center(child: Text("Page not found"))),
+                _screens[index] ?? const Scaffold(body: Center(child: Text("Page not found"))),
           ),
         );
       },
