@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Cart.css'; // Import your CSS file for styling
+import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -7,11 +8,13 @@ const Cart = () => {
   const [itemTotal, setItemTotal] = useState(0);
   const [gst, setGst] = useState(0);
   const [serviceCharge, setServiceCharge] = useState(0);
+  const navigate = useNavigate(); // Move useNavigate inside the component
+
 
   // Load cart items from local storage
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    
+
     // Ensure all items have a valid price and quantity
     const sanitizedCart = storedCart.map(item => ({
       title: item.title || "Unknown",
@@ -44,19 +47,50 @@ const Cart = () => {
     setTotalPrice(total || 0);
   }, [cartItems]);
 
-  // Function to update quantity
   const updateQuantity = (title, change) => {
-    const updatedCart = cartItems.map(item => {
-      if (item.title === title) {
-        let newQuantity = (item.quantity || 0) + change;
-        if (newQuantity < 1) return null; // Remove item if quantity is 0
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    }).filter(item => item !== null); // Remove null items
+    setCartItems((prevCart) => {
+      const updatedCart = prevCart
+        .map(item => {
+          if (item.title === title) {
+            let newQuantity = item.quantity + change;
+            return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+          }
+          return item;
+        })
+        .filter(item => item !== null); // Remove null items
 
-    setCartItems(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update local storage
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update local storage
+      return updatedCart;
+    });
+  };
+  const handlePayment = () => {
+    const options = {
+      key: "rzp_test_CkutVrejMBd1qG", // Replace with your Razorpay Test/Live Key
+      amount: totalPrice * 100, // Convert to paisa
+      currency: "INR",
+      name: "BitesOfSouth",
+      description: "Order Payment",
+      image: "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec", // Optional: Add your brand logo
+      handler: function (response) {
+        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+        localStorage.removeItem("cart"); // Clear cart after successful payment
+        setCartItems([]);
+        navigate("/order-processing.js", { state: { cartItems } });
+
+      },
+      prefill: {
+        name: "Customer Name",
+        email: "customer@example.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#F37254",
+      },
+      
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   return (
@@ -145,7 +179,8 @@ const Cart = () => {
       <div className="CheckoutFixed">
         <div className="AlmostThere"><p>Almost there! Complete your order by pay now.</p></div>
         <div className="PayNow">
-          <button className="PayNowButton">Pay Now</button>
+          {/* <button className="PayNowButton">Pay Now</button> */}
+          <button className="PayNowButton" onClick={handlePayment}>Pay Now</button>
         </div>
       </div>
     </section>
