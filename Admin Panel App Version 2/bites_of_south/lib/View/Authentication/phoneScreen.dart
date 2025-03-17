@@ -622,7 +622,7 @@ class _PhoneNumberVerificationScreenState
 
       if (enteredPhone.endsWith(widget.maskedPhoneNumber) &&
           enteredPhone == storedPhone) {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => PhoneVerificationScreen(

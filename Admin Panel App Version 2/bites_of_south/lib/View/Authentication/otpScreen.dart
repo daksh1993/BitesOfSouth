@@ -250,10 +250,11 @@
 //     );
 //   }
 // // }
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PhoneVerificationScreen extends StatefulWidget {
   final User user;
@@ -291,11 +292,11 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         phoneNumber = doc['phone'];
       });
 
+      // Always send OTP, even if phone number is already linked
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber!,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await _auth.signInWithCredential(credential);
-          _completeVerification();
+          await _handleCredential(credential);
         },
         verificationFailed: (FirebaseAuthException e) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -308,6 +309,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
             _verificationId = verificationId;
             isLoading = false;
           });
+          print("otp sent");
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           _verificationId = verificationId;
@@ -321,7 +323,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     }
   }
 
-  void _verifyOTP() async {
+  Future<void> _verifyOTP() async {
     setState(() => isLoading = true);
     try {
       String otp = _otpControllers.map((controller) => controller.text).join();
@@ -329,8 +331,7 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
         verificationId: _verificationId!,
         smsCode: otp,
       );
-      await _auth.signInWithCredential(credential);
-      _completeVerification();
+      await _handleCredential(credential);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("OTP Verification Failed: $e")),
@@ -339,12 +340,72 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     }
   }
 
-  void _completeVerification() async {
+  Future<void> _handleCredential(PhoneAuthCredential credential) async {
+    try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser != null) {
+        // Check if a phone number is already linked
+        if (currentUser.phoneNumber != null) {
+          if (currentUser.phoneNumber == phoneNumber) {
+            // Phone number matches, verify the credential by signing in
+            await _auth.signInWithCredential(credential);
+            await _completeVerification();
+          } else {
+            // A different phone number is linked, inform the user
+            throw FirebaseAuthException(
+              code: 'provider-already-linked',
+              message:
+                  'A different phone number is already linked to this account.',
+            );
+          }
+        } else {
+          // No phone number linked yet, link it
+          await currentUser.linkWithCredential(credential);
+          await _completeVerification();
+        }
+      } else {
+        throw Exception("No user is currently signed in.");
+      }
+    } catch (e) {
+      String errorMessage;
+      if (e is FirebaseAuthException && e.code == 'provider-already-linked') {
+        errorMessage =
+            "A different phone number is already linked to this account.";
+      } else {
+        errorMessage = "Failed to verify phone number: $e";
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> _completeVerification() async {
     await _firestore.collection('users').doc(widget.docId).update({
       'phoneVerified': true,
       'isAuthenticated': true,
       'lastLoginAt': FieldValue.serverTimestamp(),
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Phone number verified successfully")),
+    );
+    // print(_auth.currentUser.toString());
+    // DocumentSnapshot userDoc = await _firestore
+    //     .collection('users')
+    //     .where('email', isEqualTo: _auth.currentUser!.email)
+    //     .limit(1)
+    //     .get()
+    //     .then((snapshot) => snapshot.docs.first);
+
+    // String docId = userDoc.id;
+    // print(userDoc.data());
+
+    // print(docId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('docId', widget.docId);
+    await prefs.setBool("loggedin", true);
+
     Navigator.pushReplacementNamed(context, '/dashboard');
   }
 
@@ -353,10 +414,22 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
-        title: const Text("Phone OTP Verification"),
+        centerTitle: true,
+        title: Image(
+          image: NetworkImage(
+              "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec"),
+          // image: AssetImage("assets/round_logo.png"),
+          fit: BoxFit.cover,
+          height: MediaQuery.sizeOf(context).height / 24,
+        ),
         backgroundColor: Colors.green,
       ),
       backgroundColor: Colors.white,
@@ -471,7 +544,12 @@ class _PhoneVerificationScreenState extends State<PhoneVerificationScreen> {
                                   ),
                                 ),
                               ),
-                              if (isLoading) const CircularProgressIndicator(),
+                              if (isLoading)
+                                Container(
+                                  height:
+                                      MediaQuery.sizeOf(context).height * 0.2,
+                                  child: Lottie.asset("assets/loadin.json"),
+                                ),
                             ],
                           ),
                         ),
