@@ -1,10 +1,26 @@
-// src/Home.js
-import React from 'react';
-import './Home.css';  // Import the CSS file
+import React, { useState, useEffect } from 'react';
+import { FaUserCircle } from "react-icons/fa";
+import { auth } from './firebase';
+import LoginModal from './LoginModal'; // Adjusted path
+import UserProfileModal from './UserProfileModal'; // Adjusted path to match previous context
+import './Home.css';
 
 const Home = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false); // Login modal
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false); // Profile modal
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setIsLoggedIn(!!currentUser);
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <div className="home">  {/* Apply the CSS class */}
+    <div className="home">
       <section className="FirstH">
         <div className="nav">
           <div className="logo">
@@ -24,13 +40,40 @@ const Home = () => {
               <li className="Bscreen">
                 <a href="">About Us</a>
               </li>
-              <li className="signin">
-                <a href="">Sign in</a>
-              </li>
+              {isLoggedIn ? (
+  <li className="user-avatar">
+    {user?.photoURL ? (
+      <img
+        src={user.photoURL}
+        alt="User Avatar"
+        className="avatar-img"
+        onClick={() => setIsProfileModalOpen(true)}
+      />
+    ) : (
+      <FaUserCircle 
+        className="avatar-icon" 
+        size={40} 
+        onClick={() => setIsProfileModalOpen(true)} 
+      />
+    )}
+  </li>
+) : (
+  <li className="signin">
+    <a
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        setIsModalOpen(true);
+      }}
+    >
+      Sign in
+    </a>
+  </li>
+)}
             </ul>
           </div>
         </div>
-
+        {/* Rest of your JSX remains unchanged */}
         <div className="SecondH">
           <div className="LSideImg">
             <img src="/images/!TEmpSIdePic.avif" alt="" />
@@ -51,10 +94,10 @@ const Home = () => {
 
               <div className="FoodOption">
                 <div className="Option1">
-                  <a href='/menu'> 
-                  <h1>Order</h1>
-                  <h2>Order Food Online</h2>
-                  <img src="/images/Dosa.avif" alt="" />
+                  <a href="/menu">
+                    <h1>Order</h1>
+                    <h2>Order Food Online</h2>
+                    <img src="/images/Dosa.avif" alt="" />
                   </a>
                 </div>
                 <div className="Option1">
@@ -160,77 +203,113 @@ const Home = () => {
           </div>
         </div>
       </section>
-      
-<section className="maps">
-    <div className="TitleMaps">
-        <h2>We are located over here!</h2>
-    </div>
-    <div className="googlemapsD"> 
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3768.764234514681!2d72.847182!3d19.1617948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b64deb48f999%3A0xaeddd49518fd2974!2sBalaji%20Dosa%20Corner!5e0!3m2!1sen!2sin!4v1738253951373!5m2!1sen!2sin" allowFullScreen loading="lazy"></iframe> 
-    </div>    
-</section>
+
+      <section className="maps">
+        <div className="TitleMaps">
+          <h2>We are located over here!</h2>
+        </div>
+        <div className="googlemapsD">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3768.764234514681!2d72.847182!3d19.1617948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7b64deb48f999%3A0xaeddd49518fd2974!2sBalaji%20Dosa%20Corner!5e0!3m2!1sen!2sin!4v1738253951373!5m2!1sen!2sin"
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </div>
+      </section>
+
+      <nav className="bottom-nav">
+        <a href="/Home" className="nav-item">
+          <i className="fa-solid fa-house"></i>
+          <span>Home</span>
+        </a>
+        <a href="#" className="nav-item">
+          <i className="fa-solid fa-gift"></i>
+          <span>Rewards</span>
+        </a>
+        <a href="/menu" className="nav-item">
+          <i className="fa-solid fa-search"></i>
+          <span>Search</span>
+        </a>
+        <a href="#" className="nav-item">
+          <i className="fa-solid fa-cart-shopping"></i>
+          <span>Cart</span>
+        </a>
+      </nav>
 
       <section className="Footer">
-      <div className="footer-container">
-        <div className="footer-main">
+        <div className="footer-container">
+          <div className="footer-main">
             <div className="footer-logo">
-                <div className="logo-image">
-                    <img src="/images/dosaimg.png" alt="Logo" loading="lazy"/>
-                </div>
+              <div className="logo-image">
+                <img src="/images/dosaimg.png" alt="Logo" loading="lazy" />
+              </div>
             </div>
             <div className="footer-text">© 2025 Bites Of South Limited</div>
-        </div>
+          </div>
 
-        <div className="footer-links">
+          <div className="footer-links">
             <ul className="company-links">
-                <li className="link-item"><div className="section-title">Company</div></li>
-                <li className="link-item"><a href="" target="_blank">About Us</a></li>
-                <li className="link-item"><a href="" target="_blank">Help & Support</a></li>
-                <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Partner with Us</a></li>
-                <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Contact US</a></li>
+              <li className="link-item"><div className="section-title">Company</div></li>
+              <li className="link-item"><a href="" target="_blank">About Us</a></li>
+              <li className="link-item"><a href="" target="_blank">Help & Support</a></li>
+              <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Partner with Us</a></li>
+              <li className="link-item"><a href="" target="_blank" rel="nofollow noopener">Contact US</a></li>
             </ul>
 
             <ul className="legal-links">
-                <li className="link-item"><div className="section-title">Legal</div></li>
-                <li className="link-item"><a href="" target="_blank">Terms & Conditions</a></li>
-                <li className="link-item"><a href="" target="_blank">Cookie Policy</a></li>
-                <li className="link-item"><a href="" target="_blank">Privacy Policy</a></li>
+              <li className="link-item"><div className="section-title">Legal</div></li>
+              <li className="link-item"><a href="" target="_blank">Terms & Conditions</a></li>
+              <li className="link-item"><a href="" target="_blank">Cookie Policy</a></li>
+              <li className="link-item"><a href="" target="_blank">Privacy Policy</a></li>
             </ul>
 
             <ul className="location-links">
-                <li className="link-item"><div className="section-title">Available at:</div></li>
-                <li className="link-item"><a href="">Mumbai</a></li>
+              <li className="link-item"><div className="section-title">Available at:</div></li>
+              <li className="link-item"><a href="">Mumbai</a></li>
             </ul>
 
+            <ul className="payment-methods-list">
+              <li className="link-item"><div className="section-title">Payment Methods</div></li>
+              <li className="link-item">
+                <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/upi-icon.svg" width="50" height="30" alt="UPI" loading="lazy" />
+                <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/gpay-svg.svg" width="50" height="30" alt="Google Pay" loading="lazy" />
+              </li>
+              <li className="link-item">
+                <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/paytm-svg.svg" width="50" height="30" alt="Paytm" loading="lazy" />
+                <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/visa-svg.svg" width="50" height="30" alt="Visa" loading="lazy" />
+              </li>
+            </ul>
 
-                
-                <ul className="payment-methods-list">                       
-                        <li className="link-item"><div className="section-title">Payment Methods</div></li>
-                        <li className="link-item"> <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/upi-icon.svg" width="50" height="30" alt="UPI" loading="lazy"/> <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/gpay-svg.svg" width="50" height="30" alt="Google Pay" loading="lazy"/></li>
-                        <li className="link-item"> <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/paytm-svg.svg" width="50" height="30" alt="Paytm" loading="lazy"/> <img className="payment-icon" src="https://lapinozpizza.in/assets/wla_new/img/footer/visa-svg.svg" width="50" height="30" alt="Visa" loading="lazy"/></li>       
-                </ul>
-
-            
             <div className="social-links">
-                <a href="" target="_blank">
-                    <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Linkedin.svg" alt="LinkedIn" loading="lazy"/>
-                </a>
-                <a href="" target="_blank">
-                    <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-instagram.svg" alt="Instagram" loading="lazy"/>
-                </a>
-                <a href="" target="_blank">
-                    <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-facebook.svg" alt="Facebook" loading="lazy"/>
-                </a>
-                <a href="" target="_blank">
-                    <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-pinterest.svg" alt="Pinterest" loading="lazy"/>
-                </a>
-                <a href="" target="_blank">
-                    <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Twitter.svg" alt="Twitter" loading="lazy"/>
-                </a>
+              <a href="" target="_blank">
+                <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Linkedin.svg" alt="LinkedIn" loading="lazy" />
+              </a>
+              <a href="" target="_blank">
+                <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-instagram.svg" alt="Instagram" loading="lazy" />
+              </a>
+              <a href="" target="_blank">
+                <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-facebook.svg" alt="Facebook" loading="lazy" />
+              </a>
+              <a href="" target="_blank">
+                <img src="https://media-assets.swiggy.com/portal/testing/seo-home/icon-pinterest.svg" alt="Pinterest" loading="lazy" />
+              </a>
+              <a href="" target="_blank">
+                <img src="https://media-assets.swiggy.com/portal/testing/seo-home/Twitter.svg" alt="Twitter" loading="lazy" />
+              </a>
             </div>
+          </div>
         </div>
-    </div>
       </section>
+
+      <LoginModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+      />
+      <UserProfileModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)}
+        user={user}
+      />
     </div>
   );
 };

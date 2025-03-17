@@ -279,7 +279,7 @@ a:visited {
   }
 
   .NavOption {
-    justify-content: space-evenly;
+    justify-content: end;
     font-size: 12px;
   }
 
@@ -693,4 +693,79 @@ ul {
 .TitleMaps {
   align-items: center;
   text-align: center;
+}
+/* Bottom Navigation Bar - Swiggy Style */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid #e0e0e0;
+  z-index: 1000;
+}
+
+.bottom-nav .nav-item {
+  text-align: center;
+  text-decoration: none;
+  color: #4a4a4a;
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.bottom-nav .nav-item i {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 4px;
+  color: #757575;
+  transition: color 0.3s ease;
+}
+
+.bottom-nav .nav-item span {
+  font-size: 12px;
+  color: #757575;
+  transition: color 0.3s ease;
+}
+
+/* Active and Hover Effects */
+.bottom-nav .nav-item:hover i,
+.bottom-nav .nav-item:hover span,
+.bottom-nav .nav-item.active i,
+.bottom-nav .nav-item.active span {
+  color: #fc8019;  /* Swiggy’s signature orange */
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .bottom-nav {
+    padding: 12px 0;
+  }
+  .bottom-nav .nav-item i {
+    font-size: 24px;
+  }
+  .bottom-nav .nav-item span {
+    font-size: 13px;
+  }
+}
+
+
+/* src/Home.css */
+/* Add these styles to your existing CSS */
+.user-avatar {
+  cursor: pointer;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff6200;
 }

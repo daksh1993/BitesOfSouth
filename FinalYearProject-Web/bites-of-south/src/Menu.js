@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from "react";
 import "./Menu.css";
-import { getDocs, collection, getFirestore } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import { getDocs, collection } from "firebase/firestore"; // Firestore functions
+import { db } from "./firebase"; // Import initialized Firestore instance
 import { useNavigate } from "react-router-dom";
 
-// Firebase Configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
-  authDomain: "bitesofsouth-a38f4.firebaseapp.com",
-  databaseURL: "https://bitesofsouth-a38f4-default-rtdb.firebaseio.com",
-  projectId: "bitesofsouth-a38f4",
-  storageBucket: "bitesofsouth-a38f4.appspot.com",
-  messagingSenderId: "65231955877",
-  appId: "1:65231955877:web:aab053b6882e9894bdaa4c",
-  measurementId: "G-R9WE265DPN",
-};
+// // Firebase Configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
+//   authDomain: "bitesofsouth-a38f4.firebaseapp.com",
+//   databaseURL: "https://bitesofsouth-a38f4-default-rtdb.firebaseio.com",
+//   projectId: "bitesofsouth-a38f4",
+//   storageBucket: "bitesofsouth-a38f4.appspot.com",
+//   messagingSenderId: "65231955877",
+//   appId: "1:65231955877:web:aab053b6882e9894bdaa4c",
+//   measurementId: "G-R9WE265DPN",
+// };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+// const db = getFirestore(app);
+
 
 function Menu() {
   const [cart, setCart] = useState([]);
