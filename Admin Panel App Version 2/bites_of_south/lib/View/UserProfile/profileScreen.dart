@@ -2,6 +2,7 @@ import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -11,35 +12,39 @@ class ProfileScreen extends StatefulWidget {
 String name = "Admin Test";
 String email = "admintest@gmail.com";
 String phone = "+91 1234567890";
+String role = "admintest";
+String lastLoginAt = "Not available";
+String lastLogoutAt = "Not available";
 
 Future<void> FetchProfile() async {
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    DocumentSnapshot userProfile = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
+  SharedPreferences pref = await SharedPreferences.getInstance();
+
+  String? userid = pref.getString("docId");
+  if (userid != null) {
+    DocumentSnapshot userProfile =
+        await FirebaseFirestore.instance.collection('users').doc(userid).get();
 
     if (userProfile.exists) {
-      // Access user data here
       name = userProfile['name'];
       email = userProfile['email'];
       phone = userProfile['phone'];
-      // Update the UI or state with the fetched data
+      role = userProfile['role'];
+      lastLoginAt =
+          (userProfile['lastLoginAt'] as Timestamp).toDate().toString();
+      lastLogoutAt =
+          (userProfile['lastLogoutAt'] as Timestamp).toDate().toString() ??
+              "Not available";
     } else {
-      // Handle the case where the user profile does not exist
-      print("user profile does not exist");
+      print("User profile does not exist");
     }
   } else {
-    // Handle the case where the user is not logged in
-    print("user not logged in");
+    print("User not logged in");
   }
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FetchProfile();
   }
@@ -76,19 +81,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Colors.white,
                       ),
                     ),
-                    IconButton(
-                      onPressed: () {
-                        // Add your edit profile functionality here
-                      },
-                      icon: Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                      ),
-                    ),
+                    // IconButton(
+                    //   onPressed: () {},
+                    //   icon: Icon(
+                    //     Icons.edit,
+                    //     color: Colors.white,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
-              // Header with Profile Pic and Name
               Container(
                 padding: const EdgeInsets.symmetric(
                     vertical: 30.0, horizontal: 20.0),
@@ -108,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 15),
                     Text(
-                      name, // Replace with user's name
+                      name,
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -118,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      'Admin', // Optional role or subtitle
+                      role,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white70,
@@ -128,7 +130,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-              // Info Section
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -145,23 +146,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildInfoItem(
                         icon: Icons.email_outlined,
                         label: 'Email',
-                        value: email, // Replace with user's email
+                        value: email,
                       ),
                       const SizedBox(height: 25),
                       _buildInfoItem(
                         icon: Icons.phone_outlined,
                         label: 'Phone',
-                        value: phone, // Replace with user's phone
+                        value: phone,
+                      ),
+                      const SizedBox(height: 25),
+                      _buildInfoItem(
+                        icon: Icons.access_time,
+                        label: 'Last Login',
+                        value: lastLoginAt,
+                      ),
+                      const SizedBox(height: 25),
+                      _buildInfoItem(
+                        icon: Icons.logout,
+                        label: 'Last Logout',
+                        value: lastLogoutAt,
                       ),
                       const Spacer(),
                       Center(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen()),
-                            );
-                            // Add your logout functionality here
+                            FirebaseAuth.instance.signOut().then((_) async {
+                              SharedPreferences pref =
+                                  await SharedPreferences.getInstance();
+                              String? userid = pref.getString("docId");
+                              if (userid != null) {
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(userid)
+                                    .update({
+                                  'lastLogoutAt': FieldValue.serverTimestamp(),
+                                });
+                                pref.setString("docId", "");
+                                pref.setBool("loggedin", false);
+                              }
+
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => LoginScreen()),
+                              );
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
@@ -195,7 +223,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper method to build sleek info items
   Widget _buildInfoItem(
       {required IconData icon, required String label, required String value}) {
     return Row(

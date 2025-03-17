@@ -49,6 +49,7 @@ dependencies:
   firebase_auth: ^5.4.2
   intl: ^0.20.2
   shared_preferences: ^2.5.2
+  mailer: ^6.4.1
   
 
 dev_dependencies:
