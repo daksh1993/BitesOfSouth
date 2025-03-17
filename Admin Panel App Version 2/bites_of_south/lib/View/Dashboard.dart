@@ -5,6 +5,7 @@ import 'package:bites_of_south/View/addAdmin.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,33 +23,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
     3: Scaffold(), // Replace with actual Analysis Screen
     4:  RewardScreen(),
   };
-  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadDocId();
+  }
 
-  Future<void> _logout() async {
-    try {
-      QuerySnapshot userQuery = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: _auth.currentUser!.email)
-          .get();
-
-      if (userQuery.docs.isNotEmpty) {
-        String docId = userQuery.docs.first.id;
-        await _firestore.collection('users').doc(docId).update({
-          'phoneVerified': false,
-          'isAuthenticated': false,
-          'lastLoginAt': FieldValue.serverTimestamp(),
-          'lastLogoutAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      await _auth.signOut();
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error logging out: $e")),
-      );
+  Future<void> _loadDocId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? docId = prefs.getString('docId');
+    if (docId != null) {
+      // Use the docId as needed
+      print("Retrieved docId: $docId");
+    } else {
+      // Handle the case where docId is not found
+      print("docId not found in SharedPreferences");
     }
   }
+
+
+  // Future<void> _logout() async {
+  //   try {
+  //     QuerySnapshot userQuery = await _firestore
+  //         .collection('users')
+  //         .where('email', isEqualTo: _auth.currentUser!.email)
+  //         .get();
+
+  //     if (userQuery.docs.isNotEmpty) {
+  //       String docId = userQuery.docs.first.id;
+  //       await _firestore.collection('users').doc(docId).update({
+  //         'phoneVerified': false,
+  //         'isAuthenticated': false,
+  //         'lastLoginAt': FieldValue.serverTimestamp(),
+  //         'lastLogoutAt': FieldValue.serverTimestamp(),
+  //       });
+  //     }
+
+  //     await _auth.signOut();
+  //     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Error logging out: $e")),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +101,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             tooltip: 'Add New Admin',
           ),
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            onPressed: _logout,
-            tooltip: 'Logout',
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.logout, color: Colors.white),
+          //   onPressed: _logout,
+          //   tooltip: 'Logout',
+          // ),
         ],
       ),
       body: Padding(

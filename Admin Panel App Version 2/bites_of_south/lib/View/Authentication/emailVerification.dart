@@ -4,9 +4,7 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 
 // class EmailVerificationScreen extends StatefulWidget {
-//   final User user;
-//   final String docId; // Added docId to access Firestore document
-//   const EmailVerificationScreen({required this.user, required this.docId, super.key});
+//   const EmailVerificationScreen({ super.key});
 
 //   @override
 //   State<EmailVerificationScreen> createState() => _EmailVerificationScreenState();
@@ -40,7 +38,6 @@
 //     setState(() => isLoading = true);
 
 //     // Reload user to update Firebase Auth state
-//     await widget.user.reload();
 //     User updatedUser = _auth.currentUser!;
 
 //     // Check Firestore status
