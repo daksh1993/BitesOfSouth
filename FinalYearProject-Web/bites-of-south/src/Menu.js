@@ -59,9 +59,24 @@ function Menu() {
 
   // Add item to cart and save to local storage
   const addToCart = (item) => {
-    const updatedCart = [...cart, item];
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
+
+      let updatedCart;
+      if (existingItem) {
+        updatedCart = prevCart.map((cartItem) =>
+          cartItem.title === item.title
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        );
+      } else {
+        updatedCart = [...prevCart, { ...item, quantity: 1 }];
+      }
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update local storage
+      return updatedCart;
+    });
+
     setShowCartPopup(true);
   };
 

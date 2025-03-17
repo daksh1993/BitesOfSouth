@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food App - Login & Register</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #9dc01e;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #9dc01e;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #8aab18;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .link a {
+            color: #9dc01e;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Food-themed Illustrations */
+        .food-illustration {
+            position: absolute;
+            z-index: -1;
+        }
+
+        .food-illustration.top-left {
+            top: -50px;
+            left: -50px;
+            width: 150px;
+            height: 150px;
+            background: url('https://via.placeholder.com/150') no-repeat center/cover;
+        }
+
+        .food-illustration.bottom-right {
+            bottom: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: url('https://via.placeholder.com/150') no-repeat center/cover;
+        }
+
+        /* OTP Page Styles */
+        .otp-container {
+            display: none;
+        }
+
+        .otp-input {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .otp-input input {
+            width: 15%;
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background-color: #f8f8f8;
+        }
+
+        .otp-input input:focus {
+            border-color: #9dc01e;
+            outline: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Registration Form -->
+    <div class="container" id="register-container">
+        <div class="food-illustration top-left"></div>
+        <div class="food-illustration bottom-right"></div>
+        <h2>🍴 Create Your Account</h2>
+        <form id="register-form">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birthdate">Birthdate</label>
+                <input type="date" id="birthdate" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter your phone number" required>
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="link">
+            Already have an account? <a href="#" id="login-link">Login</a>
+        </div>
+    </div>
+
+    <!-- Login Form - Mobile Number -->
+    <div class="container" id="login-container" style="display: none;">
+        <div class="food-illustration top-left"></div>
+        <div class="food-illustration bottom-right"></div>
+        <h2>🍕 Welcome Back!</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="mobile">Mobile Number</label>
+                <input type="tel" id="mobile" placeholder="Enter your mobile number" required>
+            </div>
+            <button type="submit" class="btn">Send OTP</button>
+        </form>
+        <div class="link">
+            Don't have an account? <a href="#" id="register-link">Register</a>
+        </div>
+    </div>
+
+    <!-- OTP Verification -->
+    <div class="container otp-container" id="otp-container">
+        <div class="food-illustration top-left"></div>
+        <div class="food-illustration bottom-right"></div>
+        <h2>🔑 Verify OTP</h2>
+        <form id="otp-form">
+            <div class="otp-input">
+                <input type="text" maxlength="1" required>
+                <input type="text" maxlength="1" required>
+                <input type="text" maxlength="1" required>
+                <input type="text" maxlength="1" required>
+                <input type="text" maxlength="1" required>
+                <input type="text" maxlength="1" required>
+            </div>
+            <button type="submit" class="btn">Verify OTP</button>
+        </form>
+        <div class="link">
+            <a href="#" id="back-to-login">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for toggling between forms
+        const registerContainer = document.getElementById('register-container');
+        const loginContainer = document.getElementById('login-container');
+        const otpContainer = document.getElementById('otp-container');
+        const loginLink = document.getElementById('login-link');
+        const registerLink = document.getElementById('register-link');
+        const backToLogin = document.getElementById('back-to-login');
+
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            otpContainer.style.display = 'none';
+        });
+
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerContainer.style.display = 'block';
+            loginContainer.style.display = 'none';
+            otpContainer.style.display = 'none';
+        });
+
+        backToLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerContainer.style.display = 'none';
+            loginContainer.style.display = 'block';
+            otpContainer.style.display = 'none';
+        });
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            loginContainer.style.display = 'none';
+            otpContainer.style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
