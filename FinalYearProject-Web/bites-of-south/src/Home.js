@@ -230,7 +230,7 @@ const Home = () => {
           <i className="fa-solid fa-search"></i>
           <span>Search</span>
         </a>
-        <a href="#" className="nav-item">
+        <a href="/cart" className="nav-item">
           <i className="fa-solid fa-cart-shopping"></i>
           <span>Cart</span>
         </a>

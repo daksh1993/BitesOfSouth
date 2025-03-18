@@ -1,6 +1,6 @@
 // src/components/UserProfileModal.js
 import React, { useState, useEffect } from 'react';
-import { auth, db } from './firebase';
+import { auth, db } from './firebase'; // Ensure this matches your firebase config import
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updateProfile, updateEmail } from 'firebase/auth';
 import './UserProfileModal.css';
@@ -18,17 +18,25 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
     const fetchUserData = async () => {
       if (user) {
         try {
-          const userDoc = await getDoc(doc(db, 'clients', user.uid));
+          const userRef = doc(db, 'users', user.uid); // Changed from 'clients' to 'users'
+          const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const data = userDoc.data();
+            console.log("Fetched user data:", data); // Debug log
             setUserData(data);
+            setEditedName(data.name || user.displayName || '');
+            setEditedEmail(data.email || user.email || '');
+            setEditedPhoneNo(data.phoneNo || ''); // Ensure phoneNo is set
+          } else {
+            console.log("No user document found, using auth data");
             setEditedName(user.displayName || '');
             setEditedEmail(user.email || '');
-            setEditedPhoneNo(data.phoneNo || '');
+            setEditedPhoneNo(''); // Default to empty if no Firestore data
           }
           setLoading(false);
         } catch (err) {
           console.error('Error fetching user data:', err);
+          setError('Failed to load profile data');
           setLoading(false);
         }
       }
@@ -52,6 +60,14 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
 
   const handleSave = async () => {
     try {
+      const userRef = doc(db, 'users', user.uid); // Changed from 'clients' to 'users'
+      const updateData = {
+        name: editedName,
+        email: editedEmail,
+        phoneNo: editedPhoneNo // Always update phoneNo
+      };
+
+      // Update Firebase Auth if name or email changed
       if (editedName !== user.displayName) {
         await updateProfile(auth.currentUser, { displayName: editedName });
       }
@@ -59,32 +75,30 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
         await updateEmail(auth.currentUser, editedEmail);
       }
 
-      const updateData = {
-        name: editedName,
-        email: editedEmail
-      };
-      if (!userData?.phoneNo && editedPhoneNo) {
-        updateData.phoneNo = editedPhoneNo;
-      }
+      // Update Firestore
+      console.log("Saving updated data:", updateData); // Debug log
+      await updateDoc(userRef, updateData);
 
-      await updateDoc(doc(db, 'clients', user.uid), updateData);
-
-      setIsEditing(false);
-      setError(null);
-      user.displayName = editedName;
-      user.email = editedEmail;
+      // Update local state
       setUserData(prev => ({
         ...prev,
         name: editedName,
         email: editedEmail,
-        phoneNo: updateData.phoneNo || prev.phoneNo
+        phoneNo: editedPhoneNo
       }));
+      setIsEditing(false);
+      setError(null);
+
+      // Update auth object for consistency
+      user.displayName = editedName;
+      user.email = editedEmail;
+
+      const updatedDoc = await getDoc(userRef);
+      console.log("Saved data after update:", updatedDoc.data()); // Debug log
     } catch (err) {
       setError(err.message);
     }
   };
-
-  const isPhoneEditable = !userData?.phoneNo;
 
   return (
     <div className="modal-overlay">
@@ -122,19 +136,15 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
                 </div>
                 <div className="form-group">
                   <label><strong>Phone Number:</strong></label>
-                  {isPhoneEditable ? (
-                    <input
-                      type="tel"
-                      value={editedPhoneNo}
-                      onChange={(e) => setEditedPhoneNo(e.target.value)}
-                      className="edit-input"
-                      pattern="[0-9]{10}"
-                      title="Please enter a 10-digit phone number"
-                      placeholder="Enter phone number"
-                    />
-                  ) : (
-                    <p>{userData.phoneNo} (Not editable)</p>
-                  )}
+                  <input
+                    type="tel"
+                    value={editedPhoneNo}
+                    onChange={(e) => setEditedPhoneNo(e.target.value)}
+                    className="edit-input"
+                    pattern="[0-9]{10}"
+                    title="Please enter a 10-digit phone number"
+                    placeholder="Enter phone number"
+                  />
                 </div>
                 {error && <p className="error-message">{error}</p>}
                 <button className="save-btn" onClick={handleSave}>
@@ -146,8 +156,8 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
               </>
             ) : (
               <>
-                <p><strong>Name:</strong> {user?.displayName || 'N/A'}</p>
-                <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
+                <p><strong>Name:</strong> {userData?.name || user?.displayName || 'N/A'}</p>
+                <p><strong>Email:</strong> {userData?.email || user?.email || 'N/A'}</p>
                 <p><strong>Phone Number:</strong> {userData?.phoneNo || 'Not provided'}</p>
                 <button className="edit-btn" onClick={handleEditToggle}>
                   Edit Profile
