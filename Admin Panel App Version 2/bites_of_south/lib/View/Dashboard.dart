@@ -3,8 +3,8 @@ import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
 import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:bites_of_south/View/addAdmin.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -15,8 +15,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<int, Widget> _screens = {
     1: const MenuManagementScreen(),
     2: Scaffold(), // Replace with actual Order Screen

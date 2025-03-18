@@ -584,10 +584,183 @@
 //   }
 // }
 
+// import 'package:bites_of_south/View/Authentication/otpScreen.dart';
+// import 'package:flutter/material.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+
+// class PhoneNumberVerificationScreen extends StatefulWidget {
+//   final User user;
+//   final String docId;
+//   final String maskedPhoneNumber;
+//   const PhoneNumberVerificationScreen({
+//     required this.user,
+//     required this.docId,
+//     required this.maskedPhoneNumber,
+//     super.key,
+//   });
+
+//   @override
+//   State<PhoneNumberVerificationScreen> createState() =>
+//       _PhoneNumberVerificationScreenState();
+// }
+
+// class _PhoneNumberVerificationScreenState
+//     extends State<PhoneNumberVerificationScreen> {
+//   final TextEditingController _phoneController = TextEditingController();
+//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+//   bool isLoading = false;
+
+//   void _verifyPhoneNumber() async {
+//     setState(() => isLoading = true);
+//     String enteredPhone = "+91" + _phoneController.text.trim();
+//     try {
+//       DocumentSnapshot doc =
+//           await _firestore.collection('users').doc(widget.docId).get();
+//       String storedPhone = doc['phone'];
+//       print("Stored phone: $storedPhone");
+
+//       if (enteredPhone.endsWith(widget.maskedPhoneNumber) &&
+//           enteredPhone == storedPhone) {
+//         Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => PhoneVerificationScreen(
+//               user: widget.user,
+//               docId: widget.docId,
+//             ),
+//           ),
+//         );
+//       } else {
+//         print("Entered phone: $enteredPhone");
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           SnackBar(content: Text("Phone number does not match")),
+//         );
+//       }
+//     } catch (e) {
+//       print(e);
+//     }
+//     setState(() => isLoading = false);
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         leading: IconButton(
+//           icon: const Icon(Icons.arrow_back, color: Colors.white),
+//           onPressed: () => Navigator.of(context).pop(),
+//         ),
+//         title: Image(
+//           image: NetworkImage(
+//               "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec"),
+//           fit: BoxFit.cover,
+//           height: MediaQuery.sizeOf(context).height / 24,
+//         ),
+//         backgroundColor: Colors.green,
+//       ),
+//       backgroundColor: Colors.white,
+//       body: SingleChildScrollView(
+//         child: Stack(
+//           children: [
+//             Container(
+//               height: MediaQuery.sizeOf(context).height / 3,
+//               decoration: const BoxDecoration(
+//                 color: Colors.green,
+//                 borderRadius: BorderRadius.only(
+//                   bottomLeft: Radius.circular(18),
+//                   bottomRight: Radius.circular(18),
+//                 ),
+//               ),
+//             ),
+//             Padding(
+//               padding:
+//                   EdgeInsets.only(top: MediaQuery.sizeOf(context).height / 25),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   const Padding(
+//                     padding: EdgeInsets.symmetric(horizontal: 20),
+//                     child: Text(
+//                       "Is this you?",
+//                       style: TextStyle(
+//                           fontSize: 32,
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.white),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 10),
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 20),
+//                     child: Text(
+//                       "Enter your phone number ending with xxxxxx${widget.maskedPhoneNumber}",
+//                       style: const TextStyle(fontSize: 18, color: Colors.white),
+//                     ),
+//                   ),
+//                   SizedBox(height: MediaQuery.sizeOf(context).height / 15),
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 20),
+//                     child: Card(
+//                       elevation: 4,
+//                       shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(15)),
+//                       child: Padding(
+//                         padding:
+//                             const EdgeInsets.only(top: 20, left: 20, right: 20),
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.center,
+//                           children: [
+//                             const SizedBox(height: 12),
+//                             TextField(
+//                               controller: _phoneController,
+//                               keyboardType: TextInputType.phone,
+//                               maxLength: 10,
+//                               decoration: InputDecoration(
+//                                 prefixIcon:
+//                                     const Icon(Icons.phone, color: Colors.grey),
+//                                 labelText: "Enter Full Phone Number",
+//                                 labelStyle: const TextStyle(color: Colors.grey),
+//                                 border: OutlineInputBorder(
+//                                     borderRadius: BorderRadius.circular(10)),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 15),
+//                             ElevatedButton(
+//                               style: ElevatedButton.styleFrom(
+//                                 backgroundColor: Colors.green,
+//                                 shape: RoundedRectangleBorder(
+//                                     borderRadius: BorderRadius.circular(10)),
+//                                 minimumSize: const Size(double.infinity, 50),
+//                               ),
+//                               onPressed: _verifyPhoneNumber,
+//                               child: const Text(
+//                                 "Verify",
+//                                 style: TextStyle(
+//                                     color: Colors.white,
+//                                     fontWeight: FontWeight.bold),
+//                               ),
+//                             ),
+//                             const SizedBox(height: 20),
+//                           ],
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+import 'package:bites_of_south/Controller/Authentication/phone_auth_provider.dart';
 import 'package:bites_of_south/View/Authentication/otpScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class PhoneNumberVerificationScreen extends StatefulWidget {
   final User user;
@@ -608,150 +781,152 @@ class PhoneNumberVerificationScreen extends StatefulWidget {
 class _PhoneNumberVerificationScreenState
     extends State<PhoneNumberVerificationScreen> {
   final TextEditingController _phoneController = TextEditingController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  bool isLoading = false;
-
-  void _verifyPhoneNumber() async {
-    setState(() => isLoading = true);
-    String enteredPhone = "+91" + _phoneController.text.trim();
-    try {
-      DocumentSnapshot doc =
-          await _firestore.collection('users').doc(widget.docId).get();
-      String storedPhone = doc['phone'];
-      print("Stored phone: $storedPhone");
-
-      if (enteredPhone.endsWith(widget.maskedPhoneNumber) &&
-          enteredPhone == storedPhone) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PhoneVerificationScreen(
-              user: widget.user,
-              docId: widget.docId,
-            ),
-          ),
-        );
-      } else {
-        print("Entered phone: $enteredPhone");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Phone number does not match")),
-        );
-      }
-    } catch (e) {
-      print(e);
-    }
-    setState(() => isLoading = false);
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Image(
-          image: NetworkImage(
-              "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec"),
-          fit: BoxFit.cover,
-          height: MediaQuery.sizeOf(context).height / 24,
-        ),
-        backgroundColor: Colors.green,
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Container(
-              height: MediaQuery.sizeOf(context).height / 3,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(18),
-                  bottomRight: Radius.circular(18),
-                ),
-              ),
+    return Consumer<PhoneValidityProvider>(
+      builder: (context, phoneValidityProvider, child) {
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
             ),
-            Padding(
-              padding:
-                  EdgeInsets.only(top: MediaQuery.sizeOf(context).height / 25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "Is this you?",
-                      style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+            title: Image(
+              image: NetworkImage(
+                  "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec"),
+              fit: BoxFit.cover,
+              height: MediaQuery.sizeOf(context).height / 24,
+            ),
+            backgroundColor: Colors.green,
+          ),
+          backgroundColor: Colors.white,
+          body: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Container(
+                  height: MediaQuery.sizeOf(context).height / 3,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(18),
+                      bottomRight: Radius.circular(18),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      "Enter your phone number ending with xxxxxx${widget.maskedPhoneNumber}",
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.sizeOf(context).height / 15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 20, right: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 12),
-                            TextField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
-                              maxLength: 10,
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    const Icon(Icons.phone, color: Colors.grey),
-                                labelText: "Enter Full Phone Number",
-                                labelStyle: const TextStyle(color: Colors.grey),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                minimumSize: const Size(double.infinity, 50),
-                              ),
-                              onPressed: _verifyPhoneNumber,
-                              child: const Text(
-                                "Verify",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.sizeOf(context).height / 25),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "Is this you?",
+                          style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "Enter your phone number ending with xxxxxx${widget.maskedPhoneNumber}",
+                          style: const TextStyle(
+                              fontSize: 18, color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(height: MediaQuery.sizeOf(context).height / 15),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Card(
+                          elevation: 4,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 20, left: 20, right: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 12),
+                                TextField(
+                                  controller: _phoneController,
+                                  keyboardType: TextInputType.phone,
+                                  maxLength: 10,
+                                  decoration: InputDecoration(
+                                    prefixIcon: const Icon(Icons.phone,
+                                        color: Colors.grey),
+                                    labelText: "Enter Full Phone Number",
+                                    labelStyle:
+                                        const TextStyle(color: Colors.grey),
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                  ),
+                                ),
+                                const SizedBox(height: 15),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    minimumSize:
+                                        const Size(double.infinity, 50),
+                                  ),
+                                  onPressed: phoneValidityProvider.isLoading
+                                      ? null
+                                      : () {
+                                          phoneValidityProvider
+                                              .verifyPhoneNumber(
+                                            enteredPhone:
+                                                _phoneController.text.trim(),
+                                            docId: widget.docId,
+                                            maskedPhoneNumber:
+                                                widget.maskedPhoneNumber,
+                                            context: context,
+                                            onSuccess: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PhoneVerificationScreen(
+                                                    user: widget.user,
+                                                    docId: widget.docId,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                  child: phoneValidityProvider.isLoading
+                                      ? CircularProgressIndicator(
+                                          color: Colors.white)
+                                      : const Text(
+                                          "Verify",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

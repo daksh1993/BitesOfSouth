@@ -81,6 +81,10 @@ a:visited {
   transition: 0.3s;
 }
 
+.signin a {
+  color: white;
+}
+
 .SecondH {
   display: flex;
   justify-content: space-between;
@@ -694,6 +698,7 @@ ul {
   align-items: center;
   text-align: center;
 }
+
 /* Bottom Navigation Bar - Swiggy Style */
 .bottom-nav {
   position: fixed;
@@ -739,7 +744,8 @@ ul {
 .bottom-nav .nav-item:hover span,
 .bottom-nav .nav-item.active i,
 .bottom-nav .nav-item.active span {
-  color: #fc8019;  /* Swiggy’s signature orange */
+  color: #fc8019;
+  /* Swiggy’s signature orange */
 }
 
 /* Mobile Optimization */
@@ -747,9 +753,11 @@ ul {
   .bottom-nav {
     padding: 12px 0;
   }
+
   .bottom-nav .nav-item i {
     font-size: 24px;
   }
+
   .bottom-nav .nav-item span {
     font-size: 13px;
   }

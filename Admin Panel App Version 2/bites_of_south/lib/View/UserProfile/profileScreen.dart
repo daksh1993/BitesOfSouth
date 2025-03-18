@@ -32,8 +32,7 @@ Future<void> FetchProfile() async {
       lastLoginAt =
           (userProfile['lastLoginAt'] as Timestamp).toDate().toString();
       lastLogoutAt =
-          (userProfile['lastLogoutAt'] as Timestamp).toDate().toString() ??
-              "Not available";
+          (userProfile['lastLogoutAt'] as Timestamp).toDate().toString();
     } else {
       print("User profile does not exist");
     }
@@ -45,12 +44,14 @@ Future<void> FetchProfile() async {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
     FetchProfile();
   }
 
   @override
   Widget build(BuildContext context) {
+    FetchProfile();
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

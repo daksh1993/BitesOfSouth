@@ -41,35 +41,35 @@ const Home = () => {
                 <a href="">About Us</a>
               </li>
               {isLoggedIn ? (
-  <li className="user-avatar">
-    {user?.photoURL ? (
-      <img
-        src={user.photoURL}
-        alt="User Avatar"
-        className="avatar-img"
-        onClick={() => setIsProfileModalOpen(true)}
-      />
-    ) : (
-      <FaUserCircle 
-        className="avatar-icon" 
-        size={40} 
-        onClick={() => setIsProfileModalOpen(true)} 
-      />
-    )}
-  </li>
-) : (
-  <li className="signin">
-    <a
-      href="#"
-      onClick={(e) => {
-        e.preventDefault();
-        setIsModalOpen(true);
-      }}
-    >
-      Sign in
-    </a>
-  </li>
-)}
+                <li className="user-avatar">
+                  {user?.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="User Avatar"
+                      className="avatar-img"
+                      onClick={() => setIsProfileModalOpen(true)}
+                    />
+                  ) : (
+                    <FaUserCircle
+                      className="avatar-icon"
+                      size={40}
+                      onClick={() => setIsProfileModalOpen(true)}
+                    />
+                  )}
+                </li>
+              ) : (
+                <li className="signin">
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    Sign in
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -218,7 +218,7 @@ const Home = () => {
       </section>
 
       <nav className="bottom-nav">
-        <a href="/Home" className="nav-item">
+        <a href="/#" className="nav-item">
           <i className="fa-solid fa-house"></i>
           <span>Home</span>
         </a>
@@ -301,12 +301,12 @@ const Home = () => {
         </div>
       </section>
 
-      <LoginModal 
-        isOpen={isModalOpen} 
+      <LoginModal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
-      <UserProfileModal 
-        isOpen={isProfileModalOpen} 
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
         user={user}
       />
