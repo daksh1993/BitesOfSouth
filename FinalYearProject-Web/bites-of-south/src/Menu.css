@@ -2,14 +2,16 @@
     padding: 0px;
     margin: 0px;
     align-items: center;    
-    
     transition: 0.3s;
 
+}
+.top{
+    margin-top: 20px;
 }
 .cartPopup {
     width: 95%;
     position: fixed;
-    bottom: 10px;
+    bottom: 50px;
     left: 50%;
     transform: translateX(-50%);
     background-color: #9dc01e;

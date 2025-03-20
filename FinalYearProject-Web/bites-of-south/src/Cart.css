@@ -210,7 +210,8 @@
 
 .CheckoutFixed {
     position: fixed;
-    bottom: 0;
+    bottom: 40px;
+    border-radius: 11px 11px 0px 0px;
     width: 100%;
     background-color: #fff;
     padding: 15px 0;
@@ -389,7 +390,7 @@
     }
 
     #lastone {
-        margin-top: 60px;
+        margin-top: 0px;
     }
 
     .OrderSummary {

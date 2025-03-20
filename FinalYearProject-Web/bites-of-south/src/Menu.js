@@ -105,12 +105,8 @@ function Menu() {
   });
 
   return (
-    <div>
-      <div className="MTitle">
-        <div className="MHead">
-          <h2>Menu</h2>
-        </div>
-      </div>
+    <div className="top">
+      
 
       {/* Search Input */}
       <div className="SearchBtn">

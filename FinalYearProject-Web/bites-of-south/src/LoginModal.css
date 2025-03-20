@@ -1,4 +1,7 @@
 /* src/LoginModal.css */
+*{
+  transition: 0.3s;
+}
 .modal-overlay {
   position: fixed;
   top: 0;
