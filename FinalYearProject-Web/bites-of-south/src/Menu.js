@@ -1,25 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Menu.css";
-import { getDocs, collection } from "firebase/firestore"; // Firestore functions
-import { db } from "./firebase"; // Import initialized Firestore instance
-import { useNavigate } from "react-router-dom";
-
-// // Firebase Configuration
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCnSJVHioItNsc2kedyZTxJ7PvfX2hQC7Q",
-//   authDomain: "bitesofsouth-a38f4.firebaseapp.com",
-//   databaseURL: "https://bitesofsouth-a38f4-default-rtdb.firebaseio.com",
-//   projectId: "bitesofsouth-a38f4",
-//   storageBucket: "bitesofsouth-a38f4.appspot.com",
-//   messagingSenderId: "65231955877",
-//   appId: "1:65231955877:web:aab053b6882e9894bdaa4c",
-//   measurementId: "G-R9WE265DPN",
-// };
-
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const db = getFirestore(app);
-
+import { getDocs, collection } from "firebase/firestore";
+import { db } from "./firebase";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Menu() {
   const [cart, setCart] = useState([]);
@@ -29,26 +12,29 @@ function Menu() {
   const [sortOption, setSortOption] = useState("");
   const [category, setCategory] = useState("All");
   const [categories, setCategories] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null); // For zoomed-in modal
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch menu and load cart on component mount
   useEffect(() => {
     fetchMenu();
     loadCart();
-  }, []);
 
-  // Fetch menu from Firebase
+    const searchParams = new URLSearchParams(location.search);
+    const filter = searchParams.get("filter");
+    if (filter) {
+      setCategory(filter);
+    }
+  }, [location.search]);
+
   const fetchMenu = async () => {
     const querySnapshot = await getDocs(collection(db, "menu"));
     const menuData = querySnapshot.docs.map((doc) => doc.data());
     setMenuItems(menuData);
-
-    // Extract unique categories
     const uniqueCategories = [...new Set(menuData.map((item) => item.category))];
     setCategories(uniqueCategories);
   };
 
-  // Load cart from local storage
   const loadCart = () => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
@@ -57,11 +43,9 @@ function Menu() {
     }
   };
 
-  // Add item to cart and save to local storage
   const addToCart = (item) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
-
       let updatedCart;
       if (existingItem) {
         updatedCart = prevCart.map((cartItem) =>
@@ -72,30 +56,49 @@ function Menu() {
       } else {
         updatedCart = [...prevCart, { ...item, quantity: 1 }];
       }
-
-      localStorage.setItem("cart", JSON.stringify(updatedCart)); // Update local storage
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
       return updatedCart;
     });
-
     setShowCartPopup(true);
   };
 
-  // Navigate to cart page
+  const removeFromCart = (item) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
+      let updatedCart;
+      if (existingItem.quantity > 1) {
+        updatedCart = prevCart.map((cartItem) =>
+          cartItem.title === item.title
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            : cartItem
+        );
+      } else {
+        updatedCart = prevCart.filter((cartItem) => cartItem.title !== item.title);
+      }
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      if (updatedCart.length === 0) setShowCartPopup(false);
+      return updatedCart;
+    });
+  };
+
   const goToCart = () => {
     if (cart.length > 0) {
       navigate("/Cart");
     }
   };
 
-  // Filter items based on search and category
+  const getItemQuantity = (itemTitle) => {
+    const item = cart.find((cartItem) => cartItem.title === itemTitle);
+    return item ? item.quantity : 0;
+  };
+
   const filteredMenu = menuItems.filter((item) => {
     return (
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (category === "All" || item.category === category)
+      (category === "All" || item.category.toLowerCase() === category.toLowerCase())
     );
   });
 
-  // Sort items based on selected option
   const sortedMenu = [...filteredMenu].sort((a, b) => {
     if (sortOption === "priceLowHigh") return a.price - b.price;
     if (sortOption === "priceHighLow") return b.price - a.price;
@@ -104,10 +107,19 @@ function Menu() {
     return 0;
   });
 
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const openItemModal = (item) => {
+    setSelectedItem(item);
+  };
+
+  const closeItemModal = () => {
+    setSelectedItem(null);
+  };
+
   return (
     <div className="top">
-      
-
       {/* Search Input */}
       <div className="SearchBtn">
         <input
@@ -121,8 +133,11 @@ function Menu() {
 
       {/* Filter and Sort Options */}
       <div className="FilterSortContainer">
-        {/* Sort Dropdown */}
-        <select className="Sorting" value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+        <select
+          className="Sorting"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
           <option value="">Sort By</option>
           <option value="priceLowHigh">Price: Low to High</option>
           <option value="priceHighLow">Price: High to Low</option>
@@ -130,7 +145,6 @@ function Menu() {
           <option value="ratingLowHigh">Rating: Low to High</option>
         </select>
 
-        {/* Category Filter */}
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="All">All Categories</option>
           {categories.map((cat, index) => (
@@ -147,7 +161,11 @@ function Menu() {
       <div className="DishItems">
         {sortedMenu.length > 0 ? (
           sortedMenu.map((data, index) => (
-            <div className="DishItmesPlacement" key={index}>
+            <div
+              className="DishItmesPlacement"
+              key={index}
+              onClick={() => openItemModal(data)} // Click to open modal
+            >
               <div className="LSidePlacement">
                 <div className="ItemType">
                   <img src="/images/veg-icon.jpeg" alt="veg" />
@@ -170,8 +188,18 @@ function Menu() {
                 <div className="ItemsImgs">
                   <img src={data.image} alt="DishImg" />
                 </div>
-                <div className="AddToCart">
-                  <button onClick={() => addToCart(data)}>Add</button>
+                <div className="AddToCart" onClick={(e) => e.stopPropagation()}>
+                  {getItemQuantity(data.title) > 0 ? (
+                    <div className="quantity-controls">
+                      <button onClick={() => removeFromCart(data)}>-</button>
+                      <span>{getItemQuantity(data.title)}</span>
+                      <button onClick={() => addToCart(data)}>+</button>
+                    </div>
+                  ) : (
+                    <button className="add-btn" onClick={() => addToCart(data)}>
+                      ADD
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -181,10 +209,62 @@ function Menu() {
         )}
       </div>
 
-      {/* Floating Cart Notification */}
+      {/* Enhanced Cart Popup */}
       {showCartPopup && cart.length > 0 && (
         <div className="cartPopup" onClick={goToCart}>
-          <p> 🛒 {cart.length} items in cart. Go to Cart ➡️</p>
+          <div className="cartPopup-content">
+            <span className="cartPopup-icon">🛒</span>
+            <span className="cartPopup-text">
+              {totalItems} {totalItems === 1 ? "item" : "items"} in cart
+            </span>
+            <span className="cartPopup-price">₹{totalPrice.toFixed(2)}</span>
+            <span className="cartPopup-action">View Cart ➡️</span>
+          </div>
+        </div>
+      )}
+
+      {/* Zoomed-In Item Modal */}
+      {selectedItem && (
+        <div className="item-modal-overlay" onClick={closeItemModal}>
+          <div
+            className="item-modal"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+          >
+            <button className="modal-close-btn" onClick={closeItemModal}>
+              ×
+            </button>
+            <div className="modal-content">
+              <img src={selectedItem.image} alt={selectedItem.title} className="modal-image" />
+              <div className="modal-details">
+                <div className="modal-header">
+                  <img src="/images/veg-icon.jpeg" alt="veg" className="modal-item-type" />
+                  <h2>{selectedItem.title}</h2>
+                </div>
+                <p className="modal-price">₹{selectedItem.price}</p>
+                <div className="modal-rating">
+                  <img src="/images/Stars.png" alt="rating" />
+                  <span>{selectedItem.rating}</span>
+                </div>
+                <p className="modal-description">{selectedItem.description}</p>
+                <div className="modal-add-to-cart">
+                  {getItemQuantity(selectedItem.title) > 0 ? (
+                    <div className="quantity-controls">
+                      <button onClick={() => removeFromCart(selectedItem)}>-</button>
+                      <span>{getItemQuantity(selectedItem.title)}</span>
+                      <button onClick={() => addToCart(selectedItem)}>+</button>
+                    </div>
+                  ) : (
+                    <button
+                      className="add-btn"
+                      onClick={() => addToCart(selectedItem)}
+                    >
+                      ADD
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

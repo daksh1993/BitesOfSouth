@@ -1,404 +1,325 @@
 * {
-    padding: 0px;
-    margin: 0px;
-}
-
-.itemshow {
-    display: flex;
-    flex-direction: column;
-    width: 70%;
-    justify-content: space-around;
-    align-items: center;
-    text-align: center;
-}
-
-.Cart {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  .Cart {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-}
-
-.headc {
-    margin-top: 10px;
-    margin-bottom: 25px;
-}
-
-.ItemsCart {
+    background-color: #f5f5f5;
+    padding: 5px;
+  }
+  
+  .cart-container {
+    width: 100%;
+    max-width: 800px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .cart-header {
     display: flex;
-    justify-content: start;
-    align-items: flex-start;
-    gap: 0px;
-    /* width: 100%; */
-    margin-top: 10px;
-}
-
-.AddRemov {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    margin-left: 300px;
-}
-
-.AddRemov button {
-    width: 20px;
-    height: 20px;
-}
-
-.ItemPrice {
-    margin-left: 25px;
-    width: 50px;
-}
-
-.line {
-    margin-top: 10px;
-    height: 0.5px;
-    margin-bottom: 10px;
-    width: 55%;
-    background-color: rgba(128, 128, 128, 0.71);
-}
-
-.WriteInstruction input {
-    background-color: transparent;
-    border: 0px;
-    width: 200px;
-    height: 30px;
-    padding: 4px;
-    text-align: start;
-}
-
-.WriteInstruction input:focus {
-    border: 0px;
-    outline: none;
-}
-
-.WriteInstruction {
-    /* margin-top: 10px; */
-    align-items: center;
-    text-align: center;
-}
-
-.seprator {
-    width: 55%;
-    height: 1px;
-    background-color: rgba(128, 128, 128, 0.452);
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-
-.TakeIntakeAway {
-    /* margin-top: 10px; */
-    display: flex;
-    justify-content: center;
-    align-items: start;
-    text-align: start;
-    border: 1px solid rgb(61, 194, 61);
-    border-radius: 8px;
-    padding: 11px;
-    background-color: rgba(61, 194, 61, 0.189);
-}
-
-.DescBox {
-    width: 550px;
-    padding: 4px;
-}
-
-
-
-.HaveInCheckBox input[type="checkbox"] {
-    width: 20px;
-    /* Width of the checkbox */
-    height: 20px;
-    margin: 5px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.HeadDesc {
-    color: rgb(64, 63, 63);
-}
-
-.BodyDesc p {
-    margin-top: 4px;
-    color: grey;
-}
-
-.ApplyCoupon {
-    width: 50%;
-    /* Adjust width of the coupon button container */
-    text-align: center;
-}
-
-.ApplyCoupon button {
-    color: rgb(69, 69, 69);
-    /* margin-top: 15px; */
-    display: flex;
-    justify-content: space-between;
-    /* Align logo and text across button */
-    align-items: center;
-    /* Vertically align logo and text */
     gap: 15px;
-    /* Adjust the gap between logo and text */
-    padding: 10px 20px;
-    /* Button padding */
-    width: 100%;
-    /* Full width of the ApplyCoupon div */
-    background-color: #f4f4f4;
-    /* Subtle background */
+    margin-bottom: 20px;
+  }
+  
+  .back-btn {
+    background: none;
     border: none;
-    /* Remove default button border */
-    border-radius: 8px;
-    /* Rounded corners for a modern look */
-    transition: 0.3s;
-}
-
-.ApplyCoupon button:hover {
-    background-color: #e0e0e0;
-}
-
-.Redirectpage {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.Redirectpage h4 {
-    font-size: 16px;
-    margin: 0;
-}
-
-.Couponlogo i {
     font-size: 20px;
-}
-
-.OrderSummary {
-    /* display: flex; */
-    flex-direction: column;
-    justify-content: start;
-    /* width: 50%; */
-    /* margin-top: 20px; */
-    padding: 15px;
-}
-
-.OrderSummary h2 {
-    margin-bottom: 15px;
-}
-
-.SummaryItem {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.SummaryLabel p {
-    margin: 0;
+    color: #1ba672; /* Your green color */
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .back-btn:hover {
+    color: #168754; /* Darker green on hover */
+  }
+  
+  .cart-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1ba672;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .cart-items {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .empty-cart {
+    text-align: center;
+    color: #666;
     font-size: 16px;
-    color: #333;
-}
-
-.SummaryValue p {
-    margin: 0;
-    font-size: 16px;
-    color: #555;
-}
-
-.Total {
-    font-weight: bold;
-    color: #333;
-}
-
-.CheckoutFixed {
-    position: fixed;
-    bottom: 40px;
-    border-radius: 11px 11px 0px 0px;
-    width: 100%;
-    background-color: #fff;
-    padding: 15px 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cart-item {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    z-index: 999;
-}
-
-.AlmostThere {
-    padding-left: 4px;
-    padding-right: 4px;
-    font-size: 18px;
-    color: #555;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.PayNow {
-    width: 90%;
-    max-width: 400px;
-    /* Adjust the button width as per design */
-    text-align: center;
-}
-
-.PayNowButton {
-    padding: 12px 30px;
-    font-size: 18px;
-    background-color: #4CAF50;
-    /* Green color */
-    color: white;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .item-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 15px;
+  }
+  
+  .item-details {
+    flex: 1;
+  }
+  
+  .item-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .item-price {
+    font-size: 14px;
+    color: #1ba672;
+    font-weight: 700;
+  }
+  
+  .item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 2px solid #1ba672;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  
+  .item-quantity button {
+    width: 25px;
+    height: 25px;
+    background: #fff;
     border: none;
-    border-radius: 8px;
-    width: 100%;
-    /* Make button fill the width */
+    color: #1ba672;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
     transition: background-color 0.3s ease;
-}
-
-.PayNowButton:hover {
-    background-color: #45a049;
-}
-
-/* Media Queries for Responsiveness */
-
-/* For tablets and small desktops (width <= 768px) */
-@media (max-width: 768px) {
-    .ItemsCart {
-        /* gap: 100px; */
-        width: 100%;
-        /* Full width for smaller devices */
+  }
+  
+  .item-quantity button:hover {
+    background: #e6f5ef;
+  }
+  
+  .item-quantity span {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1ba672;
+    min-width: 20px;
+    text-align: center;
+  }
+  
+  .cart-options {
+    margin: 20px 0;
+  }
+  
+  .instructions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background: #fafafa;
+  }
+  
+  .instructions i {
+    color: #b0b0b0;
+    font-size: 18px;
+  }
+  
+  .instructions input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    color: #666;
+    background: transparent;
+  }
+  
+  .dine-in-option {
+    margin-top: 15px;
+    padding: 10px;
+    background: #e6f5ef;
+    border: 1px solid #1ba672;
+    border-radius: 5px;
+  }
+  
+  .dine-in-option label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .dine-in-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #1ba672;
+  }
+  
+  .table-number {
+    margin-top: 10px;
+  }
+  
+  .table-number input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .table-number input:invalid {
+    border-color: #ff4d4d;
+  }
+  
+  .cart-summary {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 5px;
+  }
+  
+  .cart-summary h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .summary-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+  }
+  
+  .checkout {
+    text-align: center;
+  }
+  
+  .pay-now-btn {
+    width: 100%;
+    padding: 15px;
+    background: #1ba672;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pay-now-btn:hover {
+    background: #168754;
+  }
+  
+  @media (max-width: 768px) {
+    .cart-container {
+      padding: 15px;
     }
-
-    .OrderSummary {
-        width: 80%;
-        /* Increase width on smaller screens */
+  
+    .cart-title {
+      font-size: 20px;
     }
-
-    .CheckoutFixed {
-        padding: 10px 0;
+  
+    .cart-item {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 10px;
     }
-
-    .AlmostThere {
-        font-size: 16px;
+  
+    .item-image img {
+      width: 50px;
+      height: 50px;
     }
-
-    .PayNowButton {
-        font-size: 16px;
-        padding: 10px 20px;
+  
+    .item-quantity {
+      width: 90px;
     }
-
-    .ApplyCoupon {
-        width: 80%;
-        /* Adjust coupon button for smaller screens */
+  
+    .pay-now-btn {
+      font-size: 14px;
+      padding: 12px;
     }
-
-    .ApplyCoupon button {
-        padding: 10px 20px;
+  
+    .back-btn {
+      font-size: 18px;
     }
-
-    .line {
-        width: 100%;
-        /* Make lines span full width on small screens */
+  }
+  
+  @media (max-width: 480px) {
+    .cart-container {
+      padding: 10px;
     }
-
-    .WriteInstruction input {
-        width: 100%;
-        /* Input field adjusts to screen size */
+  
+    .cart-title {
+      font-size: 18px;
     }
-
-    .TakeIntakeAway {
-        width: 100%;
-        justify-content: flex-start;
+  
+    .item-name {
+      font-size: 14px;
     }
-
-    .DescBox {
-        width: 100%;
+  
+    .item-price {
+      font-size: 12px;
     }
-}
-
-/* For smartphones (width <= 480px) */
-@media (max-width: 480px) {
-    .itemshow {
-        width: 90%;
-        text-align: start;
+  
+    .instructions input {
+      font-size: 12px;
     }
-
-    .Itemname {
-        width: 200px;
+  
+    .dine-in-option label {
+      font-size: 14px;
     }
-
-    .AddRemov {
-        margin-left: 40px;
+  
+    .cart-summary h2 {
+      font-size: 16px;
     }
-
-
-    .OrderSummary {
-        width: 85%;
-        /* Full width for order summary */
+  
+    .summary-item {
+      font-size: 12px;
     }
-
-    .CheckoutFixed {
-        padding: 8px 0;
+  
+    .summary-total {
+      font-size: 14px;
     }
-
-    .AlmostThere {
-        font-size: 14px;
+  
+    .back-btn {
+      font-size: 16px;
     }
-
-    .PayNowButton {
-        font-size: 14px;
-        padding: 10px 15px;
-    }
-
-    .ApplyCoupon {
-        width: 90%;
-        /* Full width for Apply Coupon on mobile */
-    }
-
-    .WriteInstruction {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        text-align: center;
-        justify-content: center;
-    }
-
-    .WriteInstruction input {
-        width: 200px;
-    }
-
-    .TakeIntakeAway {
-        width: 85%;
-        justify-content: center;
-    }
-
-    .TakeIntakeAway h3 {
-        font-size: 20px;
-
-    }
-
-    .TakeIntakeAway p {
-        font-size: 14px;
-
-    }
-
-    .DescBox {
-        width: 100%;
-    }
-
-    .seprator {
-        width: 100%;
-    }
-
-    #lastone {
-        margin-top: 0px;
-    }
-
-    .OrderSummary {
-        /* display: flex; */
-        flex-direction: column;
-        justify-content: start;
-        /* width: 50%; */
-        /* margin-top: 20px; */
-        padding: 15px;
-    }
-}
+  }
