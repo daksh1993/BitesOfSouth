@@ -21,7 +21,7 @@ const BottomNav = ({ user }) => {
       <a href="/" className="nav-item">
         <i className="fa-solid fa-house"></i>
       </a>
-      <a href="#" className="nav-item">
+      <a href="/reward" className="nav-item">
         <i className="fa-solid fa-gift"></i>
       </a>
       <a href="/menu" onClick={handleMenuNavigation} className="nav-item">

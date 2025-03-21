@@ -1,13 +1,14 @@
 // src/App.js
 import './App.css';
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import Menu from './Menu';
 import Cart from './Cart';
 import UserProfileModal from './UserProfileModal';
 import OrderProcessing from './OrderProcessing';
-import BottomNav from './bottomnav'; // Import the new component
+import Reward from './reward'; // Import renamed Reward component
+import BottomNav from './bottomnav';
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
@@ -47,6 +48,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reward"
+            element={
+              <ProtectedRoute>
+                <Reward /> {/* Use renamed Reward component */}
               </ProtectedRoute>
             }
           />
