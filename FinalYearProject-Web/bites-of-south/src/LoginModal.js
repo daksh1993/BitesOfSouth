@@ -1,5 +1,4 @@
-// src/LoginModal.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { auth, db } from './firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -33,7 +32,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         timestamp: serverTimestamp()
       });
     } catch (err) {
-      console.error("Error logging auth event:", err);
+      console.error("Error logging auth event:", err.code, err.message);
     }
   };
 
@@ -56,8 +55,8 @@ const LoginModal = ({ isOpen, onClose }) => {
       resetForm();
       onClose();
     } catch (err) {
-      setError(err.message);
-      console.error("Login error:", err);
+      console.error("Login error:", err.code, err.message);
+      setError(getFriendlyErrorMessage(err.code));
     }
   };
 
@@ -73,19 +72,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       console.log("Sign-in methods before register:", signInMethods);
 
       let user;
-      if (signInMethods.length > 0 && signInMethods.includes('google.com') && !signInMethods.includes('password')) {
-        // Google exists, link email/password
-        const googleUser = auth.currentUser;
-        if (!googleUser) {
-          setError("Please sign in with Google first to link email/password.");
-          return;
-        }
-        const credential = EmailAuthProvider.credential(email, password);
-        await linkWithCredential(googleUser, credential);
-        await sendEmailVerification(googleUser);
-        user = googleUser;
-        await logAuthEvent(user.uid, "email_linked_to_google");
-      } else if (signInMethods.length === 0) {
+      if (signInMethods.length === 0) {
         // New email/password registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
@@ -109,19 +96,16 @@ const LoginModal = ({ isOpen, onClose }) => {
         createdAt: existingData.createdAt || serverTimestamp(),
         lastLoginProvider: "email",
         emailVerified: user.emailVerified,
-        googleVerified: signInMethods.includes('google.com')
+        googleVerified: false
       };
       await setDoc(userRef, userData, { merge: true });
       
-      console.log("Registered/Linked with data:", userData);
-      const savedDoc = await getDoc(userRef);
-      console.log("Saved data after register:", savedDoc.data());
-
+      console.log("Registered with data:", userData);
       resetForm();
       onClose();
     } catch (err) {
-      setError(err.message);
-      console.error("Register error:", err);
+      console.error("Register error:", err.code, err.message);
+      setError(getFriendlyErrorMessage(err.code));
     }
   };
 
@@ -138,7 +122,6 @@ const LoginModal = ({ isOpen, onClose }) => {
       const existingData = userDoc.exists() ? userDoc.data() : {};
 
       if (signInMethods.length === 1 && signInMethods[0] === 'google.com') {
-        // New Google registration
         await logAuthEvent(user.uid, "google_register");
         const userData = {
           name: user.displayName,
@@ -151,19 +134,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         };
         await setDoc(userRef, userData);
         console.log("New Google registration:", userData);
-      } else if (signInMethods.includes('password') && !signInMethods.includes('google.com')) {
-        // Shouldn't happen with this flow, but keeping for safety
-        await logAuthEvent(user.uid, "google_linked");
-        const userData = {
-          ...existingData,
-          lastLoginProvider: "google",
-          emailVerified: user.emailVerified,
-          googleVerified: true
-        };
-        await setDoc(userRef, userData, { merge: true }); // Fixed typo 'stadiawait' to 'await'
-        console.log("Linked Google to existing account:", userData);
       } else {
-        // Existing account with both providers or just Google
         await logAuthEvent(user.uid, "google_login");
         const userData = {
           ...existingData,
@@ -175,22 +146,33 @@ const LoginModal = ({ isOpen, onClose }) => {
         console.log("Google login with existing data:", userData);
       }
 
-      const finalMethods = await fetchSignInMethodsForEmail(auth, user.email);
-      console.log("Final sign-in methods:", finalMethods);
-      const finalDoc = await getDoc(userRef);
-      console.log("Final database data:", finalDoc.data());
-
       resetForm();
       onClose();
     } catch (err) {
-      if (err.code === 'auth/account-exists-with-different-credential') {
-        setError("This email is registered. Please provide credentials to link accounts or use existing method.");
-      } else if (err.code === 'auth/invalid-credential') {
-        setError("Invalid credentials provided.");
-      } else {
-        setError(err.message);
-      }
-      console.error("Google sign-in error:", err);
+      console.error("Google sign-in error:", err.code, err.message);
+      setError(getFriendlyErrorMessage(err.code));
+    }
+  };
+
+  // Friendly error messages
+  const getFriendlyErrorMessage = (code) => {
+    switch (code) {
+      case 'auth/unauthorized-domain':
+        return "This domain is not authorized. Please contact support.";
+      case 'auth/invalid-email':
+        return "Please enter a valid email address.";
+      case 'auth/user-not-found':
+        return "No account found with this email.";
+      case 'auth/wrong-password':
+        return "Incorrect password. Please try again.";
+      case 'auth/email-already-in-use':
+        return "This email is already registered.";
+      case 'auth/popup-closed-by-user':
+        return "Google sign-in was canceled.";
+      case 'auth/account-exists-with-different-credential':
+        return "This email is linked to a different sign-in method.";
+      default:
+        return "An error occurred. Please try again.";
     }
   };
 

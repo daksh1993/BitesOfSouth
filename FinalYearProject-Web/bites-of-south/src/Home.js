@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle } from 'react-icons/fa';
 import { auth } from './firebase';
-import LoginModal from './LoginModal'; // Adjusted path
-import UserProfileModal from './UserProfileModal'; // Adjusted path to match previous context
+import LoginModal from './LoginModal';
+import UserProfileModal from './UserProfileModal';
 import './Home.css';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false); // Login modal
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false); // Profile modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -18,6 +20,19 @@ const Home = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  const handleMenuNavigation = (e, category = null) => {
+    e.preventDefault();
+    if (isLoggedIn) {
+      if (category) {
+        navigate(`/menu?filter=${category.toLowerCase()}`);
+      } else {
+        navigate('/menu');
+      }
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   return (
     <div className="home">
@@ -32,10 +47,12 @@ const Home = () => {
           <div className="options">
             <ul className="NavOption">
               <li className="Bscreen">
-                <a href="">Home</a>
+                <a href="/">Home</a>
               </li>
               <li className="Bscreen">
-                <a href="">Order</a>
+                <a href="/menu" onClick={(e) => handleMenuNavigation(e)}>
+                  Order
+                </a>
               </li>
               <li className="Bscreen">
                 <a href="">About Us</a>
@@ -73,7 +90,6 @@ const Home = () => {
             </ul>
           </div>
         </div>
-        {/* Rest of your JSX remains unchanged */}
         <div className="SecondH">
           <div className="LSideImg">
             <img src="/images/!TEmpSIdePic.avif" alt="" />
@@ -94,26 +110,32 @@ const Home = () => {
 
               <div className="FoodOption">
                 <div className="Option1">
-                  <a href="/menu">
-                    <h1>Order</h1>
+                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Dosa')}>
+                    <h1>Dosa</h1>
                     <h2>Order Food Online</h2>
                     <img src="/images/Dosa.avif" alt="" />
                   </a>
                 </div>
                 <div className="Option1">
-                  <h1>Order</h1>
-                  <h2>Order Food Online</h2>
-                  <img src="/images/Dosa.avif" alt="" />
+                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Thali')}>
+                    <h1>Thali</h1>
+                    <h2>Order Thali Online</h2>
+                    <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/South%20Indian.png" alt="" />
+                  </a>
                 </div>
                 <div className="Option1">
-                  <h1>Order</h1>
-                  <h2>Order Food Online</h2>
-                  <img src="/images/Dosa.avif" alt="" />
+                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Beverages')}>
+                    <h1>Ice-Cream</h1>
+                    <h2>Order Ice-Cream Online</h2>
+                    <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/Ice%20Cream.png" alt="" />
+                  </a>
                 </div>
                 <div className="Option1" id="mobshow">
-                  <h1>Order</h1>
-                  <h2>Order Food Online</h2>
-                  <img src="/images/Dosa.avif" alt="" />
+                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Drinks')}>
+                    <h1>Shawarma</h1>
+                    <h2>Order Shawarma Online</h2>
+                    <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/Shawarma.png" alt="" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -129,7 +151,7 @@ const Home = () => {
           <h3 className="carousel-title">Inspiration for your first order</h3>
           <div className="carousel">
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Pizza')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -141,7 +163,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Biryani')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -153,7 +175,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Chicken')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -165,7 +187,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Burger')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -177,7 +199,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Fried Rice')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -189,7 +211,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="">
+              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Idli')}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -216,25 +238,6 @@ const Home = () => {
           ></iframe>
         </div>
       </section>
-
-      <nav className="bottom-nav">
-        <a href="/#" className="nav-item">
-          <i className="fa-solid fa-house"></i>
-          <span>Home</span>
-        </a>
-        <a href="#" className="nav-item">
-          <i className="fa-solid fa-gift"></i>
-          <span>Rewards</span>
-        </a>
-        <a href="/menu" className="nav-item">
-          <i className="fa-solid fa-search"></i>
-          <span>Search</span>
-        </a>
-        <a href="/cart" className="nav-item">
-          <i className="fa-solid fa-cart-shopping"></i>
-          <span>Cart</span>
-        </a>
-      </nav>
 
       <section className="Footer">
         <div className="footer-container">

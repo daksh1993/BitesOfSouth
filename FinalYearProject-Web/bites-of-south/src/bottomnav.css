@@ -1,0 +1,97 @@
+
+/* Bottom Navigation Bar - Swiggy Style */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #e0e0e0;
+    z-index: 1000;
+    display: none;
+  }
+  
+  .bottom-nav .nav-item {
+    display: none;
+    text-align: center;
+    text-decoration: none;
+    color: #4a4a4a;
+    font-size: 10px;
+    font-weight: 500;
+    flex: 1;
+    transition: all 0.3s ease;
+  }
+  
+  .bottom-nav .nav-item i {
+    font-size: 18px;
+    display: block;
+    margin-bottom: 4px;
+    color: #757575;
+    transition: color 0.3s ease;
+  }
+  
+  .bottom-nav .nav-item span {
+    font-size: 12px;
+    color: #757575;
+    transition: color 0.3s ease;
+  }
+  
+  /* Active and Hover Effects */
+  .bottom-nav .nav-item:hover i,
+  .bottom-nav .nav-item:hover span,
+  .bottom-nav .nav-item.active i,
+  .bottom-nav .nav-item.active span {
+    color: #fc8019;
+    /* Swiggy’s signature orange */
+  }
+  
+  /* Mobile Optimization */
+  @media (max-width: 768px) {
+    .bottom-nav {
+      display: block;
+      position: fixed;
+      margin-bottom: 0px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 20px 0;
+      border-radius: 11px 11px 0px 0px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      border-top: 1px solid #e0e0e0;
+      z-index: 1000;
+      /* padding: 26px 0px; */
+      height: 40px;
+    }
+    .bottom-nav .nav-item {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      color: #4a4a4a;
+      font-size: 10px;
+      font-weight: 500;
+      flex: 1;
+      transition: all 0.3s ease;
+    }
+    .bottom-nav .nav-item i {
+      display: block;
+      font-size: 20px;
+      margin: 0px;
+    }
+  
+    .bottom-nav .nav-item span {
+      font-size: 13px;
+    }
+  }
+  
+  

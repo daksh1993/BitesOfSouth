@@ -5,6 +5,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f4f4f4;
+  transition: 0.3s;
 }
 
 h1 {
