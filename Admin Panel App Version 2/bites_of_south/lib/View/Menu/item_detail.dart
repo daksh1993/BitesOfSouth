@@ -1,7 +1,8 @@
+import 'package:bites_of_south/Controller/Menu/item_detail_auth_provider.dart';
 import 'package:bites_of_south/Modal/item_details_modal.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ItemDetail extends StatefulWidget {
   final ItemDetailsModal itemDetailsModal;
@@ -12,7 +13,8 @@ class ItemDetail extends StatefulWidget {
 }
 
 class _ItemDetailState extends State<ItemDetail> {
-  late bool isAvailable; // Store current availability status
+  late bool isAvailable;
+
   @override
   void initState() {
     super.initState();
@@ -23,96 +25,98 @@ class _ItemDetailState extends State<ItemDetail> {
   Widget build(BuildContext context) {
     ItemDetailsModal itemData = widget.itemDetailsModal;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text("Item Detail"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ignore: unnecessary_null_comparison
-              itemData.imageUrl != null
-                  ? ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CachedNetworkImage(
-                        imageUrl: itemData.imageUrl,
-                        height: MediaQuery.of(context).size.height * 0.35,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          height: MediaQuery.of(context).size.height * 0.45,
-                          width: double.infinity,
-                          color: Colors.grey[300],
-                          child: Center(child: Text("Image Load Failed")),
-                        ),
-                      ),
-                    )
-                  : Container(
-                      height: 200,
-                      color: Colors.grey[300],
-                      child: const Center(child: Text("No Image Available")),
-                    ),
-              const SizedBox(height: 16),
-              Text(
-                itemData.title,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "₹${itemData.price}",
-                style: const TextStyle(fontSize: 20, color: Colors.green),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                itemData.description,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Category: ${itemData.category}",
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Making Time: ${itemData.makingTime}",
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "Rating: ${itemData.rating}",
-                style: const TextStyle(fontSize: 16),
-              ),
-              SwitchListTile(
-                title: Text("Item Availability"),
-                subtitle: Text(isAvailable ? "Enabled" : "Disabled"),
-                value: isAvailable,
-                activeColor: Colors.green,
-                inactiveThumbColor: Colors.red,
-                contentPadding: const EdgeInsets.all(0),
-                onChanged: (value) {
-                  _confirmAvailabilityChange(context, value);
-                },
-              ),
-            ],
+    return Consumer<ItemDetailAuthProvider>(
+      builder: (context, itemProvider, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            title: const Text("Item Detail"),
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.grey[100],
-        onPressed: () {
-          _showEditDialog(context, itemData);
-        },
-        child: const Icon(Icons.edit),
-      ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  itemData.imageUrl != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: CachedNetworkImage(
+                            imageUrl: itemData.imageUrl,
+                            height: MediaQuery.of(context).size.height * 0.35,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              height: MediaQuery.of(context).size.height * 0.45,
+                              width: double.infinity,
+                              color: Colors.grey[300],
+                              child: Center(child: Text("Image Load Failed")),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          height: 200,
+                          color: Colors.grey[300],
+                          child: const Center(child: Text("No Image Available")),
+                        ),
+                  const SizedBox(height: 16),
+                  Text(
+                    itemData.title,
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "₹${itemData.price}",
+                    style: const TextStyle(fontSize: 20, color: Colors.green),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    itemData.description,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Category: ${itemData.category}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Making Time: ${itemData.makingTime}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Rating: ${itemData.rating}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  SwitchListTile(
+                    title: Text("Item Availability"),
+                    subtitle: Text(isAvailable ? "Enabled" : "Disabled"),
+                    value: isAvailable,
+                    activeColor: Colors.green,
+                    inactiveThumbColor: Colors.red,
+                    contentPadding: const EdgeInsets.all(0),
+                    onChanged: (value) {
+                      _confirmAvailabilityChange(context, value);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.grey[100],
+            onPressed: () {
+              _showEditDialog(context, itemData);
+            },
+            child: const Icon(Icons.edit),
+          ),
+        );
+      },
     );
   }
 
@@ -130,39 +134,24 @@ class _ItemDetailState extends State<ItemDetail> {
           ),
           ElevatedButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
-              await _updateAvailability(newValue);
+              Navigator.pop(context);
+              await Provider.of<ItemDetailAuthProvider>(context, listen: false)
+                  .updateAvailability(
+                itemId: widget.itemDetailsModal.id,
+                newValue: newValue,
+                context: context,
+                onSuccess: (updatedValue) {
+                  setState(() {
+                    isAvailable = updatedValue;
+                  });
+                },
+              );
             },
             child: Text("Confirm"),
           ),
         ],
       ),
     );
-  }
-
-  // Update Firestore
-  Future<void> _updateAvailability(bool newValue) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('menu')
-          .doc(widget.itemDetailsModal.id)
-          .update({'availability': newValue});
-
-      setState(() {
-        isAvailable = newValue; // Update UI
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Availability updated to " +
-                (isAvailable ? "Enabled" : "Disabled") +
-                " successfully!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating availability: $e")),
-      );
-    }
   }
 
   void _showEditDialog(BuildContext context, ItemDetailsModal itemData) {
@@ -180,12 +169,8 @@ class _ItemDetailState extends State<ItemDetail> {
       'Special Dosa',
       'Beverage'
     ];
-
     String selectedCategory =
         categories.contains(itemData.category) ? itemData.category : 'Default';
-
-    // final TextEditingController categoryController =
-    //     TextEditingController(text: itemData.category);
     final TextEditingController makingTimeController =
         TextEditingController(text: itemData.makingTime.toString());
     final TextEditingController ratingController =
@@ -246,42 +231,32 @@ class _ItemDetailState extends State<ItemDetail> {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Collect updated data
                 final updatedItem = {
                   'title': titleController.text,
-                  'price': (priceController.text),
+                  'price': priceController.text,
                   'description': descriptionController.text,
                   'category': selectedCategory,
-                  'makingTime': (makingTimeController.text),
-                  'rating': (ratingController.text),
+                  'makingTime': makingTimeController.text,
+                  'rating': ratingController.text,
                 };
 
-                try {
-                  // Update Firestore
-                  await FirebaseFirestore.instance
-                      .collection('menu')
-                      .doc(itemData.id)
-                      .update(updatedItem);
-
-                  Navigator.pop(context); // Close the dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Item updated successfully!")),
-                  );
-
-                  // Update local state
-                  setState(() {
-                    itemData.title = updatedItem['title'] as String;
-                    itemData.price = updatedItem['price'] as String;
-                    itemData.description = updatedItem['description'] as String;
-                    itemData.category = updatedItem['category'] as String;
-                    itemData.makingTime = updatedItem['makingTime'] as String;
-                    itemData.rating = updatedItem['rating'] as String;
-                  });
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error: ${e.toString()}")),
-                  );
-                }
+                await Provider.of<ItemDetailAuthProvider>(context, listen: false)
+                    .updateItemDetails(
+                  itemId: itemData.id,
+                  updatedItem: updatedItem,
+                  context: context,
+                  onSuccess: (updatedData) {
+                    setState(() {
+                      itemData.title = updatedData['title'] as String;
+                      itemData.price = updatedData['price'] as String;
+                      itemData.description = updatedData['description'] as String;
+                      itemData.category = updatedData['category'] as String;
+                      itemData.makingTime = updatedData['makingTime'] as String;
+                      itemData.rating = updatedData['rating'] as String;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
               },
               child: const Text("Save"),
             ),

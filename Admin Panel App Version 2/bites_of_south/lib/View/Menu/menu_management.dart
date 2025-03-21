@@ -413,7 +413,6 @@
 //   }
 // }
 
-import 'package:bites_of_south/Modal/item_details_modal.dart';
 import 'package:bites_of_south/View/Menu/add_item_to_menu.dart';
 import 'package:bites_of_south/View/Menu/item_detail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -438,7 +437,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<MenuLoadAuth>(context, listen: false).fetchMenuItems();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<MenuLoadAuth>(context, listen: false).fetchMenuItems();
+    });
     _searchController.addListener(() {
       Provider.of<MenuLoadAuth>(context, listen: false)
           .filterItems(_searchController.text);

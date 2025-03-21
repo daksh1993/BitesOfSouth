@@ -1,5 +1,7 @@
 import 'package:bites_of_south/View/Rewards/coupons.dart';
 import 'package:bites_of_south/View/Rewards/offers.dart';
+import 'package:bites_of_south/View/Rewards/rewardsTab.dart'; // Add this import
+import 'package:bites_of_south/View/Rewards/rewardsAdd.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
@@ -10,17 +12,95 @@ class RewardScreen extends StatefulWidget {
 }
 
 class _RewardScreenState extends State<RewardScreen> {
+  double? rupeesPerPoint;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRewardSettings();
+  }
+
+  // Fetch the previously saved value from Firestore
+  Future<void> fetchRewardSettings() async {
+    DocumentSnapshot doc = await FirebaseFirestore.instance
+        .collection('settings')
+        .doc('rewards')
+        .get();
+
+    if (doc.exists && doc.data() != null) {
+      setState(() {
+        rupeesPerPoint =
+            (doc.data() as Map<String, dynamic>)['rupeesPerPoint']?.toDouble();
+      });
+    }
+  }
+
+  // Update the Firestore value
+  Future<void> updateRewardSettings(double value) async {
+    await FirebaseFirestore.instance
+        .collection('settings')
+        .doc('rewards')
+        .set({'rupeesPerPoint': value});
+    setState(() {
+      rupeesPerPoint = value;
+    });
+  }
+
+  // Show dialog with the previous value pre-filled
+  void showSettingsDialog(BuildContext context) {
+    TextEditingController controller = TextEditingController(
+      text: rupeesPerPoint != null ? rupeesPerPoint.toString() : '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Set Rupees Per Point'),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration:
+                const InputDecoration(hintText: 'Enter rupees per point'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                double? value = double.tryParse(controller.text);
+                if (value != null) {
+                  updateRewardSettings(value);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3, // Changed from 2 to 3 tabs
       child: Scaffold(
         appBar: AppBar(
+          actions: [
+            IconButton(
+                onPressed: () => showSettingsDialog(context),
+                icon: Icon(Icons.settings))
+          ],
           title: Text('Reward Management'),
           bottom: TabBar(
             tabs: [
               Tab(text: 'Offers'),
               Tab(text: 'Coupons'),
+              Tab(text: 'Rewards'), // Added Rewards tab
             ],
           ),
         ),
@@ -28,6 +108,7 @@ class _RewardScreenState extends State<RewardScreen> {
           children: [
             OffersTab(),
             CouponsTab(),
+            RewardsTab(), // Added RewardsTab
           ],
         ),
         floatingActionButton: Builder(
@@ -43,11 +124,14 @@ class _RewardScreenState extends State<RewardScreen> {
   }
 
   void _showAddDialog(BuildContext context) {
-    final isOffersTab = DefaultTabController.of(context)!.index == 0;
-    if (isOffersTab) {
+    final tabIndex = DefaultTabController.of(context)!.index;
+    if (tabIndex == 0) {
       _showAddOfferDialog(context);
-    } else {
+    } else if (tabIndex == 1) {
       _showAddCouponDialog(context);
+    } else {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => AddRewardScreen()));
     }
   }
 

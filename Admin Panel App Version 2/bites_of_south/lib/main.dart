@@ -1,8 +1,8 @@
 import 'package:bites_of_south/Controller/Authentication/login_auth_provider.dart';
 import 'package:bites_of_south/Controller/Authentication/otp_verify_screen_auth.dart';
 import 'package:bites_of_south/Controller/Authentication/phone_auth_provider.dart';
+import 'package:bites_of_south/Controller/Menu/item_detail_auth_provider.dart';
 import 'package:bites_of_south/Controller/Menu/menu_load_auth.dart';
-import 'package:bites_of_south/Controller/menu_provider.dart';
 import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
 import 'package:bites_of_south/firebase_options.dart';
@@ -20,11 +20,12 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MenuProvider()),
+        // ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => LoginAuthProvider()),
         ChangeNotifierProvider(create: (_) => PhoneValidityProvider()),
         ChangeNotifierProvider(create: (_) => OTPVerifyScreenAuth()),
         ChangeNotifierProvider(create: (_) => MenuLoadAuth()),
+        ChangeNotifierProvider(create: (_)=> ItemDetailAuthProvider()),
       ],
       child: MyApp(),
     ),
