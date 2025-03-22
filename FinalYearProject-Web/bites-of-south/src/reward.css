@@ -1,4 +1,4 @@
-/* src/reward.css */
+
 .reward-wrapper {
     background: #fff;
     font-family: 'Poppins', sans-serif;
@@ -9,7 +9,6 @@
     justify-content: center;
   }
   
-  /* Back Button */
   .back-btn {
     background: none;
     border: none;
@@ -38,7 +37,7 @@
   
   /* Wallet Card */
   .wallet-card {
-    background: linear-gradient(135deg, #02cb31 0%, #ded5cf9a 85%); 
+    background: linear-gradient(135deg, #9dc01e 0%, #ded5cf9a 85%); 
     border-radius: 20px;
     margin: 20px;
     margin-top: 0px;
