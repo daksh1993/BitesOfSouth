@@ -20,7 +20,7 @@
     gap: 5px;
     font-size: 16px;
     font-weight: 600;
-    color: #28a745;
+    color: #9dc01e;
     margin: 20px 20px 0;
     align-self: flex-start;
   }
@@ -37,7 +37,7 @@
   
   /* Wallet Card */
   .wallet-card {
-    background: linear-gradient(135deg, #9dc01e 0%, #ded5cf9a 85%); 
+    background: linear-gradient(135deg, #9dc01e 0%, #ded5cf9a 90%); 
     border-radius: 20px;
     margin: 20px;
     margin-top: 0px;
@@ -99,7 +99,7 @@
   .rewards-title {
     font-size: 22px;
     font-weight: 600;
-    color: #28a745;
+    color: #9dc01e;
     margin: 20px 0;
     text-align: center;
   }
@@ -169,7 +169,7 @@
   }
   
   .redeem-btn:hover:not(.disabled) {
-    background: linear-gradient(45deg, #218838, #47b347);
+    background: linear-gradient(45deg, #218838,#9dc01e);
   }
   
   .redeem-btn.disabled {
@@ -187,7 +187,7 @@
       width: 95%;
     }
     .coin-gif {
-      width: 60px;
+      width: 70px;
     }
     .balance-value {
       font-size: 32px;
