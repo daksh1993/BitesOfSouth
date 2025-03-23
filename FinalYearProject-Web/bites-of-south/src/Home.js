@@ -126,7 +126,7 @@ const Home = () => {
                 <div className="Option1">
                   <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Beverages')}>
                     <h1>Ice-Cream</h1>
-                    <h2>Order Ice-Cream Online</h2>
+                    <h2>Order Ice-Cream </h2>
                     <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/Ice%20Cream.png" alt="" />
                   </a>
                 </div>
