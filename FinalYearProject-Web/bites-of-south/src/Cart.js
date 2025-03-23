@@ -13,6 +13,7 @@ const Cart = () => {
   const [serviceCharge, setServiceCharge] = useState(0);
   const [isTakeIn, setIsTakeIn] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
+  const [instructions, setInstructions] = useState(""); // New state for instructions
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -89,6 +90,9 @@ const Cart = () => {
           paymentStatus: "Paid",
           pendingStatus: "0"
         },
+        dineIn: isTakeIn ? "Yes" : "No",
+        tableNumber: isTakeIn ? tableNumber : "No",
+        instructions: instructions || "No instructions provided", // Add instructions field
         timestamp: serverTimestamp(),
         totalAmount: totalPrice
       };
@@ -180,6 +184,8 @@ const Cart = () => {
             <input
               type="text"
               placeholder="Add instructions for your order..."
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)} // Capture input value
             />
           </div>
           <div className="dine-in-option">
