@@ -807,5 +807,5 @@ ul {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ff6200;
+  border: 1px solid transparent;
 }

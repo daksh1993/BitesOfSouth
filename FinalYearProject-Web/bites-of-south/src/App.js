@@ -7,7 +7,7 @@ import Menu from './Menu';
 import Cart from './Cart';
 import UserProfileModal from './UserProfileModal';
 import OrderProcessing from './OrderProcessing';
-import Reward from './reward'; // Import renamed Reward component
+import Reward from './reward';
 import BottomNav from './bottomnav';
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -17,17 +17,25 @@ const ProtectedRoute = ({ children }) => {
   const [user, loading] = useAuthState(auth);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading state while checking auth
+    return (
+      <div className="loading-container">
+        <img src="/images/loading.gif" alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
-  return user ? children : <Navigate to="/" />; // Redirect to home if not logged in
+  return user ? children : <Navigate to="/" />;
 };
 
 const App = () => {
-  const [user, loading] = useAuthState(auth); // Get user state for the app
+  const [user, loading] = useAuthState(auth);
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading while auth state is initializing
+    return (
+      <div className="loading-container">
+        <img src="/images/loading.gif" alt="Loading..." className="loading-gif" />
+      </div>
+    );
   }
 
   return (
@@ -55,14 +63,14 @@ const App = () => {
             path="/reward"
             element={
               <ProtectedRoute>
-                <Reward /> {/* Use renamed Reward component */}
+                <Reward />
               </ProtectedRoute>
             }
           />
           <Route path="/UserProfileModal" element={<UserProfileModal />} />
           <Route path="/order-processing" element={<OrderProcessing />} />
         </Routes>
-        <BottomNav user={user} /> {/* Pass user to BottomNav */}
+        <BottomNav user={user} />
       </div>
     </Router>
   );

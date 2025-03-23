@@ -5,6 +5,7 @@
   left: 0;
   right: 0;
   bottom: 0;
+  padding: 15px;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -49,7 +50,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
-  border: 2px solid #ff6200;
+  border: 1px solid transparent;
 }
 
 .profile-details p {

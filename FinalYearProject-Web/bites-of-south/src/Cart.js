@@ -1,6 +1,9 @@
+// src/Cart.js
 import React, { useEffect, useState } from 'react';
-import './Cart.css';
 import { useNavigate } from "react-router-dom";
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import './Cart.css';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -61,7 +64,47 @@ const Cart = () => {
     });
   };
 
+  const saveOrderToFirestore = async (cartItems, paymentResponse) => {
+    try {
+      const orderData = {
+        items: cartItems.map((item, index) => ({
+          itemId: `item_${101 + index}`,
+          makingTime: 20,
+          name: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          orderStatus: "Completed"
+        })),
+        paymentDetails: {
+          amount: totalPrice * 100,
+          amountRefunded: 0,
+          captured: true,
+          currency: "INR",
+          paymentTimestamp: Date.now(),
+          razorpayOrderId: paymentResponse.razorpay_order_id || "order_8B44YVu180hVun",
+          razorpayPaymentId: paymentResponse.razorpay_payment_id,
+          refundStatus: null,
+          status: "captured",
+          testMode: true,
+          paymentStatus: "Paid",
+          pendingStatus: "0"
+        },
+        timestamp: serverTimestamp(),
+        totalAmount: totalPrice
+      };
+
+      await addDoc(collection(db, "orders"), orderData);
+      console.log("Order successfully saved to Firestore!");
+    } catch (error) {
+      console.error("Error saving order to Firestore:", error);
+    }
+  };
+
   const handlePayment = () => {
+    if (totalPrice <= 0) {
+      alert("Your cart is empty. Please add items before checking out.");
+      return;
+    }
     if (isTakeIn && !tableNumber) {
       alert("Please enter a table number for in-store dining.");
       return;
@@ -76,6 +119,7 @@ const Cart = () => {
       image: "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec",
       handler: function (response) {
         alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+        saveOrderToFirestore(cartItems, response);
         localStorage.removeItem("cart");
         setCartItems([]);
         navigate("/order-processing", { state: { cartItems, tableNumber } });
@@ -95,7 +139,7 @@ const Cart = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
 
   return (
@@ -182,7 +226,11 @@ const Cart = () => {
         </div>
 
         <div className="checkout">
-          <button className="pay-now-btn" onClick={handlePayment}>
+          <button
+            className="pay-now-btn"
+            onClick={handlePayment}
+            disabled={totalPrice <= 0}
+          >
             Pay Now ₹{totalPrice.toFixed(2)}
           </button>
         </div>
