@@ -5,6 +5,7 @@ import 'package:bites_of_south/Controller/Menu/item_detail_auth_provider.dart';
 import 'package:bites_of_south/Controller/Menu/menu_load_auth.dart';
 import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
+import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/firebase_options.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginScreen(),
         '/dashboard': (context) => DashboardScreen(),
+        '/cookPage': (context) => CookOrderScreen(),
       },
       // Remove home property since we're using routes
     );

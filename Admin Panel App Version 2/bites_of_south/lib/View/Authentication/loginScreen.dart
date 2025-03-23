@@ -1,9 +1,11 @@
 import 'package:bites_of_south/Controller/Authentication/login_auth_provider.dart';
 import 'package:bites_of_south/View/Authentication/phoneScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
+import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,11 +22,20 @@ class _LoginScreenState extends State<LoginScreen> {
   void _checkInitialLoginStatus() async {
     final authProvider = Provider.of<LoginAuthProvider>(context,
         listen: false); // Updated provider name
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isAdmin = prefs.getBool('isAdmin') ?? false;
     if (await authProvider.checkIfAlreadyLoggedIn()) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardScreen()),
-      );
+      if (isAdmin) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DashboardScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CookOrderScreen()),
+        );
+      }
     }
   }
 

@@ -22,7 +22,8 @@ class OTPVerifyScreenAuth with ChangeNotifier {
 
     try {
       print('Fetching user document with docId: $docId');
-      DocumentSnapshot doc = await _firestore.collection('users').doc(docId).get();
+      DocumentSnapshot doc =
+          await _firestore.collection('users').doc(docId).get();
       phoneNumber = doc['phone'];
       print('Phone number fetched: $phoneNumber');
 
@@ -107,7 +108,8 @@ class OTPVerifyScreenAuth with ChangeNotifier {
             print('Different phone number detected');
             throw FirebaseAuthException(
               code: 'provider-already-linked',
-              message: 'A different phone number is already linked to this account.',
+              message:
+                  'A different phone number is already linked to this account.',
             );
           }
         } else {
@@ -119,9 +121,10 @@ class OTPVerifyScreenAuth with ChangeNotifier {
         throw Exception("No user is currently signed in.");
       }
     } catch (e) {
-      String errorMessage = e is FirebaseAuthException && e.code == 'provider-already-linked'
-          ? "A different phone number is already linked to this account."
-          : "Failed to verify phone number: $e";
+      String errorMessage =
+          e is FirebaseAuthException && e.code == 'provider-already-linked'
+              ? "A different phone number is already linked to this account."
+              : "Failed to verify phone number: $e";
       print('Error in handleCredential: $errorMessage');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
@@ -140,17 +143,31 @@ class OTPVerifyScreenAuth with ChangeNotifier {
         'isAuthenticated': true,
         'lastLoginAt': FieldValue.serverTimestamp(),
       });
-      
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('docId', docId);
       await prefs.setBool("loggedin", true);
-      
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(docId).get();
+      String role = (userDoc.data() as Map<String, dynamic>)['role'] as String;
+      print('Role: $role');
+      if (role == 'admin') {
+        await prefs.setBool("isAdmin", true);
+      } else {
+        await prefs.setBool("isAdmin", false);
+      }
+
       print('Verification completed successfully');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Phone number verified successfully")),
       );
-      
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      bool isAdmin = prefs.getBool('isAdmin') ?? false;
+      print('isAdmin: $isAdmin');
+      if (isAdmin) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        Navigator.popAndPushNamed(context, '/cookpage');
+      }
     } catch (e) {
       print('Error completing verification: $e');
       throw e;

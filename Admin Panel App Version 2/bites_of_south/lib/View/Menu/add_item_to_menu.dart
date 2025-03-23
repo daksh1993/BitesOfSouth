@@ -37,24 +37,8 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
   ];
   String? _selectedCategory;
 
-  Future<void> addAvailabilityToExistingDocuments() async {
-    final CollectionReference menuCollection =
-        FirebaseFirestore.instance.collection('menu');
 
-    try {
-      // Fetch all documents in the menu collection
-      QuerySnapshot querySnapshot = await menuCollection.get();
-
-      for (var doc in querySnapshot.docs) {
-        // Update each document to include the new field
-        await menuCollection.doc(doc.id).update({'availability': true});
-      }
-
-      print("Successfully updated all documents!");
-    } catch (e) {
-      print("Error updating documents: $e");
-    }
-  }
+  
 
   Future<void> _pickImage() async {
     final picture = await ImagePicker().pickImage(source: ImageSource.gallery);

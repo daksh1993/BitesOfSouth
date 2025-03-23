@@ -1,4 +1,5 @@
 import 'package:bites_of_south/View/Authentication/loginScreen.dart';
+import 'package:bites_of_south/View/Dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -75,7 +76,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DashboardScreen()));
                       },
                       icon: Icon(
                         Icons.arrow_back_ios,

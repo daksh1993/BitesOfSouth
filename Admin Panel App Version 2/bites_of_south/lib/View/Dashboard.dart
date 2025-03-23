@@ -1,4 +1,5 @@
 import 'package:bites_of_south/View/Menu/menu_management.dart';
+import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
 import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:bites_of_south/View/addAdmin.dart';
@@ -19,9 +20,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<int, Widget> _screens = {
     1: const MenuManagementScreen(),
-    2: Scaffold(), // Replace with actual Order Screen
+    2: CookOrderScreen(), // Replace with actual Order Screen
     3: Scaffold(), // Replace with actual Analysis Screen
-    4:  RewardScreen(),
+    4: RewardScreen(),
   };
   @override
   void initState() {
@@ -41,7 +42,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       print("docId not found in SharedPreferences");
     }
   }
-
 
   // Future<void> _logout() async {
   //   try {
@@ -87,7 +87,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
-              Navigator.of(context).push(
+              Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => ProfileScreen()),
               );
             },
@@ -122,7 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 customContainer("Order", 2),
               ],
             ),
-            const SizedBox(height: 15),
+            SizedBox(height: MediaQuery.sizeOf(context).width * 0.029),
             Row(
               spacing: MediaQuery.sizeOf(context).width * 0.029,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -143,7 +143,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) =>
-                _screens[index] ?? const Scaffold(body: Center(child: Text("Page not found"))),
+                _screens[index] ??
+                const Scaffold(body: Center(child: Text("Page not found"))),
           ),
         );
       },
