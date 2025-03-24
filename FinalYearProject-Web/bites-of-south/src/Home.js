@@ -44,19 +44,15 @@ const Home = () => {
               <h3>BitesOfSouth</h3>
             </span>
           </div>
+
           <div className="options">
             <ul className="NavOption">
+              <li className="Bscreen"><a href="/">Home</a></li>
               <li className="Bscreen">
-                <a href="/">Home</a>
+                <a href="/menu" onClick={(e) => handleMenuNavigation(e)}>Order</a>
               </li>
-              <li className="Bscreen">
-                <a href="/menu" onClick={(e) => handleMenuNavigation(e)}>
-                  Order
-                </a>
-              </li>
-              <li className="Bscreen">
-                <a href="">About Us</a>
-              </li>
+              <li className="Bscreen" id='moborders'><a href="/orders"> <i class="fa-solid fa-box-archive"></i> Orders</a></li> {/* New Link */}
+              <li className="Bscreen"><a href="">About Us</a></li>
               {isLoggedIn ? (
                 <li className="user-avatar">
                   {user?.photoURL ? (
@@ -76,13 +72,7 @@ const Home = () => {
                 </li>
               ) : (
                 <li className="signin">
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsModalOpen(true);
-                    }}
-                  >
+                  <a href="#" onClick={(e) => { e.preventDefault(); setIsModalOpen(true); }}>
                     Sign in
                   </a>
                 </li>

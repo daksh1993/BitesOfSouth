@@ -1,8 +1,8 @@
 // src/Cart.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth } from './firebase'; // Added 'auth' import
+import { collection, addDoc } from 'firebase/firestore';
 import './Cart.css';
 
 const Cart = () => {
@@ -13,7 +13,7 @@ const Cart = () => {
   const [serviceCharge, setServiceCharge] = useState(0);
   const [isTakeIn, setIsTakeIn] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
-  const [instructions, setInstructions] = useState(""); // New state for instructions
+  const [instructions, setInstructions] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +22,8 @@ const Cart = () => {
       title: item.title || "Unknown",
       price: item.price || 0,
       quantity: item.quantity || 1,
-      image: item.image || ""
+      image: item.image || "",
+      makingTime: item.makingTime || 15
     }));
     setCartItems(sanitizedCart);
   }, []);
@@ -35,17 +36,27 @@ const Cart = () => {
       setTotalPrice(0);
       return;
     }
+    
+    // Step 1: Calculate Item Total
+    const validItems = cartItems.filter(item => item.price > 0 && item.quantity > 0);
+    const calculatedItemTotal = validItems.reduce((acc, item) => {
+      return acc + (item.price * item.quantity);
+    }, 0);
 
-    let validItems = cartItems.filter(item => item.price && item.quantity);
-    let itemTotal = validItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    let gst = itemTotal * 0.10;
-    let serviceCharge = itemTotal * 0.05;
-    let total = itemTotal + gst + serviceCharge;
+    // Step 2: Calculate GST (10% of Item Total)
+    const calculatedGst = calculatedItemTotal * 0.10;
 
-    setItemTotal(itemTotal || 0);
-    setGst(gst || 0);
-    setServiceCharge(serviceCharge || 0);
-    setTotalPrice(total || 0);
+    // Step 3: Calculate Service Charge (5% of Item Total)
+    const calculatedServiceCharge = calculatedItemTotal * 0.05;
+
+    // Step 4: Calculate Grand Total
+    const calculatedTotalPrice = calculatedItemTotal + calculatedGst + calculatedServiceCharge;
+
+    // Update state with calculated values
+    setItemTotal(calculatedItemTotal);
+    setGst(calculatedGst);
+    setServiceCharge(calculatedServiceCharge);
+    setTotalPrice(calculatedTotalPrice);
   }, [cartItems]);
 
   const updateQuantity = (title, change) => {
@@ -67,50 +78,68 @@ const Cart = () => {
 
   const saveOrderToFirestore = async (cartItems, paymentResponse) => {
     try {
+      const userId = auth.currentUser?.uid || "guest"; // Use actual UID or "guest" if not logged in
+      console.log("Saving order for userId:", userId); // Debug log
+      const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      if (!totalQuantity) {
+        throw new Error("No items in cart to save.");
+      }
+
       const orderData = {
+        userId: userId,
         items: cartItems.map((item, index) => ({
           itemId: `item_${101 + index}`,
-          makingTime: 20,
           name: item.title,
-          price: item.price,
           quantity: item.quantity,
-          orderStatus: "Completed"
+          price: item.price,
+          makingTime: Math.round((item.makingTime || 15) / totalQuantity)
         })),
+        totalAmount: totalPrice,
+        orderStatus: "Pending",
+        pendingStatus: "25",
+        paymentStatus: "Paid",
+        timestamp: Date.now(),
+        makingTime: Math.max(...cartItems.map(item => Math.round((item.makingTime || 15) / totalQuantity))),
+        dineIn: isTakeIn,
+        tableNo: isTakeIn ? tableNumber : null,
+        instructions: instructions || "No instructions provided",
         paymentDetails: {
-          amount: totalPrice * 100,
-          amountRefunded: 0,
-          captured: true,
-          currency: "INR",
-          paymentTimestamp: Date.now(),
-          razorpayOrderId: paymentResponse.razorpay_order_id || "order_8B44YVu180hVun",
           razorpayPaymentId: paymentResponse.razorpay_payment_id,
-          refundStatus: null,
+          razorpayOrderId: paymentResponse.razorpay_order_id || "order_8B44YVu180hVun",
+          amount: totalPrice * 100,
+          currency: "INR",
           status: "captured",
-          testMode: true,
-          paymentStatus: "Paid",
-          pendingStatus: "0"
-        },
-        dineIn: isTakeIn ? "Yes" : "No",
-        tableNumber: isTakeIn ? tableNumber : "No",
-        instructions: instructions || "No instructions provided", // Add instructions field
-        timestamp: serverTimestamp(),
-        totalAmount: totalPrice
+          amountRefunded: 0,
+          refundStatus: null,
+          captured: true,
+          paymentTimestamp: Date.now(),
+          testMode: true
+        }
       };
 
-      await addDoc(collection(db, "orders"), orderData);
-      console.log("Order successfully saved to Firestore!");
+      const docRef = await addDoc(collection(db, "orders"), orderData);
+      console.log("Order saved with ID:", docRef.id); // Debug log
+      return docRef.id;
     } catch (error) {
-      console.error("Error saving order to Firestore:", error);
+      console.error("Error saving order:", error.message);
+      return null;
     }
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (totalPrice <= 0) {
       alert("Your cart is empty. Please add items before checking out.");
       return;
     }
     if (isTakeIn && !tableNumber) {
       alert("Please enter a table number for in-store dining.");
+      return;
+    }
+
+    if (!window.Razorpay) {
+      console.error("Razorpay SDK not loaded.");
+      alert("Payment service is unavailable. Please try again later.");
       return;
     }
 
@@ -121,12 +150,22 @@ const Cart = () => {
       name: "BitesOfSouth",
       description: "Order Payment",
       image: "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec",
-      handler: function (response) {
-        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-        saveOrderToFirestore(cartItems, response);
-        localStorage.removeItem("cart");
-        setCartItems([]);
-        navigate("/order-processing", { state: { cartItems, tableNumber } });
+      handler: async function (response) {
+        const orderId = await saveOrderToFirestore(cartItems, response);
+        if (orderId) {
+          localStorage.removeItem("cart");
+          setCartItems([]);
+          navigate("/order-details", { 
+            state: { 
+              orderId,
+              cartItems,
+              tableNumber,
+              totalAmount: totalPrice
+            } 
+          });
+        } else {
+          alert("Failed to save order. Please try again.");
+        }
       },
       prefill: {
         name: "Customer Name",
@@ -166,7 +205,7 @@ const Cart = () => {
                 </div>
                 <div className="item-details">
                   <p className="item-name">{item.title}</p>
-                  <p className="item-price">₹{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="item-price">₹{item.price} x {item.quantity} = ₹{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                 <div className="item-quantity">
                   <button onClick={() => updateQuantity(item.title, -1)}>-</button>
@@ -185,7 +224,7 @@ const Cart = () => {
               type="text"
               placeholder="Add instructions for your order..."
               value={instructions}
-              onChange={(e) => setInstructions(e.target.value)} // Capture input value
+              onChange={(e) => setInstructions(e.target.value)}
             />
           </div>
           <div className="dine-in-option">
@@ -213,21 +252,23 @@ const Cart = () => {
 
         <div className="cart-summary">
           <h2>Bill Details</h2>
-          <div className="summary-item">
-            <span>Item Total</span>
-            <span>₹{itemTotal.toFixed(2)}</span>
-          </div>
-          <div className="summary-item">
-            <span>GST (10%)</span>
-            <span>₹{gst.toFixed(2)}</span>
-          </div>
-          <div className="summary-item">
-            <span>Service Charge (5%)</span>
-            <span>₹{serviceCharge.toFixed(2)}</span>
-          </div>
-          <div className="summary-total">
-            <span>Total</span>
-            <span>₹{totalPrice.toFixed(2)}</span>
+          <div className="summary-breakdown">
+            <div className="summary-item">
+              <span>Subtotal (Items)</span>
+              <span>₹{itemTotal.toFixed(2)}</span>
+            </div>
+            <div className="summary-item">
+              <span>GST (10%)</span>
+              <span>₹{gst.toFixed(2)}</span>
+            </div>
+            <div className="summary-item">
+              <span>Service Charge (5%)</span>
+              <span>₹{serviceCharge.toFixed(2)}</span>
+            </div>
+            <div className="summary-total">
+              <span>Grand Total</span>
+              <span>₹{totalPrice.toFixed(2)}</span>
+            </div>
           </div>
         </div>
 

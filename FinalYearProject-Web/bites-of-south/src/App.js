@@ -2,12 +2,15 @@
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Orders from './orders';
 import Home from './Home';
 import Menu from './Menu';
 import Cart from './Cart';
+import OrderDetails from './OrderDetails';
 import UserProfileModal from './UserProfileModal';
 import OrderProcessing from './OrderProcessing';
 import Reward from './reward';
+
 import BottomNav from './bottomnav';
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -67,8 +70,38 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/UserProfileModal" element={<UserProfileModal />} />
-          <Route path="/order-processing" element={<OrderProcessing />} />
+          <Route
+            path="/UserProfileModal"
+            element={
+              <ProtectedRoute>
+                <UserProfileModal />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-processing"
+            element={
+              <ProtectedRoute>
+                <OrderProcessing />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/order-details"
+            element={
+              <ProtectedRoute>
+                <OrderDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <BottomNav user={user} />
       </div>

@@ -334,3 +334,36 @@
     font-size: 16px;
   }
 }
+/* Add/Modify in src/Cart.css */
+.cart-summary {
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1ba672;
+  border-top: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+.cart-item .item-price {
+  font-size: 14px;
+  color: #666;
+}

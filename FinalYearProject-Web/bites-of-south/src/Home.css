@@ -203,7 +203,9 @@ a:visited {
     display: none;
     color: rgb(17, 48, 8);
   }
-
+  #moborder{
+    display: block;
+  }
   .nav {
     gap: 0px;
   }
@@ -262,7 +264,11 @@ a:visited {
     padding: 3px;
     justify-content: space-evenly;
   }
-
+  #moborders{
+    margin-left: 50px;
+    font-size: 14px;
+    display: block;
+  }
   .nav img {
     width: 45px;
     height: 45px;
@@ -651,6 +657,9 @@ ul {
 }
 
 @media (max-width: 480px) {
+  #moborder{
+    display: block;
+  }
   .footer-container {
     padding: 15px 5px;
   }
@@ -754,6 +763,9 @@ ul {
 
 /* Mobile Optimization */
 @media (max-width: 768px) {
+  #moborder{
+    display: block;
+  }
   .bottom-nav {
     display: block;
     position: fixed;
