@@ -1,4 +1,5 @@
 import 'package:bites_of_south/Modal/orders_modal.dart';
+import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -98,6 +99,13 @@ class CookOrderScreen extends StatelessWidget {
         title: const Text('Cook Dashboard'),
         centerTitle: true,
         backgroundColor: Colors.green,
+        leading: IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            }),
       ),
       body: Padding(
         padding: EdgeInsets.all(screenWidth * 0.02),
@@ -196,7 +204,17 @@ class _OrderCardState extends State<OrderCard> {
         .doc(widget.order.id)
         .update({'pendingStatus': status});
 
-    if (status == '100') {
+    if (status == '25') {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(widget.order.id)
+          .update({'orderStatus': 'In Progress'});
+    } else if (status == '50') {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .doc(widget.order.id)
+          .update({'orderStatus': 'Halfway Done'});
+    } else if (status == '100') {
       await FirebaseFirestore.instance
           .collection('orders')
           .doc(widget.order.id)
@@ -303,55 +321,58 @@ class _OrderCardState extends State<OrderCard> {
               style: TextStyle(fontSize: widget.screenWidth * 0.025),
             ),
             SizedBox(height: widget.screenHeight * 0.01),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed:
-                      _is25Disabled ? null : () => _updatePendingStatus('25'),
-                  child: const Text('25% Done'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.red, // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(10), // Rounded corners
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed:
+                        _is25Disabled ? null : () => _updatePendingStatus('25'),
+                    child: const Text('25% Done'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: Size(widget.screenWidth * 0.25,
+                          widget.screenHeight * 0.06),
                     ),
-                    minimumSize: Size(
-                        widget.screenWidth * 0.2, widget.screenHeight * 0.06),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed:
-                      _is50Disabled ? null : () => _updatePendingStatus('50'),
-                  child: const Text('50% Done'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.orange, // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(10), // Rounded corners
+                  SizedBox(width: widget.screenWidth * 0.03), // add spacing
+                  ElevatedButton(
+                    onPressed:
+                        _is50Disabled ? null : () => _updatePendingStatus('50'),
+                    child: const Text('50% Done'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: Size(widget.screenWidth * 0.25,
+                          widget.screenHeight * 0.06),
                     ),
-                    minimumSize: Size(
-                        widget.screenWidth * 0.2, widget.screenHeight * 0.06),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed:
-                      _is100Disabled ? null : () => _updatePendingStatus('100'),
-                  child: const Text('Order Completed'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.green, // Text color
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(10), // Rounded corners
+                  SizedBox(width: widget.screenWidth * 0.03), // add spacing
+                  ElevatedButton(
+                    onPressed: _is100Disabled
+                        ? null
+                        : () => _updatePendingStatus('100'),
+                    child: const Text('Order Completed'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      minimumSize: Size(widget.screenWidth * 0.25,
+                          widget.screenHeight * 0.06),
                     ),
-                    minimumSize: Size(
-                        widget.screenWidth * 0.25, widget.screenHeight * 0.06),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             if (_pendingStatus != '0' && _pendingStatus.isNotEmpty)
               Padding(

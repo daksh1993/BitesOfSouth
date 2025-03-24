@@ -10,49 +10,51 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-String name = "Admin Test";
-String email = "admintest@gmail.com";
-String phone = "+91 1234567890";
-String role = "admintest";
-String lastLoginAt = "Not available";
-String lastLogoutAt = "Not available";
-
-Future<void> FetchProfile() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-
-  String? userid = pref.getString("docId");
-  if (userid != null) {
-    DocumentSnapshot userProfile =
-        await FirebaseFirestore.instance.collection('users').doc(userid).get();
-
-    if (userProfile.exists) {
-      name = userProfile['name'];
-      email = userProfile['email'];
-      phone = userProfile['phone'];
-      role = userProfile['role'];
-      lastLoginAt =
-          (userProfile['lastLoginAt'] as Timestamp).toDate().toString();
-      lastLogoutAt =
-          (userProfile['lastLogoutAt'] as Timestamp).toDate().toString();
-    } else {
-      print("User profile does not exist");
-    }
-  } else {
-    print("User not logged in");
-  }
-}
-
 class _ProfileScreenState extends State<ProfileScreen> {
+  String name = "Admin Test";
+  String email = "admintest@gmail.com";
+  String phone = "+91 1234567890";
+  String role = "admintest";
+  String lastLoginAt = "Not available";
+  String lastLogoutAt = "Not available";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     FetchProfile();
   }
 
+  Future<void> FetchProfile() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? userid = pref.getString("docId");
+
+    if (userid != null) {
+      DocumentSnapshot userProfile = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userid)
+          .get();
+
+      if (userProfile.exists) {
+        setState(() {
+          name = userProfile['name'];
+          email = userProfile['email'];
+          phone = userProfile['phone'];
+          role = userProfile['role'];
+          lastLoginAt =
+              (userProfile['lastLoginAt'] as Timestamp).toDate().toString();
+          lastLogoutAt =
+              (userProfile['lastLogoutAt'] as Timestamp).toDate().toString();
+        });
+      } else {
+        print("User profile does not exist");
+      }
+    } else {
+      print("User not logged in");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    FetchProfile();
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -76,23 +78,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     IconButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => DashboardScreen()));
+                        Navigator.pop(context);
                       },
                       icon: Icon(
                         Icons.arrow_back_ios,
                         color: Colors.white,
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: () {},
-                    //   icon: Icon(
-                    //     Icons.edit,
-                    //     color: Colors.white,
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
@@ -190,9 +182,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 pref.setBool("loggedin", false);
                               }
 
-                              Navigator.of(context).pushReplacement(
+                              Navigator.pushAndRemoveUntil(
+                                context,
                                 MaterialPageRoute(
                                     builder: (context) => LoginScreen()),
+                                (Route<dynamic> route) =>
+                                    false, // Remove all previous routes
                               );
                             });
                           },
