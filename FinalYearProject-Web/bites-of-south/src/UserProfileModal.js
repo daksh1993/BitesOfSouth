@@ -1,8 +1,8 @@
-// src/components/UserProfileModal.js
 import React, { useState, useEffect } from 'react';
-import { auth, db } from './firebase'; // Ensure this matches your firebase config import
+import { auth, db } from './firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updateProfile, updateEmail } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom'; // For navigation
 import './UserProfileModal.css';
 
 const UserProfileModal = ({ isOpen, onClose, user }) => {
@@ -13,25 +13,24 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
   const [editedEmail, setEditedEmail] = useState('');
   const [editedPhoneNo, setEditedPhoneNo] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // React Router hook for navigation
 
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
         try {
-          const userRef = doc(db, 'users', user.uid); // Changed from 'clients' to 'users'
+          const userRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const data = userDoc.data();
-            console.log("Fetched user data:", data); // Debug log
             setUserData(data);
             setEditedName(data.name || user.displayName || '');
             setEditedEmail(data.email || user.email || '');
-            setEditedPhoneNo(data.phoneNo || ''); // Ensure phoneNo is set
+            setEditedPhoneNo(data.phoneNo || '');
           } else {
-            console.log("No user document found, using auth data");
             setEditedName(user.displayName || '');
             setEditedEmail(user.email || '');
-            setEditedPhoneNo(''); // Default to empty if no Firestore data
+            setEditedPhoneNo('');
           }
           setLoading(false);
         } catch (err) {
@@ -60,113 +59,94 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
 
   const handleSave = async () => {
     try {
-      const userRef = doc(db, 'users', user.uid); // Changed from 'clients' to 'users'
-      const updateData = {
-        name: editedName,
-        email: editedEmail,
-        phoneNo: editedPhoneNo // Always update phoneNo
-      };
-
-      // Update Firebase Auth if name or email changed
-      if (editedName !== user.displayName) {
-        await updateProfile(auth.currentUser, { displayName: editedName });
-      }
-      if (editedEmail !== user.email) {
-        await updateEmail(auth.currentUser, editedEmail);
-      }
-
-      // Update Firestore
-      console.log("Saving updated data:", updateData); // Debug log
+      const userRef = doc(db, 'users', user.uid);
+      const updateData = { name: editedName, email: editedEmail, phoneNo: editedPhoneNo };
+      if (editedName !== user.displayName) await updateProfile(auth.currentUser, { displayName: editedName });
+      if (editedEmail !== user.email) await updateEmail(auth.currentUser, editedEmail);
       await updateDoc(userRef, updateData);
-
-      // Update local state
-      setUserData(prev => ({
-        ...prev,
-        name: editedName,
-        email: editedEmail,
-        phoneNo: editedPhoneNo
-      }));
+      setUserData(prev => ({ ...prev, ...updateData }));
       setIsEditing(false);
       setError(null);
-
-      // Update auth object for consistency
       user.displayName = editedName;
       user.email = editedEmail;
-
-      const updatedDoc = await getDoc(userRef);
-      console.log("Saved data after update:", updatedDoc.data()); // Debug log
     } catch (err) {
       setError(err.message);
     }
   };
 
+  const handleOrdersClick = () => {
+    onClose(); // Close the modal
+    navigate('/orders'); // Navigate to full-screen Orders page
+  };
+
   return (
-    <div className="modal-overlay">
+    <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
       <div className="modal-content">
-        <button className="modal-close-btn" onClick={onClose}>×</button>
-        <h2>User Profile</h2>
+        <button className="modal-close-btn" onClick={onClose}>
+          <span>×</span>
+        </button>
+        <div className="menu-header">
+          <img
+            src={user?.photoURL || 'https://via.placeholder.com/40'}
+            alt="User Avatar"
+            className="menu-avatar"
+          />
+          <div className="user-info">
+            <span className="user-name">{userData?.name || user?.displayName || 'User'}</span>
+            <span className="user-email">{userData?.email || user?.email || 'N/A'}</span>
+          </div>
+        </div>
         {loading ? (
-          <p>Loading...</p>
+          <div className="loading">Loading...</div>
         ) : (
-          <div className="profile-details">
-            <img
-              src={user?.photoURL || 'https://via.placeholder.com/100'}
-              alt="User Avatar"
-              className="profile-avatar"
-            />
-            {isEditing ? (
-              <>
-                <div className="form-group">
-                  <label><strong>Name:</strong></label>
-                  <input
-                    type="text"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    className="edit-input"
-                  />
+          <div className="menu-options">
+            <ul>
+              <li onClick={handleEditToggle}>
+                <span className="icon">✎</span> Edit Profile
+              </li>
+              {isEditing && (
+                <div className="edit-profile-section">
+                  <div className="form-group">
+                    <label>Name</label>
+                    <input
+                      type="text"
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="edit-input"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={editedEmail}
+                      onChange={(e) => setEditedEmail(e.target.value)}
+                      className="edit-input"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone Number</label>
+                    <input
+                      type="tel"
+                      value={editedPhoneNo}
+                      onChange={(e) => setEditedPhoneNo(e.target.value)}
+                      className="edit-input"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  {error && <p className="error-message">{error}</p>}
+                  <button className="save-btn" onClick={handleSave}>Save Changes</button>
                 </div>
-                <div className="form-group">
-                  <label><strong>Email:</strong></label>
-                  <input
-                    type="email"
-                    value={editedEmail}
-                    onChange={(e) => setEditedEmail(e.target.value)}
-                    className="edit-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label><strong>Phone Number:</strong></label>
-                  <input
-                    type="tel"
-                    value={editedPhoneNo}
-                    onChange={(e) => setEditedPhoneNo(e.target.value)}
-                    className="edit-input"
-                    pattern="[0-9]{10}"
-                    title="Please enter a 10-digit phone number"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-                {error && <p className="error-message">{error}</p>}
-                <button className="save-btn" onClick={handleSave}>
-                  Save
-                </button>
-                <button className="cancel-btn" onClick={handleEditToggle}>
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <p><strong>Name:</strong> {userData?.name || user?.displayName || 'N/A'}</p>
-                <p><strong>Email:</strong> {userData?.email || user?.email || 'N/A'}</p>
-                <p><strong>Phone Number:</strong> {userData?.phoneNo || 'Not provided'}</p>
-                <button className="edit-btn" onClick={handleEditToggle}>
-                  Edit Profile
-                </button>
-                <button className="logout-btn" onClick={handleLogout}>
-                  Logout
-                </button>
-              </>
-            )}
+              )}
+              <li onClick={handleOrdersClick}>
+                <span className="icon">📦</span> Orders
+              </li>
+              <li onClick={handleLogout} className="logout-option">
+                <span className="icon">🚪</span> Logout
+              </li>
+            </ul>
           </div>
         )}
       </div>

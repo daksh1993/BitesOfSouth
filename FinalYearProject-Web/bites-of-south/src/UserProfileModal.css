@@ -1,132 +1,195 @@
-/* src/components/UserProfileModal.css */
+/* Modal Overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 15px;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: rgba(0, 0, 0, 0.4);
   z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
 }
 
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Modal Content (Sidebar) */
 .modal-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 400px;
-  position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  width: 300px;
+  height: 100%;
+  padding: 20px;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+.modal-overlay.open .modal-content {
+  transform: translateX(0);
 }
 
 .modal-close-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 15px;
   border: none;
   background: none;
   font-size: 24px;
   cursor: pointer;
-  color: #666;
+  color: #888;
 }
 
-.modal-content h2 {
-  margin-bottom: 1.5rem;
-  color: #333;
-  text-align: center;
+/* Menu Header */
+.menu-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.profile-details {
-  text-align: center;
-}
-
-.profile-avatar {
-  width: 100px;
-  height: 100px;
+.menu-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  margin-right: 10px;
   object-fit: cover;
-  margin-bottom: 1rem;
-  border: 1px solid transparent;
 }
 
-.profile-details p {
-  margin: 0.5rem 0;
-  font-size: 1rem;
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 600;
   color: #333;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Menu Options */
+.menu-options ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-options li {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.menu-options li:hover {
+  background-color: #f8f8f8;
+}
+
+.menu-options .icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.logout-option {
+  color: #ff5722;
+}
+
+/* Edit Profile Section */
+.edit-profile-section {
+  padding: 15px 0;
 }
 
 .form-group {
-  margin: 0.5rem 0;
-  text-align: left;
+  margin-bottom: 15px;
 }
 
 .form-group label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 0.25rem;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
 }
 
 .edit-input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus {
+  border-color: #ff5722;
 }
 
 .error-message {
-  color: red;
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.edit-btn, .save-btn, .cancel-btn, .logout-btn {
-  width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.edit-btn {
-  background-color: #007bff;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #0056b3;
+  color: #e63946;
+  font-size: 14px;
+  margin-top: 5px;
 }
 
 .save-btn {
-  background-color: #28a745;
-  color: white;
+  width: 100%;
+  padding: 12px;
+  background-color: #ff5722;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .save-btn:hover {
-  background-color: #218838;
+  background-color: #e64a19;
 }
 
-.cancel-btn {
-  background-color: #6c757d;
-  color: white;
+/* Orders Section */
+.orders-section {
+  padding: 15px 0;
 }
 
-.cancel-btn:hover {
-  background-color: #5a6268;
+.orders-list {
+  list-style: none;
+  padding: 0;
 }
 
-.logout-btn {
-  background-color: #ff6200;
-  color: white;
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
 }
 
-.logout-btn:hover {
-  background-color: #e55a00;
+.no-orders {
+  font-size: 14px;
+  color: #777;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.loading {
+  font-size: 16px;
+  color: #777;
+  text-align: center;
 }
