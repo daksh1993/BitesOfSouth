@@ -1,7 +1,7 @@
 // src/Cart.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { db, auth } from './firebase'; // Added 'auth' import
+import { db, auth } from './firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import './Cart.css';
 
@@ -19,6 +19,7 @@ const Cart = () => {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     const sanitizedCart = storedCart.map(item => ({
+      uid: item.uid || "unknown", // Add uid, fallback to "unknown" if missing
       title: item.title || "Unknown",
       price: item.price || 0,
       quantity: item.quantity || 1,
@@ -37,33 +38,26 @@ const Cart = () => {
       return;
     }
     
-    // Step 1: Calculate Item Total
     const validItems = cartItems.filter(item => item.price > 0 && item.quantity > 0);
     const calculatedItemTotal = validItems.reduce((acc, item) => {
       return acc + (item.price * item.quantity);
     }, 0);
 
-    // Step 2: Calculate GST (10% of Item Total)
     const calculatedGst = calculatedItemTotal * 0.10;
-
-    // Step 3: Calculate Service Charge (5% of Item Total)
     const calculatedServiceCharge = calculatedItemTotal * 0.05;
-
-    // Step 4: Calculate Grand Total
     const calculatedTotalPrice = calculatedItemTotal + calculatedGst + calculatedServiceCharge;
 
-    // Update state with calculated values
     setItemTotal(calculatedItemTotal);
     setGst(calculatedGst);
     setServiceCharge(calculatedServiceCharge);
     setTotalPrice(calculatedTotalPrice);
   }, [cartItems]);
 
-  const updateQuantity = (title, change) => {
+  const updateQuantity = (uid, change) => { // Use uid instead of title
     setCartItems((prevCart) => {
       const updatedCart = prevCart
         .map(item => {
-          if (item.title === title) {
+          if (item.uid === uid) { // Match by uid
             let newQuantity = item.quantity + change;
             return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
           }
@@ -78,8 +72,8 @@ const Cart = () => {
 
   const saveOrderToFirestore = async (cartItems, paymentResponse) => {
     try {
-      const userId = auth.currentUser?.uid || "guest"; // Use actual UID or "guest" if not logged in
-      console.log("Saving order for userId:", userId); // Debug log
+      const userId = auth.currentUser?.uid || "guest";
+      console.log("Saving order for userId:", userId);
       const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
       if (!totalQuantity) {
@@ -88,8 +82,8 @@ const Cart = () => {
 
       const orderData = {
         userId: userId,
-        items: cartItems.map((item, index) => ({
-          itemId: `item_${101 + index}`,
+        items: cartItems.map(item => ({
+          itemId: item.uid, // Use product UID instead of index-based ID
           name: item.title,
           quantity: item.quantity,
           price: item.price,
@@ -119,7 +113,7 @@ const Cart = () => {
       };
 
       const docRef = await addDoc(collection(db, "orders"), orderData);
-      console.log("Order saved with ID:", docRef.id); // Debug log
+      console.log("Order saved with ID:", docRef.id);
       return docRef.id;
     } catch (error) {
       console.error("Error saving order:", error.message);
@@ -199,7 +193,7 @@ const Cart = () => {
             <p className="empty-cart">Your cart is empty.</p>
           ) : (
             cartItems.map(item => (
-              <div className="cart-item" key={item.title}>
+              <div className="cart-item" key={item.uid}> {/* Use uid as key */}
                 <div className="item-image">
                   {item.image && <img src={item.image} alt={item.title} />}
                 </div>
@@ -208,9 +202,9 @@ const Cart = () => {
                   <p className="item-price">₹{item.price} x {item.quantity} = ₹{(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                 <div className="item-quantity">
-                  <button onClick={() => updateQuantity(item.title, -1)}>-</button>
+                  <button onClick={() => updateQuantity(item.uid, -1)}>-</button> {/* Use uid */}
                   <span>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.title, 1)}>+</button>
+                  <button onClick={() => updateQuantity(item.uid, 1)}>+</button> {/* Use uid */}
                 </div>
               </div>
             ))
