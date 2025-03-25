@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bites_of_south/Controller/Authentication/login_auth_provider.dart';
 import 'package:bites_of_south/Controller/Authentication/otp_verify_screen_auth.dart';
 import 'package:bites_of_south/Controller/Authentication/phone_auth_provider.dart';
@@ -7,6 +9,7 @@ import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
 import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/firebase_options.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +29,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PhoneValidityProvider()),
         ChangeNotifierProvider(create: (_) => OTPVerifyScreenAuth()),
         ChangeNotifierProvider(create: (_) => MenuLoadAuth()),
-        ChangeNotifierProvider(create: (_)=> ItemDetailAuthProvider()),
+        ChangeNotifierProvider(create: (_) => ItemDetailAuthProvider()),
       ],
       child: MyApp(),
     ),
@@ -44,11 +47,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
+      // initialRoute: '/mainPage', // Set initial route to login
       initialRoute: '/login', // Set initial route to login
       routes: {
         '/login': (context) => LoginScreen(),
         '/dashboard': (context) => DashboardScreen(),
         '/cookPage': (context) => CookOrderScreen(),
+        '/mainPage': (context) => MyHomePage(
+              title: 'BitesOf South',
+            ),
       },
       // Remove home property since we're using routes
     );
@@ -74,6 +81,61 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> updateMenuMakingPrices() async {
+    try {
+      // Get reference to the menu collection
+      CollectionReference menuRef =
+          FirebaseFirestore.instance.collection('menu');
+
+      // List of possible percentage reductions
+      final List<int> percentages = [10, 15, 17, 22];
+
+      // Get random percentage
+      int getRandomPercentage() =>
+          percentages[Random().nextInt(percentages.length)];
+
+      // Get all documents
+      QuerySnapshot snapshot = await menuRef.get();
+
+      // Create a batch write
+      WriteBatch batch = FirebaseFirestore.instance.batch();
+
+      // Process each document
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        // Get the price from document data
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data.containsKey('price')) {
+          // Convert price to double, handling both String and num cases
+          double price;
+          if (data['price'] is String) {
+            price = double.parse(data['price']);
+          } else if (data['price'] is num) {
+            price = (data['price'] as num).toDouble();
+          } else {
+            continue; // Skip if price is neither String nor num
+          }
+
+          // Calculate makingPrice with random reduction
+          int reductionPercent = getRandomPercentage();
+          double reductionAmount = price * (reductionPercent / 100);
+          double makingPrice = price - reductionAmount;
+
+          // Add update to batch
+          batch.update(doc.reference, {
+            'makingPrice': double.parse(makingPrice.toStringAsFixed(2)),
+          });
+        }
+      }
+
+      // Commit the batch
+      await batch.commit();
+      print('Menu prices updated successfully');
+    } catch (e) {
+      print('Error updating menu prices: $e');
+      throw e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: updateMenuMakingPrices,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),

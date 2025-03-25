@@ -1,26 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrdersModal {
-  final String? id; // Auto-generated ID from Firestore
+  final String? id;
+  final bool dineIn;
   final List<OrderItem> items;
-  final int totalAmount;
+  final double totalAmount;
   final String? orderStatus;
   final String? pendingStatus;
   final String? paymentStatus;
+  final String? tableNo;
   final int timestamp;
-  final int makingTime;
   final PaymentDetails paymentDetails;
+  final String? userId;
 
   OrdersModal({
-    this.id, // Nullable, set by Firestore
+    this.id,
+    required this.dineIn,
     required this.items,
     required this.totalAmount,
-    required this.orderStatus,
-    required this.pendingStatus,
-    required this.paymentStatus,
+    this.orderStatus,
+    this.pendingStatus,
+    this.paymentStatus,
+    this.tableNo,
     required this.timestamp,
-    required this.makingTime,
     required this.paymentDetails,
+    this.userId,
   });
 
   factory OrdersModal.fromFirestore(DocumentSnapshot doc) {
@@ -29,33 +33,45 @@ class OrdersModal {
       throw Exception('Firestore document data is null');
     }
     return OrdersModal(
-      id: doc.id, // Use the auto-generated document ID
+      id: doc.id,
+      dineIn: data['dineIn'] as bool? ?? false,
       items: (data['items'] as List<dynamic>?)
               ?.map((item) => OrderItem.fromMap(item as Map<String, dynamic>))
               .toList() ??
           [],
-      totalAmount: data['totalAmount'] as int? ?? 0,
-      orderStatus: data['orderStatus'] as String? ?? 'Unknown',
+      totalAmount: (data['totalAmount'] is num
+          ? (data['totalAmount'] as num).toDouble()
+          : data['totalAmount'] is String
+              ? double.tryParse(data['totalAmount'] as String) ?? 0.0
+              : 0.0),
+      orderStatus: data['orderStatus'] as String? ?? 'Pending',
       pendingStatus: data['pendingStatus'] as String? ?? '0',
       paymentStatus: data['paymentStatus'] as String? ?? 'Unknown',
-      timestamp: data['timestamp'] as int? ?? 0,
-      makingTime: data['makingTime'] as int? ?? 0,
+      tableNo: data['tableNo'] as String? ?? '',
+      timestamp: (data['timestamp'] is Timestamp
+              ? (data['timestamp'] as Timestamp).millisecondsSinceEpoch
+              : data['timestamp'] is String
+                  ? int.tryParse(data['timestamp'] as String) ?? 0
+                  : data['timestamp'] as int?) ??
+          0,
       paymentDetails: PaymentDetails.fromMap(
           data['paymentDetails'] as Map<String, dynamic>? ?? {}),
+      userId: data['userId'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      // Do not include 'id' here; Firestore will generate it
+      'dineIn': dineIn,
       'items': items.map((item) => item.toMap()).toList(),
       'totalAmount': totalAmount,
       'orderStatus': orderStatus,
       'pendingStatus': pendingStatus,
       'paymentStatus': paymentStatus,
+      'tableNo': tableNo,
       'timestamp': timestamp,
-      'makingTime': makingTime,
       'paymentDetails': paymentDetails.toMap(),
+      'userId': userId,
     };
   }
 }
@@ -64,8 +80,9 @@ class OrderItem {
   final String itemId;
   final String? name;
   final int quantity;
-  final int price;
+  final String price; // Kept as String as per Firestore data
   final int makingTime;
+  final String? orderStatus;
 
   OrderItem({
     required this.itemId,
@@ -73,15 +90,23 @@ class OrderItem {
     required this.quantity,
     required this.price,
     required this.makingTime,
+    this.orderStatus,
   });
 
   factory OrderItem.fromMap(Map<String, dynamic> data) {
     return OrderItem(
       itemId: data['itemId'] as String? ?? '',
       name: data['name'] as String? ?? 'Unknown Item',
-      quantity: data['quantity'] as int? ?? 0,
-      price: data['price'] as int? ?? 0,
-      makingTime: data['makingTime'] as int? ?? 0,
+      quantity: (data['quantity'] is String
+              ? int.tryParse(data['quantity'] as String) ?? 0
+              : data['quantity'] as int?) ??
+          0,
+      price: data['price'] as String? ?? '0',
+      makingTime: (data['makingTime'] is String
+              ? int.tryParse(data['makingTime'] as String) ?? 0
+              : data['makingTime'] as int?) ??
+          0,
+      orderStatus: data['orderStatus'] as String? ?? 'Pending',
     );
   }
 
@@ -92,8 +117,12 @@ class OrderItem {
       'quantity': quantity,
       'price': price,
       'makingTime': makingTime,
+      'orderStatus': orderStatus,
     };
   }
+
+  // Helper method to get price as double for calculations
+  double getPriceAsDouble() => double.tryParse(price) ?? 0.0;
 }
 
 class PaymentDetails {
@@ -125,13 +154,22 @@ class PaymentDetails {
     return PaymentDetails(
       razorpayPaymentId: data['razorpayPaymentId'] as String? ?? '',
       razorpayOrderId: data['razorpayOrderId'] as String? ?? '',
-      amount: data['amount'] as int? ?? 0,
+      amount: (data['amount'] is String
+              ? int.tryParse(data['amount'] as String) ?? 0
+              : data['amount'] as int?) ??
+          0,
       currency: data['currency'] as String? ?? 'INR',
       status: data['status'] as String? ?? 'unknown',
-      amountRefunded: data['amountRefunded'] as int? ?? 0,
+      amountRefunded: (data['amountRefunded'] is String
+              ? int.tryParse(data['amountRefunded'] as String) ?? 0
+              : data['amountRefunded'] as int?) ??
+          0,
       refundStatus: data['refundStatus'] as String?,
       captured: data['captured'] as bool? ?? false,
-      paymentTimestamp: data['paymentTimestamp'] as int? ?? 0,
+      paymentTimestamp: (data['paymentTimestamp'] is String
+              ? int.tryParse(data['paymentTimestamp'] as String) ?? 0
+              : data['paymentTimestamp'] as int?) ??
+          0,
       testMode: data['testMode'] as bool? ?? false,
     );
   }

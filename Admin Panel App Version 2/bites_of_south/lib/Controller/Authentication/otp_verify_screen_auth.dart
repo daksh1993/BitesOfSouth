@@ -84,6 +84,8 @@ class OTPVerifyScreenAuth with ChangeNotifier {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("OTP Verification Failed: $e")),
       );
+      print('Error verifying OTP: $e');
+
       isLoading = false;
       notifyListeners();
     }
@@ -166,7 +168,7 @@ class OTPVerifyScreenAuth with ChangeNotifier {
       if (isAdmin) {
         Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
-        Navigator.popAndPushNamed(context, '/cookpage');
+        Navigator.popAndPushNamed(context, '/cookPage');
       }
     } catch (e) {
       print('Error completing verification: $e');
