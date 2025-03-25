@@ -2,93 +2,6 @@ import 'package:bites_of_south/Modal/orders_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Function to create the 'orders' collection with dummy data using auto-generated IDs
-// Future<void> createOrdersCollectionWithDummyData() async {
-//   final firestore = FirebaseFirestore.instance;
-//   final collectionRef = firestore.collection('orders');
-
-//   // Dummy data (2 orders) without pre-set userId
-//   List<OrdersModal> dummyOrders = [
-//     OrdersModal(
-//       id: null, // Will be set by Firestore
-//       items: [
-//         OrderItem(
-//           itemId: 'item_456',
-//           name: 'Paneer Butter Masala',
-//           quantity: 2,
-//           price: 250,
-//           makingTime: 15,
-//         ),
-//         OrderItem(
-//           itemId: 'item_789',
-//           name: 'Butter Naan',
-//           quantity: 3,
-//           price: 50,
-//           makingTime: 10,
-//         ),
-//       ],
-//       totalAmount: 650,
-//       orderStatus: 'Pending',
-//       pendingStatus: '0',
-//       paymentStatus: 'Paid',
-//       timestamp: DateTime.now().millisecondsSinceEpoch,
-//       makingTime: 15,
-//       paymentDetails: PaymentDetails(
-//         razorpayPaymentId: 'pay_29QQoUBi66xm2f',
-//         razorpayOrderId: 'order_9A33XWu170gUtm',
-//         amount: 65000, // Amount in paise (650 INR)
-//         currency: 'INR',
-//         status: 'captured',
-//         amountRefunded: 0,
-//         refundStatus: null,
-//         captured: true,
-//         paymentTimestamp: DateTime.now().millisecondsSinceEpoch,
-//         testMode: true,
-//       ),
-//     ),
-//     OrdersModal(
-//       id: null, // Will be set by Firestore
-//       items: [
-//         OrderItem(
-//           itemId: 'item_101',
-//           name: 'Chicken Biryani',
-//           quantity: 1,
-//           price: 300,
-//           makingTime: 20,
-//         ),
-//       ],
-//       totalAmount: 300,
-//       orderStatus: 'Pending',
-//       pendingStatus: '0',
-//       paymentStatus: 'Paid',
-//       timestamp: DateTime.now().millisecondsSinceEpoch,
-//       makingTime: 20,
-//       paymentDetails: PaymentDetails(
-//         razorpayPaymentId: 'pay_30RRpVBi77yn3g',
-//         razorpayOrderId: 'order_8B44YVu180hVun',
-//         amount: 30000, // Amount in paise (300 INR)
-//         currency: 'INR',
-//         status: 'captured',
-//         amountRefunded: 0,
-//         refundStatus: null,
-//         captured: true,
-//         paymentTimestamp: DateTime.now().millisecondsSinceEpoch,
-//         testMode: true,
-//       ),
-//     ),
-//   ];
-
-//   // Insert dummy data into Firestore with auto-generated IDs
-//   for (var order in dummyOrders) {
-//     DocumentReference docRef = await collectionRef.add(order.toMap());
-//     print('Order added with ID: ${docRef.id}');
-//   }
-//   print('Dummy orders added to Firestore');
-// }
-
-// // Cook Dashboard Screen (with update functionality)
-
-// Admin Order View Screen (read-only with payment status button)
 class OrderAdmin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -127,7 +40,7 @@ class OrderAdmin extends StatelessWidget {
               itemBuilder: (context, index) {
                 final order = orders[index];
                 return AdminOrderCard(
-                  key: ValueKey(order.id), // Unique key based on order ID
+                  key: ValueKey(order.id),
                   order: order,
                   screenWidth: screenWidth,
                   screenHeight: screenHeight,
@@ -141,7 +54,6 @@ class OrderAdmin extends StatelessWidget {
   }
 }
 
-// AdminOrderCard for Admin View (read-only with payment status button)
 class AdminOrderCard extends StatelessWidget {
   final OrdersModal order;
   final double screenWidth;
@@ -171,14 +83,13 @@ class AdminOrderCard extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () async {
                     if (order.orderStatus != 'Completed') {
-                      // Mark order as completed
                       await FirebaseFirestore.instance
                           .collection('orders')
                           .doc(order.id)
@@ -188,7 +99,6 @@ class AdminOrderCard extends StatelessWidget {
                             content: Text('Order marked as completed')),
                       );
                     } else {
-                      // Revert payment status to Pending
                       await FirebaseFirestore.instance
                           .collection('orders')
                           .doc(order.id)
@@ -199,7 +109,7 @@ class AdminOrderCard extends StatelessWidget {
                                 Text('Payment status reverted to Pending')),
                       );
                     }
-                    Navigator.of(context).pop(); // Close the dialog
+                    Navigator.of(context).pop();
                   },
                   child: const Text('Yes'),
                 ),
@@ -212,7 +122,7 @@ class AdminOrderCard extends StatelessWidget {
         elevation: 5,
         color: order.paymentStatus == 'Pending'
             ? Colors.red.shade100
-            : Colors.green.shade100, // Color based on payment status
+            : Colors.green.shade100,
         margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.02),
@@ -238,7 +148,7 @@ class AdminOrderCard extends StatelessWidget {
                           style: TextStyle(fontSize: screenWidth * 0.025),
                         ),
                         Text(
-                          '₹${item.price * item.quantity}',
+                          '₹${(item.getPriceAsDouble() * item.quantity).toStringAsFixed(2)}',
                           style: TextStyle(fontSize: screenWidth * 0.025),
                         ),
                       ],
@@ -246,7 +156,7 @@ class AdminOrderCard extends StatelessWidget {
                   )),
               SizedBox(height: screenHeight * 0.01),
               Text(
-                'Total: ₹${order.totalAmount}',
+                'Total: ₹${order.totalAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: screenWidth * 0.03,
                   fontWeight: FontWeight.bold,
@@ -280,11 +190,11 @@ class AdminOrderCard extends StatelessWidget {
                             ),
                           );
                         }
-                      : null, // Enable only if payment is pending and order is completed
+                      : null,
                   child: Text(
                     order.paymentStatus == 'Pending'
                         ? 'Payment Pending'
-                        : 'Amount Paid: ₹${order.totalAmount}',
+                        : 'Amount Paid: ₹${order.totalAmount.toStringAsFixed(2)}',
                     style: const TextStyle(color: Colors.white),
                   ),
                   style: ElevatedButton.styleFrom(

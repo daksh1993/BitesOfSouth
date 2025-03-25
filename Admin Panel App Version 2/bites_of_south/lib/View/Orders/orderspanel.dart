@@ -4,88 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // Function to create the 'orders' collection with dummy data using auto-generated IDs
-Future<void> createOrdersCollectionWithDummyData() async {
-  final firestore = FirebaseFirestore.instance;
-  final collectionRef = firestore.collection('orders');
-
-  // Dummy data (2 orders) without pre-set userId
-  List<OrdersModal> dummyOrders = [
-    OrdersModal(
-      id: null, // Will be set by Firestore
-      items: [
-        OrderItem(
-          itemId: 'item_456',
-          name: 'Paneer Butter Masala',
-          quantity: 2,
-          price: 250,
-          makingTime: 15,
-        ),
-        OrderItem(
-          itemId: 'item_789',
-          name: 'Butter Naan',
-          quantity: 3,
-          price: 50,
-          makingTime: 10,
-        ),
-      ],
-      totalAmount: 650,
-      orderStatus: 'Pending',
-      pendingStatus: '0',
-      paymentStatus: 'Paid',
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      makingTime: 15,
-      paymentDetails: PaymentDetails(
-        razorpayPaymentId: 'pay_29QQoUBi66xm2f',
-        razorpayOrderId: 'order_9A33XWu170gUtm',
-        amount: 65000, // Amount in paise (650 INR)
-        currency: 'INR',
-        status: 'captured',
-        amountRefunded: 0,
-        refundStatus: null,
-        captured: true,
-        paymentTimestamp: DateTime.now().millisecondsSinceEpoch,
-        testMode: true,
-      ),
-    ),
-    OrdersModal(
-      id: null, // Will be set by Firestore
-      items: [
-        OrderItem(
-          itemId: 'item_101',
-          name: 'Chicken Biryani',
-          quantity: 1,
-          price: 300,
-          makingTime: 20,
-        ),
-      ],
-      totalAmount: 300,
-      orderStatus: 'Pending',
-      pendingStatus: '0',
-      paymentStatus: 'Paid',
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      makingTime: 20,
-      paymentDetails: PaymentDetails(
-        razorpayPaymentId: 'pay_30RRpVBi77yn3g',
-        razorpayOrderId: 'order_8B44YVu180hVun',
-        amount: 30000, // Amount in paise (300 INR)
-        currency: 'INR',
-        status: 'captured',
-        amountRefunded: 0,
-        refundStatus: null,
-        captured: true,
-        paymentTimestamp: DateTime.now().millisecondsSinceEpoch,
-        testMode: true,
-      ),
-    ),
-  ];
-
-  // Insert dummy data into Firestore with auto-generated IDs
-  for (var order in dummyOrders) {
-    DocumentReference docRef = await collectionRef.add(order.toMap());
-    print('Order added with ID: ${docRef.id}');
-  }
-  print('Dummy orders added to Firestore');
-}
 
 class CookOrderScreen extends StatelessWidget {
   @override
@@ -95,63 +13,52 @@ class CookOrderScreen extends StatelessWidget {
     final screenHeight = mediaQuery.size.height;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cook Dashboard'),
-        centerTitle: true,
-        backgroundColor: Colors.green,
-        leading: IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
-            }),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(screenWidth * 0.02),
-        child: StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('orders').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('No orders found'));
-            }
-
-            final orders = snapshot.data!.docs
-                .map((doc) => OrdersModal.fromFirestore(doc))
-                .toList();
-
-            return ListView.builder(
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                final order = orders[index];
-                return OrderCard(
-                  key: ValueKey(order.id), // Unique key based on order ID
-                  order: order,
-                  screenWidth: screenWidth,
-                  screenHeight: screenHeight,
+        appBar: AppBar(
+          title: const Text('Cook Dashboard'),
+          centerTitle: true,
+          backgroundColor: Colors.green,
+          leading: IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
                 );
-              },
-            );
-          },
+              }),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await createOrdersCollectionWithDummyData();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Dummy orders added')),
-          );
-        },
-        child: const Icon(Icons.add),
-        backgroundColor: Colors.green,
-      ),
-    );
+        body: Padding(
+          padding: EdgeInsets.all(screenWidth * 0.02),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('orders').snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(child: Text('No orders found'));
+              }
+
+              final orders = snapshot.data!.docs
+                  .map((doc) => OrdersModal.fromFirestore(doc))
+                  .toList();
+
+              return ListView.builder(
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  return OrderCard(
+                    key: ValueKey(order.id), // Unique key based on order ID
+                    order: order,
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight,
+                  );
+                },
+              );
+            },
+          ),
+        ));
   }
 }
 
@@ -301,7 +208,7 @@ class _OrderCardState extends State<OrderCard> {
                         style: TextStyle(fontSize: widget.screenWidth * 0.025),
                       ),
                       Text(
-                        '₹${item.price * item.quantity}',
+                        '₹${(int.parse(item.price) * item.quantity)}',
                         style: TextStyle(fontSize: widget.screenWidth * 0.025),
                       ),
                     ],
@@ -309,7 +216,7 @@ class _OrderCardState extends State<OrderCard> {
                 )),
             SizedBox(height: widget.screenHeight * 0.01),
             Text(
-              'Total: ₹${widget.order.totalAmount}',
+              'Total: ₹${widget.order.totalAmount.toStringAsFixed(2)}',
               style: TextStyle(
                 fontSize: widget.screenWidth * 0.03,
                 fontWeight: FontWeight.bold,

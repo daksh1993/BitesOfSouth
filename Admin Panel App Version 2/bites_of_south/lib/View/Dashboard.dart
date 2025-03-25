@@ -1,4 +1,5 @@
 import 'package:bites_of_south/View/Menu/menu_management.dart';
+import 'package:bites_of_south/View/Orders/ordersAdmin.dart';
 import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
 import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
@@ -20,7 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Map<int, Widget> _screens = {
     1: const MenuManagementScreen(),
-    2: CookOrderScreen(), // Replace with actual Order Screen
+    2: OrderAdmin(), // Replace with actual Order Screen
     3: Scaffold(), // Replace with actual Analysis Screen
     4: RewardScreen(),
   };
@@ -87,7 +88,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
             onPressed: () {
-              Navigator.of(context).pushReplacement(
+              Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => ProfileScreen()),
               );
             },
