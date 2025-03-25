@@ -367,3 +367,278 @@
   font-size: 14px;
   color: #666;
 }
+/* Coupon Section */
+.coupon-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+}
+
+.coupon-input:focus {
+  border-color: #1ba672;
+}
+
+.apply-coupon-btn {
+  padding: 10px 20px;
+  background: #1ba672;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-coupon-btn:hover {
+  background: #168754;
+}
+
+.coupon-success {
+  color: #1ba672;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.coupon-error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Discount in Summary */
+.summary-item.discount {
+  color: #1ba672;
+  font-weight: 600;
+}
+
+/* Adjust existing styles if needed */
+.cart-options {
+  margin: 20px 0;
+}
+/* Coupon Section */
+.coupon-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+}
+
+.coupon-input:focus {
+  border-color: #1ba672;
+}
+
+.apply-coupon-btn {
+  padding: 10px 20px;
+  background: #1ba672;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-coupon-btn:hover {
+  background: #168754;
+}
+
+.coupon-success {
+  color: #1ba672;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.coupon-error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Available Coupons */
+.available-coupons {
+  margin: 15px 0;
+}
+
+.available-coupons h3 {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.available-coupons ul {
+  list-style: none;
+  padding: 0;
+}
+
+.coupon-item {
+  padding: 10px;
+  background: #e6f5ef;
+  border: 1px solid #1ba672;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.3s ease;
+}
+
+.coupon-item:hover {
+  background: #d4f0e5;
+}
+
+.coupon-item span {
+  font-weight: 600;
+  color: #1ba672;
+}
+
+/* Discount in Summary */
+.summary-item.discount {
+  color: #1ba672;
+  font-weight: 600;
+}
+.cart-summary {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 5px;
+}
+/* Coupon Section */
+.coupon-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+}
+
+.coupon-input:focus {
+  border-color: #1ba672;
+}
+
+.apply-coupon-btn {
+  padding: 10px 20px;
+  background: #1ba672;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.apply-coupon-btn:hover {
+  background: #168754;
+}
+
+.coupon-success {
+  color: #1ba672;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.coupon-error {
+  color: #ff4d4d;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+/* Available Coupons */
+.available-coupons {
+  margin: 20px 0;
+}
+
+.available-coupons h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.coupon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coupon-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #fff;
+  border: 1px dashed #1ba672;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.coupon-item:hover {
+  background: #e6f5ef;
+}
+
+.coupon-code {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1ba672;
+  margin-right: 15px;
+  padding: 5px 10px;
+  background: #e6f5ef;
+  border-radius: 3px;
+}
+
+.coupon-details {
+  flex: 1;
+}
+
+.coupon-details p {
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+}
+
+.apply-link {
+  font-size: 12px;
+  color: #1ba672;
+  text-decoration: underline;
+}
+
+.no-coupons {
+  font-size: 14px;
+  color: #777;
+  text-align: center;
+}
+
+/* Discount in Summary */
+.summary-item.discount {
+  color: #1ba672;
+  font-weight: 600;
+}
