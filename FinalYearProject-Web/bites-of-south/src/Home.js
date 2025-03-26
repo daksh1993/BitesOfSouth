@@ -1,39 +1,8 @@
-import React, { useState, useEffect } from 'react';
+// src/Home.js
+import React from 'react';
 import { FaUserCircle } from 'react-icons/fa';
-import { auth } from './firebase';
-import LoginModal from './LoginModal';
-import UserProfileModal from './UserProfileModal';
 import './Home.css';
-import { useNavigate } from 'react-router-dom';
-
-const Home = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setIsLoggedIn(!!currentUser);
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleMenuNavigation = (e, category = null) => {
-    e.preventDefault();
-    if (isLoggedIn) {
-      if (category) {
-        navigate(`/menu?filter=${category.toLowerCase()}`);
-      } else {
-        navigate('/menu');
-      }
-    } else {
-      setIsModalOpen(true);
-    }
-  };
-
+const Home = ({ user, onOpenLogin, onOpenProfile, onMenuNavigation }) => {
   return (
     <div className="home">
       <section className="FirstH">
@@ -49,30 +18,31 @@ const Home = () => {
             <ul className="NavOption">
               <li className="Bscreen"><a href="/">Home</a></li>
               <li className="Bscreen">
-                <a href="/order" onClick={(e) => handleMenuNavigation(e)}>Order</a>
+                <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation(); }}>
+                  Order
+                </a>
               </li>
-
               <li className="Bscreen"><a href="">About Us</a></li>
-              {isLoggedIn ? (
+              {user ? (
                 <li className="user-avatar">
-                  {user?.photoURL ? (
+                  {user.photoURL ? (
                     <img
                       src={user.photoURL}
                       alt="User Avatar"
                       className="avatar-img"
-                      onClick={() => setIsProfileModalOpen(true)}
+                      onClick={onOpenProfile}
                     />
                   ) : (
                     <FaUserCircle
                       className="avatar-icon"
                       size={40}
-                      onClick={() => setIsProfileModalOpen(true)}
+                      onClick={onOpenProfile}
                     />
                   )}
                 </li>
               ) : (
                 <li className="signin">
-                  <a href="#" onClick={(e) => { e.preventDefault(); setIsModalOpen(true); }}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); onOpenLogin(); }}>
                     Sign in
                   </a>
                 </li>
@@ -100,28 +70,28 @@ const Home = () => {
 
               <div className="FoodOption">
                 <div className="Option1">
-                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Dosa')}>
+                  <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Dosa'); }}>
                     <h1>Dosa</h1>
                     <h2>Order Food Online</h2>
                     <img src="/images/Dosa.avif" alt="" />
                   </a>
                 </div>
                 <div className="Option1">
-                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Thali')}>
+                  <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Thali'); }}>
                     <h1>Thali</h1>
                     <h2>Order Thali Online</h2>
                     <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/South%20Indian.png" alt="" />
                   </a>
                 </div>
                 <div className="Option1">
-                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Beverages')}>
+                  <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Beverages'); }}>
                     <h1>Ice-Cream</h1>
                     <h2>Order Ice-Cream </h2>
                     <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/Ice%20Cream.png" alt="" />
                   </a>
                 </div>
                 <div className="Option1" id="mobshow">
-                  <a href="/menu" onClick={(e) => handleMenuNavigation(e, 'Drinks')}>
+                  <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Drinks'); }}>
                     <h1>Shawarma</h1>
                     <h2>Order Shawarma Online</h2>
                     <img src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/PC_Mweb/Shawarma.png" alt="" />
@@ -141,7 +111,7 @@ const Home = () => {
           <h3 className="carousel-title">Inspiration for your first order</h3>
           <div className="carousel">
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Pizza')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Pizza'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -153,7 +123,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Biryani')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Biryani'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -165,7 +135,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Chicken')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Chicken'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -177,7 +147,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Burger')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Burger'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -189,7 +159,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Fried Rice')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Fried Rice'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -201,7 +171,7 @@ const Home = () => {
               </a>
             </div>
             <div className="slide">
-              <a className="food-link" href="/menu" onClick={(e) => handleMenuNavigation(e, 'Idli')}>
+              <a className="food-link" href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation('Idli'); }}>
                 <div className="image-container">
                   <img
                     className="food-image"
@@ -293,16 +263,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      <LoginModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-      <UserProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        user={user}
-      />
     </div>
   );
 };

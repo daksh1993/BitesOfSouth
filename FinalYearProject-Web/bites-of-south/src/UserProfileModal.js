@@ -1,11 +1,12 @@
+// src/UserProfileModal.js
 import React, { useState, useEffect } from 'react';
-import { auth, db } from './firebase';
+import { db } from './firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { updateProfile, updateEmail } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom'; // For navigation
 import './UserProfileModal.css';
+import { useNavigate } from 'react-router-dom';
 
-const UserProfileModal = ({ isOpen, onClose, user }) => {
+const UserProfileModal = ({ isOpen, onClose, user, onLogout }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -13,7 +14,7 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
   const [editedEmail, setEditedEmail] = useState('');
   const [editedPhoneNo, setEditedPhoneNo] = useState('');
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // React Router hook for navigation
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -47,36 +48,24 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
 
   if (!isOpen) return null;
 
-  const handleLogout = () => {
-    auth.signOut();
-    onClose();
-  };
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-    setError(null);
-  };
-
   const handleSave = async () => {
     try {
       const userRef = doc(db, 'users', user.uid);
       const updateData = { name: editedName, email: editedEmail, phoneNo: editedPhoneNo };
-      if (editedName !== user.displayName) await updateProfile(auth.currentUser, { displayName: editedName });
-      if (editedEmail !== user.email) await updateEmail(auth.currentUser, editedEmail);
+      if (editedName !== user.displayName) await updateProfile(user, { displayName: editedName });
+      if (editedEmail !== user.email) await updateEmail(user, editedEmail);
       await updateDoc(userRef, updateData);
       setUserData(prev => ({ ...prev, ...updateData }));
       setIsEditing(false);
       setError(null);
-      user.displayName = editedName;
-      user.email = editedEmail;
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleOrdersClick = () => {
-    onClose(); // Close the modal
-    navigate('/orders'); // Navigate to full-screen Orders page
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+    setError(null);
   };
 
   return (
@@ -140,10 +129,10 @@ const UserProfileModal = ({ isOpen, onClose, user }) => {
                   <button className="save-btn" onClick={handleSave}>Save Changes</button>
                 </div>
               )}
-              <li onClick={handleOrdersClick}>
+              <li onClick={() => navigate('/orders')}>
                 <span className="icon">📦</span> Orders
               </li>
-              <li onClick={handleLogout} className="logout-option">
+              <li onClick={onLogout} className="logout-option">
                 <span className="icon">🚪</span> Logout
               </li>
             </ul>

@@ -1,5 +1,5 @@
 /* Modal Overlay */
-.modal-overlay {
+:where(.UserProfileModal) .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,13 +14,13 @@
   transition: opacity 0.3s ease;
 }
 
-.modal-overlay.open {
+:where(.UserProfileModal) .modal-overlay.open {
   opacity: 1;
   visibility: visible;
 }
 
 /* Modal Content (Sidebar) */
-.modal-content {
+:where(.UserProfileModal) .modal-content {
   background-color: #fff;
   width: 300px;
   height: 100%;

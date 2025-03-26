@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// src/LoginModal.js
+import React, { useState } from 'react';
 import { auth, db } from './firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -52,11 +53,16 @@ const LoginModal = ({ isOpen, onClose }) => {
         setPhoneNo(userData.phoneNo);
       }
       
-      resetForm();
+      setName('');
+      setEmail('');
+      setPhoneNo('');
+      setPassword('');
+      setConfirmPassword('');
+      setError(null);
       onClose();
     } catch (err) {
       console.error("Login error:", err.code, err.message);
-      setError(getFriendlyErrorMessage(err.code));
+      setError("Invalid email or password"); // Simplified error for now
     }
   };
 
@@ -73,7 +79,6 @@ const LoginModal = ({ isOpen, onClose }) => {
 
       let user;
       if (signInMethods.length === 0) {
-        // New email/password registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
         await sendEmailVerification(user);
@@ -101,11 +106,16 @@ const LoginModal = ({ isOpen, onClose }) => {
       await setDoc(userRef, userData, { merge: true });
       
       console.log("Registered with data:", userData);
-      resetForm();
+      setName('');
+      setEmail('');
+      setPhoneNo('');
+      setPassword('');
+      setConfirmPassword('');
+      setError(null);
       onClose();
     } catch (err) {
       console.error("Register error:", err.code, err.message);
-      setError(getFriendlyErrorMessage(err.code));
+      setError("Registration failed. Try again.");
     }
   };
 
@@ -146,52 +156,26 @@ const LoginModal = ({ isOpen, onClose }) => {
         console.log("Google login with existing data:", userData);
       }
 
-      resetForm();
+      setName('');
+      setEmail('');
+      setPhoneNo('');
+      setPassword('');
+      setConfirmPassword('');
+      setError(null);
       onClose();
     } catch (err) {
       console.error("Google sign-in error:", err.code, err.message);
-      setError(getFriendlyErrorMessage(err.code));
+      setError("Google sign-in failed.");
     }
-  };
-
-  // Friendly error messages
-  const getFriendlyErrorMessage = (code) => {
-    switch (code) {
-      case 'auth/unauthorized-domain':
-        return "This domain is not authorized. Please contact support.";
-      case 'auth/invalid-email':
-        return "Please enter a valid email address.";
-      case 'auth/user-not-found':
-        return "No account found with this email.";
-      case 'auth/wrong-password':
-        return "Incorrect password. Please try again.";
-      case 'auth/email-already-in-use':
-        return "This email is already registered.";
-      case 'auth/popup-closed-by-user':
-        return "Google sign-in was canceled.";
-      case 'auth/account-exists-with-different-credential':
-        return "This email is linked to a different sign-in method.";
-      default:
-        return "An error occurred. Please try again.";
-    }
-  };
-
-  const resetForm = () => {
-    setName('');
-    setEmail('');
-    setPhoneNo('');
-    setPassword('');
-    setConfirmPassword('');
-    setError(null);
   };
 
   const toggleMode = () => {
     setIsRegistering(!isRegistering);
-    resetForm();
+    setError(null);
   };
 
   return (
-    <div className="modal-overlay">
+    <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
       <div className="modal-content">
         <button className="modal-close-btn" onClick={onClose}>×</button>
         <h2>{isRegistering ? 'Register' : 'Sign In'}</h2>
