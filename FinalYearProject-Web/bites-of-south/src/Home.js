@@ -2,6 +2,7 @@
 import React from 'react';
 import { FaUserCircle } from 'react-icons/fa';
 import './Home.css';
+
 const Home = ({ user, onOpenLogin, onOpenProfile, onMenuNavigation }) => {
   return (
     <div className="home">
@@ -56,16 +57,19 @@ const Home = ({ user, onOpenLogin, onOpenProfile, onMenuNavigation }) => {
           </div>
           <div className="SloganSearch">
             <div className="MidPart">
-              <div className="search-container">
-                <input
-                  type="text"
-                  className="serachH"
-                  placeholder="Search for Dosa, items or more"
-                />
-                <button className="searchHbtn">
-                  <i className="fa-solid fa-magnifying-glass" id="search"></i>
-                </button>
-              </div>
+              <a href="/menu" onClick={(e) => { e.preventDefault(); onMenuNavigation(); }} className="search-link">
+                <div className="search-container">
+                  <input
+                    type="text"
+                    className="serachH"
+                    placeholder="Search for Dosa, items or more"
+                    readOnly // Prevents typing since it’s just a redirect trigger
+                  />
+                  <button className="searchHbtn" disabled>
+                    <i className="fa-solid fa-magnifying-glass" id="search"></i>
+                  </button>
+                </div>
+              </a>
               <h1 className="slogan">Bites of South: Where Food Meets Culture.</h1>
 
               <div className="FoodOption">
@@ -221,9 +225,9 @@ const Home = ({ user, onOpenLogin, onOpenProfile, onMenuNavigation }) => {
 
             <ul className="legal-links">
               <li className="link-item"><div className="section-title">Legal</div></li>
-              <li className="link-item"><a href="" target="_blank">Terms & Conditions</a></li>
-              <li className="link-item"><a href="" target="_blank">Cookie Policy</a></li>
-              <li className="link-item"><a href="" target="_blank">Privacy Policy</a></li>
+            <li className="link-item"><a href="" target="_blank">Terms & Conditions</a></li>
+            <li className="link-item"><a href="" target="_blank">Cookie Policy</a></li>
+            <li className="link-item"><a href="" target="_blank">Privacy Policy</a></li>
             </ul>
 
             <ul className="location-links">
