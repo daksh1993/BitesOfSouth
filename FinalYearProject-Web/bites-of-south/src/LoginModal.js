@@ -8,8 +8,6 @@ import {
   GoogleAuthProvider,
   updateProfile,
   fetchSignInMethodsForEmail,
-  linkWithCredential,
-  EmailAuthProvider,
   sendEmailVerification
 } from 'firebase/auth';
 import { setDoc, doc, addDoc, collection, serverTimestamp, getDoc } from 'firebase/firestore';
@@ -43,16 +41,13 @@ const LoginModal = ({ isOpen, onClose }) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       await logAuthEvent(user.uid, "login");
-      
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
       console.log("Login data:", userData);
-      
       if (userData?.phoneNo) {
         setPhoneNo(userData.phoneNo);
       }
-      
       setName('');
       setEmail('');
       setPhoneNo('');
@@ -62,7 +57,7 @@ const LoginModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (err) {
       console.error("Login error:", err.code, err.message);
-      setError("Invalid email or password"); // Simplified error for now
+      setError("Invalid email or password");
     }
   };
 
@@ -72,7 +67,6 @@ const LoginModal = ({ isOpen, onClose }) => {
       setError("Passwords do not match");
       return;
     }
-
     try {
       const signInMethods = await fetchSignInMethodsForEmail(auth, email);
       console.log("Sign-in methods before register:", signInMethods);
@@ -101,7 +95,8 @@ const LoginModal = ({ isOpen, onClose }) => {
         createdAt: existingData.createdAt || serverTimestamp(),
         lastLoginProvider: "email",
         emailVerified: user.emailVerified,
-        googleVerified: false
+        googleVerified: false,
+        rewardPoints: existingData.rewardPoints || 0 // Set to 0 for new users
       };
       await setDoc(userRef, userData, { merge: true });
       
@@ -140,7 +135,8 @@ const LoginModal = ({ isOpen, onClose }) => {
           createdAt: serverTimestamp(),
           lastLoginProvider: "google",
           emailVerified: user.emailVerified,
-          googleVerified: true
+          googleVerified: true,
+          rewardPoints: 0 // Set to 0 for new Google users
         };
         await setDoc(userRef, userData);
         console.log("New Google registration:", userData);
@@ -150,7 +146,8 @@ const LoginModal = ({ isOpen, onClose }) => {
           ...existingData,
           lastLoginProvider: "google",
           emailVerified: user.emailVerified,
-          googleVerified: true
+          googleVerified: true,
+          rewardPoints: existingData.rewardPoints !== undefined ? existingData.rewardPoints : 0 // Preserve existing or set 0
         };
         await setDoc(userRef, userData, { merge: true });
         console.log("Google login with existing data:", userData);
@@ -175,13 +172,13 @@ const LoginModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
-      <div className="modal-content">
-        <button className="modal-close-btn" onClick={onClose}>×</button>
+    <div className={`login-modal-overlay ${isOpen ? 'open' : ''}`}>
+      <div className="login-modal-content">
+        <button className="login-modal-close-btn" onClick={onClose}>×</button>
         <h2>{isRegistering ? 'Register' : 'Sign In'}</h2>
         <form onSubmit={isRegistering ? handleRegister : handleLogin}>
           {isRegistering && (
-            <div className="form-group">
+            <div className="login-form-group">
               <input
                 type="text"
                 value={name}
@@ -191,7 +188,7 @@ const LoginModal = ({ isOpen, onClose }) => {
               />
             </div>
           )}
-          <div className="form-group">
+          <div className="login-form-group">
             <input
               type="email"
               value={email}
@@ -201,7 +198,7 @@ const LoginModal = ({ isOpen, onClose }) => {
             />
           </div>
           {isRegistering && (
-            <div className="form-group">
+            <div className="login-form-group">
               <input
                 type="tel"
                 value={phoneNo}
@@ -213,7 +210,7 @@ const LoginModal = ({ isOpen, onClose }) => {
               />
             </div>
           )}
-          <div className="form-group">
+          <div className="login-form-group">
             <input
               type="password"
               value={password}
@@ -223,7 +220,7 @@ const LoginModal = ({ isOpen, onClose }) => {
             />
           </div>
           {isRegistering && (
-            <div className="form-group">
+            <div className="login-form-group">
               <input
                 type="password"
                 value={confirmPassword}
@@ -233,7 +230,7 @@ const LoginModal = ({ isOpen, onClose }) => {
               />
             </div>
           )}
-          {error && <p className="error-message">{error}</p>}
+          {error && <p className="login-error-message">{error}</p>}
           <button type="submit" className="login-btn">
             {isRegistering ? 'Register' : 'Login'}
           </button>
@@ -245,9 +242,9 @@ const LoginModal = ({ isOpen, onClose }) => {
           </button>
         )}
 
-        <p className="toggle-text">
+        <p className="login-toggle-text">
           {isRegistering ? 'Already have an account?' : "Don't have an account?"}
-          <span className="toggle-link" onClick={toggleMode}>
+          <span className="login-toggle-link" onClick={toggleMode}>
             {isRegistering ? ' Sign In' : ' Register'}
           </span>
         </p>
