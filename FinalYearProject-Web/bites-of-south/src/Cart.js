@@ -1,7 +1,8 @@
+// src/Cart.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { db, auth } from './firebase';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'; // Added updateDoc
 import './Cart.css';
 
 const Cart = () => {
@@ -48,7 +49,7 @@ const Cart = () => {
             const usesLeft = coupon.usesTillValid > coupon.uses;
             return isNotExpired && usesLeft;
           });
-        console.log("Fetched coupons:", couponsData); // Debug log
+        console.log("Fetched coupons:", couponsData);
         setAvailableCoupons(couponsData);
       } catch (error) {
         console.error("Error fetching coupons:", error);
@@ -182,9 +183,23 @@ const Cart = () => {
 
       const docRef = await addDoc(collection(db, "orders"), orderData);
       console.log("Order saved with ID:", docRef.id);
+
+      // Update reward points
+      if (userId !== "guest") {
+        const userRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userRef);
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        const currentPoints = userData.rewardPoints || 0;
+        const pointsToAdd = Math.floor(totalPrice / 50); // 1 point per ₹50
+        const newPoints = currentPoints + pointsToAdd;
+
+        await updateDoc(userRef, { rewardPoints: newPoints });
+        console.log(`Added ${pointsToAdd} points. New total: ${newPoints}`);
+      }
+
       return docRef.id;
     } catch (error) {
-      console.error("Error saving order:", error.message);
+      console.error("Error saving order or updating points:", error.message);
       return null;
     }
   };
@@ -292,7 +307,6 @@ const Cart = () => {
             />
           </div>
 
-          {/* Coupon Section */}
           <div className="coupon-section">
             <input
               type="text"
@@ -305,7 +319,6 @@ const Cart = () => {
           </div>
           {couponMessage && <p className={discount > 0 ? "coupon-success" : "coupon-error"}>{couponMessage}</p>}
 
-          {/* Available Coupons */}
           <div className="available-coupons">
             <h3>Available Offers</h3>
             {availableCoupons.length > 0 ? (
