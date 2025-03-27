@@ -68,72 +68,82 @@ const UserProfileModal = ({ isOpen, onClose, user, onLogout }) => {
     setError(null);
   };
 
+  const handleNavigation = (path) => {
+    navigate(path);
+    onClose(); // Close the modal after navigation
+  };
+
+  const handleLogout = () => {
+    onLogout(); // Call the logout function passed from parent
+    onClose(); // Close the modal after logout
+  };
+
   return (
-    <div className={`modal-overlay ${isOpen ? 'open' : ''}`}>
-      <div className="modal-content">
-        <button className="modal-close-btn" onClick={onClose}>
+    <div className={`UserProfileModal-modal-overlay ${isOpen ? 'open' : ''}`}>
+      <div className="UserProfileModal-modal-content">
+        <button className="UserProfileModal-modal-close-btn" onClick={onClose}>
           <span>×</span>
         </button>
-        <div className="menu-header">
+        <div className="UserProfileModal-menu-header">
           <img
             src={user?.photoURL || 'https://via.placeholder.com/40'}
             alt="User Avatar"
-            className="menu-avatar"
+            className="UserProfileModal-menu-avatar"
           />
-          <div className="user-info">
-            <span className="user-name">{userData?.name || user?.displayName || 'User'}</span>
-            <span className="user-email">{userData?.email || user?.email || 'N/A'}</span>
+          <div className="UserProfileModal-user-info">
+            <span className="UserProfileModal-user-name">{userData?.name || user?.displayName || 'User'}</span>
+            <span className="UserProfileModal-user-email">{userData?.email || user?.email || 'N/A'}</span>
           </div>
         </div>
         {loading ? (
-          <div className="loading">Loading...</div>
+          <div className="UserProfileModal-loading">Loading...</div>
         ) : (
-          <div className="menu-options">
+          <div className="UserProfileModal-menu-options">
             <ul>
               <li onClick={handleEditToggle}>
-                <span className="icon">✎</span> Edit Profile
+                <span className="UserProfileModal-icon">✎</span> Edit Profile
               </li>
               {isEditing && (
-                <div className="edit-profile-section">
-                  <div className="form-group">
+                <div className="UserProfileModal-edit-profile-section">
+                  <div className="UserProfileModal-form-group">
                     <label>Name</label>
                     <input
                       type="text"
                       value={editedName}
                       onChange={(e) => setEditedName(e.target.value)}
-                      className="edit-input"
+                      className="UserProfileModal-edit-input"
                       placeholder="Enter your name"
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="UserProfileModal-form-group">
                     <label>Email</label>
                     <input
                       type="email"
                       value={editedEmail}
                       onChange={(e) => setEditedEmail(e.target.value)}
-                      className="edit-input"
+                      className="UserProfileModal-edit-input"
                       placeholder="Enter your email"
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="UserProfileModal-form-group">
                     <label>Phone Number</label>
                     <input
                       type="tel"
                       value={editedPhoneNo}
                       onChange={(e) => setEditedPhoneNo(e.target.value)}
-                      className="edit-input"
+                      className="UserProfileModal-edit-input"
                       placeholder="Enter your phone number"
                     />
                   </div>
-                  {error && <p className="error-message">{error}</p>}
-                  <button className="save-btn" onClick={handleSave}>Save Changes</button>
+                  {error && <p className="UserProfileModal-error-message">{error}</p>}
+                  <button className="UserProfileModal-save-btn" onClick={handleSave}>Save Changes</button>
                 </div>
               )}
-              <li onClick={() => navigate('/orders')}>
-                <span className="icon">📦</span> Orders
+              <li onClick={() => handleNavigation('/orders')}>
+                <span className="UserProfileModal-icon">📦</span> Orders
               </li>
-              <li onClick={onLogout} className="logout-option">
-                <span className="icon">🚪</span> Logout
+              <li onClick={handleLogout} className="UserProfileModal-logout-option">
+                <span className="UserProfileModal-icon">🚪</span> Logout
               </li>
             </ul>
           </div>

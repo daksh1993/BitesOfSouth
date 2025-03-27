@@ -1,5 +1,6 @@
+/* src/UserProfileModal.css */
 /* Modal Overlay */
-:where(.UserProfileModal) .modal-overlay {
+.UserProfileModal-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -14,13 +15,13 @@
   transition: opacity 0.3s ease;
 }
 
-:where(.UserProfileModal) .modal-overlay.open {
+.UserProfileModal-modal-overlay.open {
   opacity: 1;
   visibility: visible;
 }
 
 /* Modal Content (Sidebar) */
-:where(.UserProfileModal) .modal-content {
+.UserProfileModal-modal-content {
   background-color: #fff;
   width: 300px;
   height: 100%;
@@ -28,14 +29,14 @@
   box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
   transform: translateX(100%);
   transition: transform 0.3s ease;
-  overflow-y: auto; /* Allow scrolling if content overflows */
+  overflow-y: auto;
 }
 
-.modal-overlay.open .modal-content {
+.UserProfileModal-modal-overlay.open .UserProfileModal-modal-content {
   transform: translateX(0);
 }
 
-.modal-close-btn {
+.UserProfileModal-modal-close-btn {
   position: absolute;
   top: 15px;
   right: 15px;
@@ -47,7 +48,7 @@
 }
 
 /* Menu Header */
-.menu-header {
+.UserProfileModal-menu-header {
   display: flex;
   align-items: center;
   margin-bottom: 20px;
@@ -55,7 +56,7 @@
   border-bottom: 1px solid #eee;
 }
 
-.menu-avatar {
+.UserProfileModal-menu-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -63,30 +64,30 @@
   object-fit: cover;
 }
 
-.user-info {
+.UserProfileModal-user-info {
   display: flex;
   flex-direction: column;
 }
 
-.user-name {
+.UserProfileModal-user-name {
   font-size: 16px;
   font-weight: 600;
   color: #333;
 }
 
-.user-email {
+.UserProfileModal-user-email {
   font-size: 12px;
   color: #777;
 }
 
 /* Menu Options */
-.menu-options ul {
+.UserProfileModal-menu-options ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.menu-options li {
+.UserProfileModal-menu-options li {
   display: flex;
   align-items: center;
   padding: 15px 0;
@@ -97,36 +98,36 @@
   transition: background-color 0.2s ease;
 }
 
-.menu-options li:hover {
+.UserProfileModal-menu-options li:hover {
   background-color: #f8f8f8;
 }
 
-.menu-options .icon {
+.UserProfileModal-menu-options .UserProfileModal-icon {
   margin-right: 10px;
   font-size: 18px;
 }
 
-.logout-option {
+.UserProfileModal-logout-option {
   color: #ff5722;
 }
 
 /* Edit Profile Section */
-.edit-profile-section {
+.UserProfileModal-edit-profile-section {
   padding: 15px 0;
 }
 
-.form-group {
+.UserProfileModal-form-group {
   margin-bottom: 15px;
 }
 
-.form-group label {
+.UserProfileModal-form-group label {
   display: block;
   font-size: 14px;
   color: #555;
   margin-bottom: 5px;
 }
 
-.edit-input {
+.UserProfileModal-edit-input {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
@@ -136,17 +137,17 @@
   transition: border-color 0.2s ease;
 }
 
-.edit-input:focus {
+.UserProfileModal-edit-input:focus {
   border-color: #ff5722;
 }
 
-.error-message {
+.UserProfileModal-error-message {
   color: #e63946;
   font-size: 14px;
   margin-top: 5px;
 }
 
-.save-btn {
+.UserProfileModal-save-btn {
   width: 100%;
   padding: 12px;
   background-color: #ff5722;
@@ -158,21 +159,21 @@
   transition: background-color 0.2s ease;
 }
 
-.save-btn:hover {
+.UserProfileModal-save-btn:hover {
   background-color: #e64a19;
 }
 
 /* Orders Section */
-.orders-section {
+.UserProfileModal-orders-section {
   padding: 15px 0;
 }
 
-.orders-list {
+.UserProfileModal-orders-list {
   list-style: none;
   padding: 0;
 }
 
-.order-item {
+.UserProfileModal-order-item {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
@@ -181,14 +182,14 @@
   color: #333;
 }
 
-.no-orders {
+.UserProfileModal-no-orders {
   font-size: 14px;
   color: #777;
   text-align: center;
   margin-top: 10px;
 }
 
-.loading {
+.UserProfileModal-loading {
   font-size: 16px;
   color: #777;
   text-align: center;
