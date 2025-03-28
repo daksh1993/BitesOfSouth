@@ -1,6 +1,6 @@
 import 'package:bites_of_south/View/Rewards/coupons.dart';
 import 'package:bites_of_south/View/Rewards/offers.dart';
-import 'package:bites_of_south/View/Rewards/rewardsTab.dart'; // Add this import
+import 'package:bites_of_south/View/Rewards/rewardsTab.dart';
 import 'package:bites_of_south/View/Rewards/rewardsAdd.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,7 +20,6 @@ class _RewardScreenState extends State<RewardScreen> {
     fetchRewardSettings();
   }
 
-  // Fetch the previously saved value from Firestore
   Future<void> fetchRewardSettings() async {
     DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('settings')
@@ -35,7 +34,6 @@ class _RewardScreenState extends State<RewardScreen> {
     }
   }
 
-  // Update the Firestore value
   Future<void> updateRewardSettings(double value) async {
     await FirebaseFirestore.instance
         .collection('settings')
@@ -46,75 +44,86 @@ class _RewardScreenState extends State<RewardScreen> {
     });
   }
 
-  // Show dialog with the previous value pre-filled
   void showSettingsDialog(BuildContext context) {
     TextEditingController controller = TextEditingController(
       text: rupeesPerPoint != null ? rupeesPerPoint.toString() : '',
     );
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Set Rupees Per Point'),
-          content: TextField(
-            controller: controller,
-            keyboardType: TextInputType.number,
-            decoration:
-                const InputDecoration(hintText: 'Enter rupees per point'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Set Rupees Per Point',
+                style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Enter rupees per point',
+                border: OutlineInputBorder(),
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                double? value = double.tryParse(controller.text);
-                if (value != null) {
-                  updateRewardSettings(value);
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Save'),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    double? value = double.tryParse(controller.text);
+                    if (value != null) {
+                      updateRewardSettings(value);
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Changed from 2 to 3 tabs
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
-          actions: [
-            IconButton(
-                onPressed: () => showSettingsDialog(context),
-                icon: Icon(Icons.settings))
-          ],
           title: Text('Reward Management'),
           bottom: TabBar(
             tabs: [
-              Tab(text: 'Offers'),
               Tab(text: 'Coupons'),
-              Tab(text: 'Rewards'), // Added Rewards tab
+              Tab(text: 'Rewards'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            OffersTab(),
             CouponsTab(),
-            RewardsTab(), // Added RewardsTab
+            RewardsTab(),
           ],
         ),
         floatingActionButton: Builder(
           builder: (BuildContext fabContext) {
             return FloatingActionButton(
-              onPressed: () => _showAddDialog(fabContext),
+              onPressed: () => _showAddBottomSheet(fabContext),
               child: Icon(Icons.add),
             );
           },
@@ -123,180 +132,229 @@ class _RewardScreenState extends State<RewardScreen> {
     );
   }
 
-  void _showAddDialog(BuildContext context) {
+  void _showAddBottomSheet(BuildContext context) {
     final tabIndex = DefaultTabController.of(context)!.index;
     if (tabIndex == 0) {
-      _showAddOfferDialog(context);
-    } else if (tabIndex == 1) {
-      _showAddCouponDialog(context);
+      _showAddCouponBottomSheet(context);
     } else {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AddRewardScreen()));
+        context,
+        MaterialPageRoute(builder: (context) => AddRewardScreen()),
+      );
     }
   }
 
-  void _showAddOfferDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final multiplierController = TextEditingController();
-    final minAmountController = TextEditingController();
-    final usesTillValidController = TextEditingController();
-    DateTime? startDate;
-    DateTime? endDate;
+  // void _showAddOfferBottomSheet(BuildContext context) {
+  //   final nameController = TextEditingController();
+  //   final multiplierController = TextEditingController();
+  //   final minAmountController = TextEditingController();
+  //   final usesTillValidController = TextEditingController();
+  //   DateTime? startDate;
+  //   DateTime? endDate;
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text('Add New Offer'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: InputDecoration(labelText: 'Offer Name'),
-                ),
-                TextField(
-                  controller: multiplierController,
-                  decoration: InputDecoration(
-                      labelText: 'Points Multiplier (e.g., 2 for 2x)'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: minAmountController,
-                  decoration:
-                      InputDecoration(labelText: 'Min Order Amount (₹)'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: usesTillValidController,
-                  decoration:
-                      InputDecoration(labelText: 'Uses Till Valid (per user)'),
-                  keyboardType: TextInputType.number,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(startDate == null
-                        ? 'Start Date: Not Set'
-                        : 'Start: ${DateFormat.yMMMd().format(startDate!)}'),
-                    TextButton(
-                      onPressed: () async {
-                        startDate = await showDatePicker(
-                          context: dialogContext,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2026),
-                        );
-                        setDialogState(() {});
-                      },
-                      child: Text('Pick Start Date'),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(endDate == null
-                        ? 'End Date: Not Set'
-                        : 'End: ${DateFormat.yMMMd().format(endDate!)}'),
-                    TextButton(
-                      onPressed: () async {
-                        endDate = await showDatePicker(
-                          context: dialogContext,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(2026),
-                        );
-                        setDialogState(() {});
-                      },
-                      child: Text('Pick End Date'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (nameController.text.isEmpty ||
-                    multiplierController.text.isEmpty ||
-                    minAmountController.text.isEmpty ||
-                    usesTillValidController.text.isEmpty ||
-                    startDate == null ||
-                    endDate == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('All fields are required')),
-                  );
-                  return;
-                }
-                FirebaseFirestore.instance.collection('offers').add({
-                  'name': nameController.text,
-                  'multiplier': double.parse(multiplierController.text),
-                  'minAmount': double.parse(minAmountController.text),
-                  'usesTillValid': int.parse(usesTillValidController.text),
-                  'startDate': startDate,
-                  'endDate': endDate,
-                  'usedBy': {},
-                });
-                Navigator.pop(dialogContext);
-              },
-              child: Text('Save'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (context, setState) => Padding(
+  //         padding: EdgeInsets.only(
+  //           bottom: MediaQuery.of(context).viewInsets.bottom,
+  //           left: 16,
+  //           right: 16,
+  //           top: 16,
+  //         ),
+  //         child: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               Text('Add New Offer',
+  //                   style: Theme.of(context).textTheme.titleLarge),
+  //               SizedBox(height: 16),
+  //               TextField(
+  //                 controller: nameController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Offer Name',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 8),
+  //               TextField(
+  //                 controller: multiplierController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Points Multiplier (e.g., 2 for 2x)',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 keyboardType: TextInputType.number,
+  //               ),
+  //               SizedBox(height: 8),
+  //               TextField(
+  //                 controller: minAmountController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Min Order Amount (₹)',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 keyboardType: TextInputType.number,
+  //               ),
+  //               SizedBox(height: 8),
+  //               TextField(
+  //                 controller: usesTillValidController,
+  //                 decoration: InputDecoration(
+  //                   labelText: 'Uses Till Valid (per user)',
+  //                   border: OutlineInputBorder(),
+  //                 ),
+  //                 keyboardType: TextInputType.number,
+  //               ),
+  //               SizedBox(height: 8),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(startDate == null
+  //                       ? 'Start Date: Not Set'
+  //                       : 'Start: ${DateFormat.yMMMd().format(startDate!)}'),
+  //                   TextButton(
+  //                     onPressed: () async {
+  //                       startDate = await showDatePicker(
+  //                         context: context,
+  //                         initialDate: DateTime.now(),
+  //                         firstDate: DateTime.now(),
+  //                         lastDate: DateTime(2026),
+  //                       );
+  //                       setState(() {});
+  //                     },
+  //                     child: Text('Pick Start Date'),
+  //                   ),
+  //                 ],
+  //               ),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text(endDate == null
+  //                       ? 'End Date: Not Set'
+  //                       : 'End: ${DateFormat.yMMMd().format(endDate!)}'),
+  //                   TextButton(
+  //                     onPressed: () async {
+  //                       endDate = await showDatePicker(
+  //                         context: context,
+  //                         initialDate: DateTime.now(),
+  //                         firstDate: DateTime.now(),
+  //                         lastDate: DateTime(2026),
+  //                       );
+  //                       setState(() {});
+  //                     },
+  //                     child: Text('Pick End Date'),
+  //                   ),
+  //                 ],
+  //               ),
+  //               SizedBox(height: 16),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.end,
+  //                 children: [
+  //                   TextButton(
+  //                     onPressed: () => Navigator.pop(context),
+  //                     child: Text('Cancel'),
+  //                   ),
+  //                   SizedBox(width: 8),
+  //                   ElevatedButton(
+  //                     onPressed: () {
+  //                       if (nameController.text.isEmpty ||
+  //                           multiplierController.text.isEmpty ||
+  //                           minAmountController.text.isEmpty ||
+  //                           usesTillValidController.text.isEmpty ||
+  //                           startDate == null ||
+  //                           endDate == null) {
+  //                         ScaffoldMessenger.of(context).showSnackBar(
+  //                           SnackBar(content: Text('All fields are required')),
+  //                         );
+  //                         return;
+  //                       }
+  //                       FirebaseFirestore.instance.collection('offers').add({
+  //                         'name': nameController.text,
+  //                         'multiplier': double.parse(multiplierController.text),
+  //                         'minAmount': double.parse(minAmountController.text),
+  //                         'usesTillValid':
+  //                             int.parse(usesTillValidController.text),
+  //                         'startDate': startDate,
+  //                         'endDate': endDate,
+  //                         'usedBy': {},
+  //                       });
+  //                       Navigator.pop(context);
+  //                     },
+  //                     child: Text('Save'),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  void _showAddCouponDialog(BuildContext context) {
+  void _showAddCouponBottomSheet(BuildContext context) {
     final codeController = TextEditingController();
     final valueController = TextEditingController();
     final usesTillValidController = TextEditingController();
     String discountType = 'percent';
     DateTime? expiryDate;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, setDialogState) => AlertDialog(
-          title: Text('Add New Coupon'),
-          content: SingleChildScrollView(
+      isScrollControlled: true,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Text('Add New Coupon',
+                    style: Theme.of(context).textTheme.titleLarge),
+                SizedBox(height: 16),
                 TextField(
                   controller: codeController,
-                  decoration:
-                      InputDecoration(labelText: 'Coupon Code (e.g., DOSA20)'),
+                  decoration: InputDecoration(
+                    labelText: 'Coupon Code (e.g., DOSA20)',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-                DropdownButton<String>(
+                SizedBox(height: 8),
+                DropdownButtonFormField<String>(
                   value: discountType,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                  ),
                   items: [
                     DropdownMenuItem(
                         value: 'percent', child: Text('Percentage')),
                     DropdownMenuItem(value: 'flat', child: Text('Flat Amount')),
                   ],
-                  onChanged: (value) =>
-                      setDialogState(() => discountType = value!),
+                  onChanged: (value) => setState(() => discountType = value!),
                 ),
+                SizedBox(height: 8),
                 TextField(
                   controller: valueController,
                   decoration: InputDecoration(
-                      labelText: 'Discount Value (e.g., 20 for 20%)'),
+                    labelText: 'Discount Value (e.g., 20 for 20%)',
+                    border: OutlineInputBorder(),
+                  ),
                   keyboardType: TextInputType.number,
                 ),
+                SizedBox(height: 8),
                 TextField(
                   controller: usesTillValidController,
-                  decoration:
-                      InputDecoration(labelText: 'Uses Till Valid (per user)'),
+                  decoration: InputDecoration(
+                    labelText: 'Uses Till Valid (per user)',
+                    border: OutlineInputBorder(),
+                  ),
                   keyboardType: TextInputType.number,
                 ),
+                SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -306,52 +364,60 @@ class _RewardScreenState extends State<RewardScreen> {
                     TextButton(
                       onPressed: () async {
                         expiryDate = await showDatePicker(
-                          context: dialogContext,
+                          context: context,
                           initialDate: DateTime.now(),
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2026),
                         );
-                        setDialogState(() {});
+                        setState(() {});
                       },
                       child: Text('Pick Expiry Date'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Cancel'),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (codeController.text.isEmpty ||
+                            valueController.text.isEmpty ||
+                            usesTillValidController.text.isEmpty ||
+                            expiryDate == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('All fields are required')),
+                          );
+                          return;
+                        }
+                        FirebaseFirestore.instance.collection('coupons').add({
+                          'code': codeController.text.toUpperCase(),
+                          'discountType': discountType,
+                          'value': double.parse(valueController.text),
+                          'usesTillValid':
+                              int.parse(usesTillValidController.text),
+                          'expiryDate': expiryDate,
+                          'maxUses':
+                              codeController.text.toUpperCase() == 'NEW99'
+                                  ? null
+                                  : 100,
+                          'uses': 0,
+                          'usedBy': {},
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Text('Save'),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (codeController.text.isEmpty ||
-                    valueController.text.isEmpty ||
-                    usesTillValidController.text.isEmpty ||
-                    expiryDate == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('All fields are required')),
-                  );
-                  return;
-                }
-                FirebaseFirestore.instance.collection('coupons').add({
-                  'code': codeController.text.toUpperCase(),
-                  'discountType': discountType,
-                  'value': double.parse(valueController.text),
-                  'usesTillValid': int.parse(usesTillValidController.text),
-                  'expiryDate': expiryDate,
-                  'maxUses':
-                      codeController.text.toUpperCase() == 'NEW99' ? null : 100,
-                  'uses': 0,
-                  'usedBy': {},
-                });
-                Navigator.pop(dialogContext);
-              },
-              child: Text('Save'),
-            ),
-          ],
         ),
       ),
     );

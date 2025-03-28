@@ -16,7 +16,6 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
   String discountType = "free";
   List<String> selectedItems = [];
   Map<String, List<QueryDocumentSnapshot>> categorizedMenu = {};
-  List<QueryDocumentSnapshot> menuItems = [];
 
   @override
   void initState() {
@@ -39,7 +38,6 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
 
     setState(() {
       categorizedMenu = categorized;
-      menuItems = snapshot.docs;
     });
   }
 
@@ -66,7 +64,6 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Reward added successfully!")));
 
-    // Clear fields and go back
     _nameController.clear();
     _pointsController.clear();
     _discountController.clear();
@@ -91,9 +88,11 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
                 decoration: InputDecoration(labelText: "Points Required")),
             DropdownButton<String>(
               value: discountType,
-              items: ["free", "percentage"].map((type) {
+              items: ["free"].map((type) {
                 return DropdownMenuItem(
-                    value: type, child: Text(type.toUpperCase()));
+                    enabled: type == "free",
+                    value: type,
+                    child: Text(type.toUpperCase()));
               }).toList(),
               onChanged: (value) {
                 setState(() {
@@ -112,6 +111,9 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
               onChanged: (value) {
                 setState(() {
                   isCombo = value;
+                  if (!isCombo && selectedItems.length > 1) {
+                    selectedItems = [selectedItems.first]; // Keep only one
+                  }
                 });
               },
             ),
@@ -122,7 +124,7 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
                   labelText: "Search Menu Items",
                   prefixIcon: Icon(Icons.search)),
               onChanged: (query) {
-                setState(() {}); // Rebuild UI to filter results
+                setState(() {});
               },
             ),
             Expanded(
@@ -154,10 +156,17 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
                               value: selectedItems.contains(itemId),
                               onChanged: (bool? selected) {
                                 setState(() {
-                                  if (selected!) {
-                                    selectedItems.add(itemId);
+                                  if (isCombo) {
+                                    if (selected!) {
+                                      selectedItems.add(itemId);
+                                    } else {
+                                      selectedItems.remove(itemId);
+                                    }
                                   } else {
-                                    selectedItems.remove(itemId);
+                                    selectedItems.clear();
+                                    if (selected!) {
+                                      selectedItems.add(itemId);
+                                    }
                                   }
                                 });
                               },
