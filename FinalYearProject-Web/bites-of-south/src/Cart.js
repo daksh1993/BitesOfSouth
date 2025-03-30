@@ -1,7 +1,8 @@
+// src/Cart.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { db, auth } from './firebase';
-import { collection, addDoc, getDocs, doc, getDoc, updateDoc, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'; // Added updateDoc
 import './Cart.css';
 
 const Cart = () => {
@@ -146,33 +147,10 @@ const Cart = () => {
         throw new Error("No items in cart to save.");
       }
 
-      // Fetch real item IDs from menu collection
-      const menuRef = collection(db, "menu");
-      const itemsWithRealIds = await Promise.all(
-        cartItems.map(async (item) => {
-          const q = query(menuRef, where("title", "==", item.title));
-          const querySnapshot = await getDocs(q);
-
-          if (!querySnapshot.empty) {
-            const menuDoc = querySnapshot.docs[0];
-            return {
-              ...item,
-              itemId: menuDoc.id // Replace the uid with actual Firestore document ID
-            };
-          } else {
-            console.warn(`No menu item found for title: ${item.title}, using original uid`);
-            return {
-              ...item,
-              itemId: item.uid // Fallback to original uid if not found
-            };
-          }
-        })
-      );
-
       const orderData = {
         userId: userId,
-        items: itemsWithRealIds.map(item => ({
-          itemId: item.itemId,
+        items: cartItems.map(item => ({
+          itemId: item.uid,
           name: item.title,
           quantity: item.quantity,
           price: item.price,
@@ -183,7 +161,7 @@ const Cart = () => {
         pendingStatus: "25",
         paymentStatus: "Paid",
         timestamp: Date.now(),
-        makingTime: Math.max(...itemsWithRealIds.map(item => Math.round((item.makingTime || 15) / totalQuantity))),
+        makingTime: Math.max(...cartItems.map(item => Math.round((item.makingTime || 15) / totalQuantity))),
         dineIn: isTakeIn,
         tableNo: isTakeIn ? tableNumber : null,
         instructions: instructions || "No instructions provided",
@@ -350,8 +328,8 @@ const Cart = () => {
                     <div className="coupon-code">{coupon.id}</div>
                     <div className="coupon-details">
                       <p>
-                        {coupon.discountType === "percentage"
-                          ? `${coupon.value}% off`
+                        {coupon.discountType === "percentage" 
+                          ? `${coupon.value}% off` 
                           : `₹${coupon.value} off`}
                         {coupon.expiryDate && ` (Valid till ${coupon.expiryDate.toDate().toLocaleDateString()})`}
                       </p>
