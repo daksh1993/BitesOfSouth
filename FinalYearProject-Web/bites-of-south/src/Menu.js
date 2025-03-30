@@ -12,7 +12,7 @@ function Menu() {
   const [sortOption, setSortOption] = useState("");
   const [category, setCategory] = useState("All");
   const [categories, setCategories] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null); // For zoomed-in modal
+  const [selectedItem, setSelectedItem] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,6 +44,9 @@ function Menu() {
   };
 
   const addToCart = (item) => {
+    // Check if item is available before adding to cart
+    if (!item.availability) return;
+
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
       let updatedCart;
@@ -162,9 +165,9 @@ function Menu() {
         {sortedMenu.length > 0 ? (
           sortedMenu.map((data, index) => (
             <div
-              className="DishItmesPlacement"
+              className={`DishItmesPlacement ${!data.availability ? "unavailable" : ""}`}
               key={index}
-              onClick={() => openItemModal(data)} // Click to open modal
+              onClick={() => openItemModal(data)}
             >
               <div className="LSidePlacement">
                 <div className="ItemType">
@@ -196,8 +199,12 @@ function Menu() {
                       <button onClick={() => addToCart(data)}>+</button>
                     </div>
                   ) : (
-                    <button className="add-btn" onClick={() => addToCart(data)}>
-                      ADD
+                    <button
+                      className="add-btn"
+                      onClick={() => addToCart(data)}
+                      disabled={!data.availability}
+                    >
+                      Add
                     </button>
                   )}
                 </div>
@@ -228,7 +235,7 @@ function Menu() {
         <div className="item-modal-overlay" onClick={closeItemModal}>
           <div
             className="item-modal"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+            onClick={(e) => e.stopPropagation()}
           >
             <button className="modal-close-btn" onClick={closeItemModal}>
               ×
@@ -257,8 +264,9 @@ function Menu() {
                     <button
                       className="add-btn"
                       onClick={() => addToCart(selectedItem)}
+                      disabled={!selectedItem.availability}
                     >
-                      ADD
+                      Add
                     </button>
                   )}
                 </div>

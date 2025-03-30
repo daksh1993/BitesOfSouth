@@ -520,3 +520,33 @@
       font-size: 18px;
     }
   }
+/* Add this to your existing CSS */
+.DishItmesPlacement.unavailable {
+  opacity: 0.5; /* Greyed-out effect */
+  background-color: #f0f0f0; /* Light grey background */
+  cursor: not-allowed; /* Indicate it's not clickable */
+}
+
+.DishItmesPlacement.unavailable .add-btn {
+  background-color: #ccc; /* Grey background for unavailable items */
+  border-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.DishItmesPlacement.unavailable .add-btn:hover {
+  background-color: #ccc; /* No hover effect for unavailable items */
+  color: #666;
+}
+
+.add-btn:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.add-btn:disabled:hover {
+  background-color: #ccc;
+  color: #666;
+}
