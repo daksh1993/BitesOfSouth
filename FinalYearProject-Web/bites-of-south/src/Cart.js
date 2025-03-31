@@ -1,8 +1,7 @@
-// src/Cart.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { db, auth } from './firebase';
-import { collection, addDoc, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore'; // Added updateDoc
+import { collection, addDoc, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import './Cart.css';
 
 const Cart = () => {
@@ -20,21 +19,21 @@ const Cart = () => {
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch cart items from localStorage
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     const sanitizedCart = storedCart.map(item => ({
-      uid: item.uid || "unknown",
+      id: item.id || "unknown",
       title: item.title || "Unknown",
       price: item.price || 0,
       quantity: item.quantity || 1,
       image: item.image || "",
-      makingTime: item.makingTime || 15
+      makingTime: item.makingTime || 15,
+      isRedeemed: item.isRedeemed || false,
+      requiredPoints: item.requiredPoints || 0,
     }));
     setCartItems(sanitizedCart);
   }, []);
 
-  // Fetch available coupons from Firestore
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
@@ -45,21 +44,17 @@ const Cart = () => {
           .map(doc => ({ id: doc.id, ...doc.data() }))
           .filter(coupon => {
             const expiryDate = coupon.expiryDate?.toDate().getTime() || Infinity;
-            const isNotExpired = expiryDate > currentTime;
-            const usesLeft = coupon.usesTillValid > coupon.uses;
-            return isNotExpired && usesLeft;
+            return expiryDate > currentTime && coupon.usesTillValid > coupon.uses;
           });
-        console.log("Fetched coupons:", couponsData);
         setAvailableCoupons(couponsData);
       } catch (error) {
         console.error("Error fetching coupons:", error);
-        setCouponMessage("Failed to load coupons. Please try again later.");
+        setCouponMessage("Failed to load coupons.");
       }
     };
     fetchCoupons();
   }, []);
 
-  // Calculate totals
   useEffect(() => {
     if (cartItems.length === 0) {
       setItemTotal(0);
@@ -70,7 +65,7 @@ const Cart = () => {
       return;
     }
 
-    const validItems = cartItems.filter(item => item.price > 0 && item.quantity > 0);
+    const validItems = cartItems.filter(item => item.price >= 0 && item.quantity > 0);
     const calculatedItemTotal = validItems.reduce((acc, item) => {
       return acc + (item.price * item.quantity);
     }, 0);
@@ -85,11 +80,12 @@ const Cart = () => {
     setTotalPrice(calculatedTotalPrice > 0 ? calculatedTotalPrice : 0);
   }, [cartItems, discount]);
 
-  const updateQuantity = (uid, change) => {
+  const updateQuantity = (id, change) => {
     setCartItems((prevCart) => {
       const updatedCart = prevCart
         .map(item => {
-          if (item.uid === uid) {
+          if (item.id === id) {
+            if (item.isRedeemed) return item; // No change for rewards
             let newQuantity = item.quantity + change;
             return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
           }
@@ -116,12 +112,9 @@ const Cart = () => {
       return;
     }
 
-    let newDiscount = 0;
-    if (coupon.discountType === "percentage") {
-      newDiscount = (itemTotal * coupon.value) / 100;
-    } else if (coupon.discountType === "flat") {
-      newDiscount = coupon.value;
-    }
+    let newDiscount = coupon.discountType === "percentage" 
+      ? (itemTotal * coupon.value) / 100 
+      : coupon.value;
 
     if (newDiscount >= itemTotal) {
       setCouponMessage("Discount cannot exceed subtotal.");
@@ -150,11 +143,13 @@ const Cart = () => {
       const orderData = {
         userId: userId,
         items: cartItems.map(item => ({
-          itemId: item.uid,
+          itemId: item.id,
           name: item.title,
           quantity: item.quantity,
           price: item.price,
-          makingTime: Math.round((item.makingTime || 15) / totalQuantity)
+          makingTime: Math.round((item.makingTime || 15) / totalQuantity),
+          isRedeemed: item.isRedeemed || false,
+          requiredPoints: item.isRedeemed ? item.requiredPoints : 0, // Track points for rewards
         })),
         totalAmount: totalPrice,
         orderStatus: "Pending",
@@ -181,31 +176,19 @@ const Cart = () => {
         }
       };
 
-      const docRef = await addDoc(collection(db, "orders"), orderData);
+      const docRef = await addDoc(collection(db, "orders"), orderData); // Fixed to "orders"
       console.log("Order saved with ID:", docRef.id);
 
-      // Update reward points
-      if (userId !== "guest") {
-        const userRef = doc(db, "users", userId);
-        const userDoc = await getDoc(userRef);
-        const userData = userDoc.exists() ? userDoc.data() : {};
-        const currentPoints = userData.rewardPoints || 0;
-        const pointsToAdd = Math.floor(totalPrice / 50); // 1 point per ₹50
-        const newPoints = currentPoints + pointsToAdd;
-
-        await updateDoc(userRef, { rewardPoints: newPoints });
-        console.log(`Added ${pointsToAdd} points. New total: ${newPoints}`);
-      }
-
+      // No points addition here since rewards deduct points at redeem time
       return docRef.id;
     } catch (error) {
-      console.error("Error saving order or updating points:", error.message);
+      console.error("Error saving order:", error.message);
       return null;
     }
   };
 
   const handlePayment = async () => {
-    if (totalPrice <= 0) {
+    if (totalPrice <= 0 && !cartItems.some(item => item.isRedeemed)) {
       alert("Your cart is empty. Please add items before checking out.");
       return;
     }
@@ -216,7 +199,7 @@ const Cart = () => {
 
     if (!window.Razorpay) {
       console.error("Razorpay SDK not loaded.");
-      alert("Payment service is unavailable. Please try again later.");
+      alert("Payment service is unavailable.");
       return;
     }
 
@@ -233,17 +216,10 @@ const Cart = () => {
           localStorage.removeItem("cart");
           setCartItems([]);
           navigate("/order-details", {
-            state: {
-              orderId,
-              cartItems,
-              tableNumber,
-              totalAmount: totalPrice,
-              couponCode,
-              discount
-            }
+            state: { orderId, cartItems, tableNumber, totalAmount: totalPrice, couponCode, discount }
           });
         } else {
-          alert("Failed to save order. Please try again.");
+          alert("Failed to save order.");
         }
       },
       prefill: {
@@ -278,18 +254,28 @@ const Cart = () => {
             <p className="empty-cart">Your cart is empty.</p>
           ) : (
             cartItems.map(item => (
-              <div className="cart-item" key={item.uid}>
+              <div className="cart-item" key={item.id}>
                 <div className="item-image">
                   {item.image && <img src={item.image} alt={item.title} />}
                 </div>
                 <div className="item-details">
                   <p className="item-name">{item.title}</p>
-                  <p className="item-price">₹{item.price} x {item.quantity} = ₹{(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="item-price">
+                    {item.isRedeemed ? 
+                      (item.requiredPoints ? `${item.requiredPoints} Points` : "Redeemed Item") : 
+                      `₹${item.price} x ${item.quantity} = ₹${(item.price * item.quantity).toFixed(2)}`}
+                  </p>
                 </div>
                 <div className="item-quantity">
-                  <button onClick={() => updateQuantity(item.uid, -1)}>-</button>
+                  <button 
+                    onClick={() => updateQuantity(item.id, -1)} 
+                    disabled={item.isRedeemed}
+                  >-</button>
                   <span>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.uid, 1)}>+</button>
+                  <button 
+                    onClick={() => updateQuantity(item.id, 1)} 
+                    disabled={item.isRedeemed}
+                  >+</button>
                 </div>
               </div>
             ))
@@ -339,7 +325,7 @@ const Cart = () => {
                 ))}
               </div>
             ) : (
-              <p className="no-coupons">No coupons available at the moment.</p>
+              <p className="no-coupons">No coupons available.</p>
             )}
           </div>
 
@@ -398,7 +384,7 @@ const Cart = () => {
           <button
             className="pay-now-btn"
             onClick={handlePayment}
-            disabled={totalPrice <= 0}
+            disabled={totalPrice < 0}
           >
             Pay Now ₹{totalPrice.toFixed(2)}
           </button>

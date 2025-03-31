@@ -29,7 +29,7 @@ function Menu() {
 
   const fetchMenu = async () => {
     const querySnapshot = await getDocs(collection(db, "menu"));
-    const menuData = querySnapshot.docs.map((doc) => doc.data());
+    const menuData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     setMenuItems(menuData);
     const uniqueCategories = [...new Set(menuData.map((item) => item.category))];
     setCategories(uniqueCategories);
@@ -44,17 +44,14 @@ function Menu() {
   };
 
   const addToCart = (item) => {
-    // Check if item is available before adding to cart
     if (!item.availability) return;
 
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
       let updatedCart;
       if (existingItem) {
         updatedCart = prevCart.map((cartItem) =>
-          cartItem.title === item.title
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
+          cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem
         );
       } else {
         updatedCart = [...prevCart, { ...item, quantity: 1 }];
@@ -67,16 +64,14 @@ function Menu() {
 
   const removeFromCart = (item) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((cartItem) => cartItem.title === item.title);
+      const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
       let updatedCart;
       if (existingItem.quantity > 1) {
         updatedCart = prevCart.map((cartItem) =>
-          cartItem.title === item.title
-            ? { ...cartItem, quantity: cartItem.quantity - 1 }
-            : cartItem
+          cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity - 1 } : cartItem
         );
       } else {
-        updatedCart = prevCart.filter((cartItem) => cartItem.title !== item.title);
+        updatedCart = prevCart.filter((cartItem) => cartItem.id !== item.id);
       }
       localStorage.setItem("cart", JSON.stringify(updatedCart));
       if (updatedCart.length === 0) setShowCartPopup(false);
@@ -90,8 +85,8 @@ function Menu() {
     }
   };
 
-  const getItemQuantity = (itemTitle) => {
-    const item = cart.find((cartItem) => cartItem.title === itemTitle);
+  const getItemQuantity = (itemId) => {
+    const item = cart.find((cartItem) => cartItem.id === itemId);
     return item ? item.quantity : 0;
   };
 
@@ -192,10 +187,10 @@ function Menu() {
                   <img src={data.image} alt="DishImg" />
                 </div>
                 <div className="AddToCart" onClick={(e) => e.stopPropagation()}>
-                  {getItemQuantity(data.title) > 0 ? (
+                  {getItemQuantity(data.id) > 0 ? (
                     <div className="quantity-controls">
                       <button onClick={() => removeFromCart(data)}>-</button>
-                      <span>{getItemQuantity(data.title)}</span>
+                      <span>{getItemQuantity(data.id)}</span>
                       <button onClick={() => addToCart(data)}>+</button>
                     </div>
                   ) : (
@@ -233,10 +228,7 @@ function Menu() {
       {/* Zoomed-In Item Modal */}
       {selectedItem && (
         <div className="item-modal-overlay" onClick={closeItemModal}>
-          <div
-            className="item-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="item-modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close-btn" onClick={closeItemModal}>
               ×
             </button>
@@ -254,10 +246,10 @@ function Menu() {
                 </div>
                 <p className="modal-description">{selectedItem.description}</p>
                 <div className="modal-add-to-cart">
-                  {getItemQuantity(selectedItem.title) > 0 ? (
+                  {getItemQuantity(selectedItem.id) > 0 ? (
                     <div className="quantity-controls">
                       <button onClick={() => removeFromCart(selectedItem)}>-</button>
-                      <span>{getItemQuantity(selectedItem.title)}</span>
+                      <span>{getItemQuantity(selectedItem.id)}</span>
                       <button onClick={() => addToCart(selectedItem)}>+</button>
                     </div>
                   ) : (

@@ -642,3 +642,10 @@
   color: #1ba672;
   font-weight: 600;
 }
+
+/* Existing styles remain unchanged, just adding this */
+.item-quantity button:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
