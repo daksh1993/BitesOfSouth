@@ -1,6 +1,6 @@
+import 'package:bites_of_south/View/Analysis/analysisScreen.dart';
 import 'package:bites_of_south/View/Menu/menu_management.dart';
 import 'package:bites_of_south/View/Orders/ordersAdmin.dart';
-import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/View/Rewards/rewardspanel.dart';
 import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:bites_of_south/View/addAdmin.dart';
@@ -22,7 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final Map<int, Widget> _screens = {
     1: const MenuManagementScreen(),
     2: OrderAdmin(), // Replace with actual Order Screen
-    3: Scaffold(), // Replace with actual Analysis Screen
+    3: AnalysisScreen(), // Replace with actual Analysis Screen
     4: RewardScreen(),
   };
   @override
@@ -43,32 +43,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       print("docId not found in SharedPreferences");
     }
   }
-
-  // Future<void> _logout() async {
-  //   try {
-  //     QuerySnapshot userQuery = await _firestore
-  //         .collection('users')
-  //         .where('email', isEqualTo: _auth.currentUser!.email)
-  //         .get();
-
-  //     if (userQuery.docs.isNotEmpty) {
-  //       String docId = userQuery.docs.first.id;
-  //       await _firestore.collection('users').doc(docId).update({
-  //         'phoneVerified': false,
-  //         'isAuthenticated': false,
-  //         'lastLoginAt': FieldValue.serverTimestamp(),
-  //         'lastLogoutAt': FieldValue.serverTimestamp(),
-  //       });
-  //     }
-
-  //     await _auth.signOut();
-  //     Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Error logging out: $e")),
-  //     );
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +106,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 customContainer("Rewards", 4),
               ],
             ),
+            // ElevatedButton(
+            //     onPressed: () {
+            //       exportMenuCollection();
+            //     },
+            //     child: Text("Retrive data"))
           ],
         ),
       ),

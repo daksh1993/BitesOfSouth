@@ -32,6 +32,15 @@ class OrdersModal {
     if (data == null) {
       throw Exception('Firestore document data is null');
     }
+
+    // Helper function to safely convert a value to String?
+    String? toStringOrNull(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value;
+      if (value is int) return value.toString();
+      return null; // Or handle other unexpected types as needed
+    }
+
     return OrdersModal(
       id: doc.id,
       dineIn: data['dineIn'] as bool? ?? false,
@@ -44,10 +53,10 @@ class OrdersModal {
           : data['totalAmount'] is String
               ? double.tryParse(data['totalAmount'] as String) ?? 0.0
               : 0.0),
-      orderStatus: data['orderStatus'] as String? ?? 'Pending',
-      pendingStatus: data['pendingStatus'] as String? ?? '0',
-      paymentStatus: data['paymentStatus'] as String? ?? 'Unknown',
-      tableNo: data['tableNo'] as String? ?? '',
+      orderStatus: toStringOrNull(data['orderStatus']) ?? 'Pending',
+      pendingStatus: toStringOrNull(data['pendingStatus']) ?? '0',
+      paymentStatus: toStringOrNull(data['paymentStatus']) ?? 'Unknown',
+      tableNo: toStringOrNull(data['tableNo']) ?? '',
       timestamp: (data['timestamp'] is Timestamp
               ? (data['timestamp'] as Timestamp).millisecondsSinceEpoch
               : data['timestamp'] is String
@@ -56,7 +65,7 @@ class OrdersModal {
           0,
       paymentDetails: PaymentDetails.fromMap(
           data['paymentDetails'] as Map<String, dynamic>? ?? {}),
-      userId: data['userId'] as String? ?? '',
+      userId: toStringOrNull(data['userId']) ?? '',
     );
   }
 
@@ -94,19 +103,27 @@ class OrderItem {
   });
 
   factory OrderItem.fromMap(Map<String, dynamic> data) {
+    // Helper function to safely convert a value to String?
+    String? toStringOrNull(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value;
+      if (value is int) return value.toString();
+      return null; // Or handle other unexpected types as needed
+    }
+
     return OrderItem(
-      itemId: data['itemId'] as String? ?? '',
-      name: data['name'] as String? ?? 'Unknown Item',
+      itemId: toStringOrNull(data['itemId']) ?? '',
+      name: toStringOrNull(data['name']) ?? 'Unknown Item',
       quantity: (data['quantity'] is String
               ? int.tryParse(data['quantity'] as String) ?? 0
               : data['quantity'] as int?) ??
           0,
-      price: data['price'] as String? ?? '0',
+      price: toStringOrNull(data['price']) ?? '0',
       makingTime: (data['makingTime'] is String
               ? int.tryParse(data['makingTime'] as String) ?? 0
               : data['makingTime'] as int?) ??
           0,
-      orderStatus: data['orderStatus'] as String? ?? 'Pending',
+      orderStatus: toStringOrNull(data['orderStatus']) ?? 'Pending',
     );
   }
 
@@ -151,20 +168,28 @@ class PaymentDetails {
   });
 
   factory PaymentDetails.fromMap(Map<String, dynamic> data) {
+    // Helper function to safely convert a value to String?
+    String? toStringOrNull(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value;
+      if (value is int) return value.toString();
+      return null; // Or handle other unexpected types as needed
+    }
+
     return PaymentDetails(
-      razorpayPaymentId: data['razorpayPaymentId'] as String? ?? '',
-      razorpayOrderId: data['razorpayOrderId'] as String? ?? '',
+      razorpayPaymentId: toStringOrNull(data['razorpayPaymentId']) ?? '',
+      razorpayOrderId: toStringOrNull(data['razorpayOrderId']) ?? '',
       amount: (data['amount'] is String
               ? int.tryParse(data['amount'] as String) ?? 0
               : data['amount'] as int?) ??
           0,
-      currency: data['currency'] as String? ?? 'INR',
-      status: data['status'] as String? ?? 'unknown',
+      currency: toStringOrNull(data['currency']) ?? 'INR',
+      status: toStringOrNull(data['status']) ?? 'unknown',
       amountRefunded: (data['amountRefunded'] is String
               ? int.tryParse(data['amountRefunded'] as String) ?? 0
               : data['amountRefunded'] as int?) ??
           0,
-      refundStatus: data['refundStatus'] as String?,
+      refundStatus: toStringOrNull(data['refundStatus']),
       captured: data['captured'] as bool? ?? false,
       paymentTimestamp: (data['paymentTimestamp'] is String
               ? int.tryParse(data['paymentTimestamp'] as String) ?? 0
