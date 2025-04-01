@@ -135,99 +135,131 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: const Text("Analysis Dashboard"),
-        backgroundColor: Colors.green.shade700,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _analysisData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator(color: Colors.green));
-          }
-          if (snapshot.hasError) {
-            return Center(
-                child: Text("Error: ${snapshot.error}",
-                    style: const TextStyle(color: Colors.red)));
-          }
-          if (!snapshot.hasData) {
-            return const Center(
-                child:
-                    Text("No data available", style: TextStyle(fontSize: 18)));
-          }
-
-          final data = snapshot.data!;
-          final menuItems =
-              data['menuItems'] as Map<String, Map<String, dynamic>>? ?? {};
-          final itemQuantities =
-              data['itemQuantities'] as Map<String, int>? ?? {};
-          final itemRevenues =
-              data['itemRevenues'] as Map<String, double>? ?? {};
-          final itemProfits = data['itemProfits'] as Map<String, double>? ?? {};
-          final trendingItems =
-              data['trendingItems'] as Map<String, int>? ?? {};
-          final dailyRevenues =
-              data['dailyRevenues'] as Map<int, double>? ?? {};
-          final dailyProfits = data['dailyProfits'] as Map<int, double>? ?? {};
-          final currencyFormat =
-              NumberFormat.currency(locale: 'en_IN', symbol: '₹');
-
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(screenWidth * 0.04),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                        child: _buildNetSalesCard(data['netSales'] ?? 0.0,
-                            currencyFormat, screenWidth)),
-                    SizedBox(width: screenWidth * 0.04),
-                    Flexible(
-                        child: _buildNetProfitCard(data['netProfit'] ?? 0.0,
-                            currencyFormat, screenWidth)),
-                  ],
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                SizedBox(
-                  height: screenHeight * 0.35,
-                  child: _buildLineChart(dailyRevenues, dailyProfits,
-                      screenWidth, screenHeight, currencyFormat),
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                ...selectedAnalyses
-                    .where((analysis) =>
-                        analysis != 'Net Sales' && analysis != 'Net Profit')
-                    .map((analysis) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: screenHeight * 0.015),
-                    child: _buildAnalysisCard(
-                      analysis,
-                      data,
-                      menuItems,
-                      itemQuantities,
-                      itemRevenues,
-                      itemProfits,
-                      trendingItems,
-                      currencyFormat,
-                      screenWidth,
-                      screenHeight,
-                    ),
-                  );
-                }).toList(),
-              ],
+        foregroundColor: Colors.white, // Change the color of the back button
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.green.shade400],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          );
-        },
+          ),
+        ),
+        title: const Text(
+          "Analysis Dashboard",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.grey.shade100, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: _analysisData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.green));
+            }
+            if (snapshot.hasError) {
+              return Center(
+                  child: Text("Error: ${snapshot.error}",
+                      style: const TextStyle(color: Colors.red, fontSize: 18)));
+            }
+            if (!snapshot.hasData) {
+              return const Center(
+                  child: Text("No data available",
+                      style: TextStyle(fontSize: 18, color: Colors.grey)));
+            }
+
+            final data = snapshot.data!;
+            final menuItems =
+                data['menuItems'] as Map<String, Map<String, dynamic>>? ?? {};
+            final itemQuantities =
+                data['itemQuantities'] as Map<String, int>? ?? {};
+            final itemRevenues =
+                data['itemRevenues'] as Map<String, double>? ?? {};
+            final itemProfits =
+                data['itemProfits'] as Map<String, double>? ?? {};
+            final trendingItems =
+                data['trendingItems'] as Map<String, int>? ?? {};
+            final dailyRevenues =
+                data['dailyRevenues'] as Map<int, double>? ?? {};
+            final dailyProfits =
+                data['dailyProfits'] as Map<int, double>? ?? {};
+            final currencyFormat =
+                NumberFormat.currency(locale: 'en_IN', symbol: '₹');
+
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(screenWidth * 0.05),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                          child: _buildNetSalesCard(data['netSales'] ?? 0.0,
+                              currencyFormat, screenWidth)),
+                      SizedBox(width: screenWidth * 0.03),
+                      Expanded(
+                          child: _buildNetProfitCard(data['netProfit'] ?? 0.0,
+                              currencyFormat, screenWidth)),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+                  Card(
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: SizedBox(
+                        height: screenHeight * 0.35,
+                        child: _buildLineChart(dailyRevenues, dailyProfits,
+                            screenWidth, screenHeight, currencyFormat),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.03),
+                  ...selectedAnalyses
+                      .where((analysis) =>
+                          analysis != 'Net Sales' && analysis != 'Net Profit')
+                      .map((analysis) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+                      child: _buildAnalysisCard(
+                        analysis,
+                        data,
+                        menuItems,
+                        itemQuantities,
+                        itemRevenues,
+                        itemProfits,
+                        trendingItems,
+                        currencyFormat,
+                        screenWidth,
+                        screenHeight,
+                      ),
+                    );
+                  }).toList(),
+                ],
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddAnalysisBottomSheet(context),
         backgroundColor: Colors.green.shade700,
-        child: const Icon(Icons.add, color: Colors.white),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add, size: 28, color: Colors.white),
       ),
     );
   }
@@ -235,33 +267,41 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   Widget _buildNetSalesCard(
       double netSales, NumberFormat currencyFormat, double screenWidth) {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
-      child: Padding(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue.shade50, Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
         padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Net Sales",
-                style: TextStyle(
-                    fontSize: screenWidth * 0.045,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700)),
+            Text(
+              "Net Sales",
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade700,
+              ),
+            ),
             SizedBox(height: screenWidth * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Revenue:",
-                    style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        color: Colors.grey[800])),
                 Flexible(
                   child: Text(
                     currencyFormat.format(netSales),
                     style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        fontWeight: FontWeight.w600),
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade900,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -276,33 +316,41 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   Widget _buildNetProfitCard(
       double netProfit, NumberFormat currencyFormat, double screenWidth) {
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
-      child: Padding(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green.shade50, Colors.white],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
         padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Net Profit",
-                style: TextStyle(
-                    fontSize: screenWidth * 0.045,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700)),
+            Text(
+              "Net Profit",
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.bold,
+                color: Colors.green.shade700,
+              ),
+            ),
             SizedBox(height: screenWidth * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Profit:",
-                    style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        color: Colors.grey[800])),
                 Flexible(
                   child: Text(
                     currencyFormat.format(netProfit),
                     style: TextStyle(
-                        fontSize: screenWidth * 0.035,
-                        fontWeight: FontWeight.w600),
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade900,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -353,22 +401,34 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         intervalType: DateTimeIntervalType.days,
         interval: 5,
         majorGridLines: const MajorGridLines(width: 0),
-        labelStyle: TextStyle(fontSize: screenWidth * 0.035),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
       ),
       primaryYAxis: NumericAxis(
         numberFormat: currencyFormat,
-        labelStyle: TextStyle(fontSize: screenWidth * 0.035),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
       ),
-      legend: Legend(isVisible: true, position: LegendPosition.bottom),
-      tooltipBehavior:
-          TooltipBehavior(enable: true, format: 'point.x : point.y'),
+      legend: Legend(
+        isVisible: true,
+        position: LegendPosition.bottom,
+        textStyle: TextStyle(
+            fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
+      ),
+      tooltipBehavior: TooltipBehavior(
+        enable: true,
+        format: 'point.x : point.y',
+        color: Colors.grey.shade800,
+        textStyle: const TextStyle(color: Colors.white),
+      ),
       series: <CartesianSeries>[
         SplineSeries<ChartData, DateTime>(
           dataSource: revenueData,
           xValueMapper: (ChartData data, _) => data.date!,
           yValueMapper: (ChartData data, _) => data.value,
           name: 'Revenue',
-          color: Colors.blue,
+          color: Colors.blue.shade600,
+          width: 2.5,
           animationDuration: 1000,
           splineType: SplineType.cardinal,
         ),
@@ -377,7 +437,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           xValueMapper: (ChartData data, _) => data.date!,
           yValueMapper: (ChartData data, _) => data.value,
           name: 'Profit',
-          color: Colors.green,
+          color: Colors.green.shade600,
+          width: 2.5,
           animationDuration: 1000,
           splineType: SplineType.cardinal,
         ),
@@ -465,8 +526,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           final bottomRevenue =
               itemRevenues.entries.reduce((a, b) => a.value < b.value ? a : b);
           itemName = menuItems[bottomRevenue.key]?['title'] ?? 'Unknown';
-          revenue = currencyFormat.format(
-              bottomRevenue.value); // Fixed: Changed to bottomRevenue.value
+          revenue = currencyFormat.format(bottomRevenue.value);
           profit = currencyFormat.format(itemProfits[bottomRevenue.key] ?? 0);
           chart = _buildBarChart(
             [
@@ -495,7 +555,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 entry.value.toDouble());
           }).toList();
           chart = _buildLineChartWithDots(trendingData, screenWidth,
-              screenHeight, 'Quantity Sold', Colors.blue);
+              screenHeight, 'Quantity Sold', Colors.blue.shade600);
         }
         break;
       case 'Total Items Sold':
@@ -520,7 +580,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 menuItems[entry.key]?['title'] ?? 'Unknown', entry.value);
           }).toList();
           chart = _buildLineChartWithDots(profitData, screenWidth, screenHeight,
-              'Profit (₹)', Colors.green);
+              'Profit (₹)', Colors.green.shade600);
         }
         break;
       case 'Top 3 Items Revenue Share':
@@ -547,42 +607,59 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     }
 
     return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.white,
-      child: Padding(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade50],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
         padding: EdgeInsets.all(screenWidth * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: TextStyle(
-                    fontSize: screenWidth * 0.045,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700)),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
+                fontWeight: FontWeight.bold,
+                color: Colors.green.shade700,
+              ),
+            ),
             if (itemName.isNotEmpty) ...[
               SizedBox(height: screenWidth * 0.02),
-              Text(itemName,
-                  style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[800])),
+              Text(
+                itemName,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade800,
+                ),
+              ),
             ],
             if (revenue != null) ...[
               SizedBox(height: screenWidth * 0.02),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Revenue:",
-                      style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          color: Colors.grey[800])),
+                  Text(
+                    "Revenue",
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: Colors.grey.shade700),
+                  ),
                   Flexible(
                     child: Text(
                       revenue,
                       style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          fontWeight: FontWeight.w600),
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade900,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -594,16 +671,20 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Profit:",
-                      style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          color: Colors.grey[800])),
+                  Text(
+                    "Profit",
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: Colors.grey.shade700),
+                  ),
                   Flexible(
                     child: Text(
                       profit,
                       style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          fontWeight: FontWeight.w600),
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade900,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -615,19 +696,27 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Value:",
-                      style: TextStyle(fontSize: screenWidth * 0.035)),
-                  Text(value,
-                      style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    "Value",
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: Colors.grey.shade700),
+                  ),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade900,
+                    ),
+                  ),
                 ],
               ),
             ],
             if (chart != null) ...[
-              SizedBox(height: screenWidth * 0.02),
+              SizedBox(height: screenWidth * 0.03),
               SizedBox(
-                height: screenHeight * 0.25,
+                height: screenHeight * 0.3,
                 child: chart,
               ),
             ],
@@ -642,26 +731,33 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       [NumberFormat? format]) {
     return SfCartesianChart(
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(fontSize: screenWidth * 0.035),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
         majorGridLines: const MajorGridLines(width: 0),
       ),
       primaryYAxis: NumericAxis(
         numberFormat: format,
-        labelStyle: TextStyle(fontSize: screenWidth * 0.035),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
       ),
-      tooltipBehavior:
-          TooltipBehavior(enable: true, format: 'point.x: point.y'),
+      tooltipBehavior: TooltipBehavior(
+          enable: true,
+          format: 'point.x: point.y',
+          color: Colors.grey.shade800),
       series: <CartesianSeries>[
         ColumnSeries<ChartData, String>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.label,
           yValueMapper: (ChartData data, _) => data.value,
-          pointColorMapper: (ChartData data, _) =>
-              data.label == 'Revenue' ? Colors.blue : Colors.green,
+          pointColorMapper: (ChartData data, _) => data.label == 'Revenue'
+              ? Colors.blue.shade600
+              : Colors.green.shade600,
           animationDuration: 800,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
           dataLabelSettings: const DataLabelSettings(
-              isVisible: true, textStyle: TextStyle(color: Colors.white)),
+              isVisible: true,
+              textStyle:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -671,36 +767,42 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       double screenHeight, String yAxisTitle, Color lineColor) {
     return SfCartesianChart(
       primaryXAxis: CategoryAxis(
-        labelStyle: TextStyle(fontSize: screenWidth * 0.015),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.015, color: Colors.grey.shade700),
         majorGridLines: const MajorGridLines(width: 0),
-        labelRotation:
-            45, // Rotate labels for better readability if names are long
+        labelRotation: 45,
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: TextStyle(fontSize: screenWidth * 0.035),
+        labelStyle: TextStyle(
+            fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
         title: AxisTitle(
             text: yAxisTitle,
-            textStyle: TextStyle(fontSize: screenWidth * 0.035)),
+            textStyle: TextStyle(
+                fontSize: screenWidth * 0.035, color: Colors.grey.shade800)),
       ),
-      tooltipBehavior:
-          TooltipBehavior(enable: true, format: 'point.x: point.y'),
+      tooltipBehavior: TooltipBehavior(
+          enable: true,
+          format: 'point.x: point.y',
+          color: Colors.grey.shade800),
       series: <CartesianSeries>[
         LineSeries<ChartData, String>(
           dataSource: data,
           xValueMapper: (ChartData data, _) => data.label,
           yValueMapper: (ChartData data, _) => data.value,
           color: lineColor,
+          width: 2.5,
           animationDuration: 800,
           markerSettings: MarkerSettings(
-            isVisible: true, // Show dots on the line
+            isVisible: true,
             shape: DataMarkerType.circle,
             color: lineColor,
-            width: 6,
-            height: 6,
+            width: 8,
+            height: 8,
           ),
           dataLabelSettings: const DataLabelSettings(
             isVisible: true,
-            textStyle: TextStyle(color: Colors.black, fontSize: 12),
+            textStyle: TextStyle(
+                color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -710,9 +812,16 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   Widget _buildPieChart(List<ChartData> data, double screenWidth,
       double screenHeight, NumberFormat currencyFormat) {
     return SfCircularChart(
-      legend: Legend(isVisible: true, position: LegendPosition.bottom),
-      tooltipBehavior:
-          TooltipBehavior(enable: true, format: 'point.x: point.y'),
+      legend: Legend(
+        isVisible: true,
+        position: LegendPosition.bottom,
+        textStyle: TextStyle(
+            fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
+      ),
+      tooltipBehavior: TooltipBehavior(
+          enable: true,
+          format: 'point.x: point.y',
+          color: Colors.grey.shade800),
       series: <CircularSeries>[
         PieSeries<ChartData, String>(
           dataSource: data,
@@ -723,7 +832,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           explode: true,
           explodeIndex: 0,
           dataLabelSettings: const DataLabelSettings(
-              isVisible: true, textStyle: TextStyle(color: Colors.white)),
+              isVisible: true,
+              textStyle:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -749,37 +860,47 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       context: context,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Colors.white,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Add New Analysis",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green)),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Text(
+                    "Add New Analysis",
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade700),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                   DropdownButtonFormField<String>(
                     decoration: InputDecoration(
                       labelText: "Select Analysis",
+                      labelStyle: TextStyle(color: Colors.grey.shade700),
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
                     ),
                     items: availableAnalyses
                         .where(
                             (analysis) => !selectedAnalyses.contains(analysis))
                         .map((analysis) {
                       return DropdownMenuItem(
-                          value: analysis, child: Text(analysis));
+                          value: analysis,
+                          child: Text(analysis,
+                              style: const TextStyle(fontSize: 16)));
                     }).toList(),
                     onChanged: (value) =>
                         setModalState(() => selectedAnalysis = value),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                   ElevatedButton(
                     onPressed: () {
                       if (selectedAnalysis != null) {
@@ -792,10 +913,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                          horizontal: 30, vertical: 12),
+                      elevation: 4,
                     ),
                     child: const Text("Add Analysis",
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
