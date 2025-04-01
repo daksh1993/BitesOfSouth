@@ -50,6 +50,8 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.5.2
   mailer: ^6.4.1
+  fl_chart: ^0.70.2
+  syncfusion_flutter_charts: ^29.1.35
   
 
 dev_dependencies:

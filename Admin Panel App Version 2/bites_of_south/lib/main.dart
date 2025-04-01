@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FirebaseFirestore.instance.collection('menu');
 
       // List of possible percentage reductions
-      final List<int> percentages = [10, 15, 17, 22];
+      final List<int> percentages = [45, 32, 67, 74];
 
       // Get random percentage
       int getRandomPercentage() =>
