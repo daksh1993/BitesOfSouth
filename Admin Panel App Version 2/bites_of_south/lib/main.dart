@@ -9,6 +9,7 @@ import 'package:bites_of_south/View/Authentication/loginScreen.dart';
 import 'package:bites_of_south/View/Dashboard.dart';
 import 'package:bites_of_south/View/Orders/orderspanel.dart';
 import 'package:bites_of_south/firebase_options.dart';
+import 'package:bites_of_south/generate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
       ),
       // initialRoute: '/mainPage', // Set initial route to login
       initialRoute: '/login', // Set initial route to login
+      // initialRoute: '/generate', // Set initial route to login
       routes: {
         '/login': (context) => LoginScreen(),
         '/dashboard': (context) => DashboardScreen(),
@@ -56,6 +58,7 @@ class MyApp extends StatelessWidget {
         '/mainPage': (context) => MyHomePage(
               title: 'BitesOf South',
             ),
+        '/generate': (context) => OrderGeneratorButton(),
       },
       // Remove home property since we're using routes
     );

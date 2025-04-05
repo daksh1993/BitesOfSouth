@@ -25,6 +25,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     'Most Profitable Item',
     'Top 3 Items Revenue Share'
   ];
+  DateTime? _startDate;
+  DateTime? _endDate;
+  String? _selectedRange;
 
   @override
   void initState() {
@@ -32,10 +35,34 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     _analysisData = _fetchAnalysisData();
   }
 
+  void _updateDateRange(DateTime? start, DateTime? end, {String? range}) {
+    setState(() {
+      _startDate = start;
+      _endDate = end;
+      _selectedRange = range;
+      _analysisData = _fetchAnalysisData();
+    });
+  }
+
   Future<Map<String, dynamic>> _fetchAnalysisData() async {
     try {
-      final ordersSnapshot =
-          await FirebaseFirestore.instance.collection('orders').get();
+      Query<Map<String, dynamic>> ordersQuery =
+          FirebaseFirestore.instance.collection('orders');
+
+      if (_startDate != null) {
+        final startMillis = _startDate!.millisecondsSinceEpoch;
+        ordersQuery =
+            ordersQuery.where('timestamp', isGreaterThanOrEqualTo: startMillis);
+      }
+      if (_endDate != null) {
+        final endMillis =
+            DateTime(_endDate!.year, _endDate!.month, _endDate!.day, 23, 59, 59)
+                .millisecondsSinceEpoch;
+        ordersQuery =
+            ordersQuery.where('timestamp', isLessThanOrEqualTo: endMillis);
+      }
+
+      final ordersSnapshot = await ordersQuery.get();
       final menuSnapshot =
           await FirebaseFirestore.instance.collection('menu').get();
 
@@ -51,10 +78,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       Map<int, double> dailyRevenues = {};
       Map<int, double> dailyProfits = {};
 
-      final now = DateTime.now();
-      final thirtyDaysAgo =
-          now.subtract(const Duration(days: 30)).millisecondsSinceEpoch;
-
       for (var order in ordersSnapshot.docs) {
         final orderData = order.data();
         final items = List<Map<String, dynamic>>.from(orderData['items'] ?? []);
@@ -66,11 +89,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             orderDate.difference(DateTime(1970, 1, 1)).inDays;
 
         netSales += totalAmount;
-
-        if (timestamp >= thirtyDaysAgo) {
-          dailyRevenues[daysSinceEpoch] =
-              (dailyRevenues[daysSinceEpoch] ?? 0) + totalAmount;
-        }
+        dailyRevenues[daysSinceEpoch] =
+            (dailyRevenues[daysSinceEpoch] ?? 0) + totalAmount;
 
         for (var item in items) {
           if (item['isRedeemed'] == true) continue;
@@ -89,15 +109,10 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               (itemProfits[itemId] ?? 0) + ((price - makingPrice) * quantity);
           netProfit += (price - makingPrice) * quantity;
 
-          if (timestamp >= thirtyDaysAgo) {
-            dailyProfits[daysSinceEpoch] = (dailyProfits[daysSinceEpoch] ?? 0) +
-                ((price - makingPrice) * quantity);
-          }
+          dailyProfits[daysSinceEpoch] = (dailyProfits[daysSinceEpoch] ?? 0) +
+              ((price - makingPrice) * quantity);
 
-          final thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
-          if (now.millisecondsSinceEpoch - timestamp <= thirtyDaysInMillis) {
-            trendingItems[itemId] = (trendingItems[itemId] ?? 0) + quantity;
-          }
+          trendingItems[itemId] = (trendingItems[itemId] ?? 0) + quantity;
         }
       }
 
@@ -135,7 +150,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        foregroundColor: Colors.white, // Change the color of the back button
+        foregroundColor: Colors.white,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -160,98 +175,126 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: FutureBuilder<Map<String, dynamic>>(
-          future: _analysisData,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                  child: CircularProgressIndicator(color: Colors.green));
-            }
-            if (snapshot.hasError) {
-              return Center(
-                  child: Text("Error: ${snapshot.error}",
-                      style: const TextStyle(color: Colors.red, fontSize: 18)));
-            }
-            if (!snapshot.hasData) {
-              return const Center(
-                  child: Text("No data available",
-                      style: TextStyle(fontSize: 18, color: Colors.grey)));
-            }
+        child: Column(
+          children: [
+            DateRangeSection(
+              screenWidth: screenWidth,
+              onDateRangeChanged: _updateDateRange,
+              selectedRange: _selectedRange,
+            ),
+            Expanded(
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: _analysisData,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator(color: Colors.green));
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: Text("Error: ${snapshot.error}",
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 18)));
+                  }
+                  if (!snapshot.hasData) {
+                    return const Center(
+                        child: Text("No data available",
+                            style:
+                                TextStyle(fontSize: 18, color: Colors.grey)));
+                  }
 
-            final data = snapshot.data!;
-            final menuItems =
-                data['menuItems'] as Map<String, Map<String, dynamic>>? ?? {};
-            final itemQuantities =
-                data['itemQuantities'] as Map<String, int>? ?? {};
-            final itemRevenues =
-                data['itemRevenues'] as Map<String, double>? ?? {};
-            final itemProfits =
-                data['itemProfits'] as Map<String, double>? ?? {};
-            final trendingItems =
-                data['trendingItems'] as Map<String, int>? ?? {};
-            final dailyRevenues =
-                data['dailyRevenues'] as Map<int, double>? ?? {};
-            final dailyProfits =
-                data['dailyProfits'] as Map<int, double>? ?? {};
-            final currencyFormat =
-                NumberFormat.currency(locale: 'en_IN', symbol: '₹');
+                  final data = snapshot.data!;
+                  final menuItems =
+                      data['menuItems'] as Map<String, Map<String, dynamic>>? ??
+                          {};
+                  final itemQuantities =
+                      data['itemQuantities'] as Map<String, int>? ?? {};
+                  final itemRevenues =
+                      data['itemRevenues'] as Map<String, double>? ?? {};
+                  final itemProfits =
+                      data['itemProfits'] as Map<String, double>? ?? {};
+                  final trendingItems =
+                      data['trendingItems'] as Map<String, int>? ?? {};
+                  final dailyRevenues =
+                      data['dailyRevenues'] as Map<int, double>? ?? {};
+                  final dailyProfits =
+                      data['dailyProfits'] as Map<int, double>? ?? {};
+                  final currencyFormat =
+                      NumberFormat.currency(locale: 'en_IN', symbol: '₹');
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(screenWidth * 0.05),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                          child: _buildNetSalesCard(data['netSales'] ?? 0.0,
-                              currencyFormat, screenWidth)),
-                      SizedBox(width: screenWidth * 0.03),
-                      Expanded(
-                          child: _buildNetProfitCard(data['netProfit'] ?? 0.0,
-                              currencyFormat, screenWidth)),
-                    ],
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  Card(
-                    elevation: 8,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: SizedBox(
-                        height: screenHeight * 0.35,
-                        child: _buildLineChart(dailyRevenues, dailyProfits,
-                            screenWidth, screenHeight, currencyFormat),
-                      ),
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.all(screenWidth * 0.05),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            if (selectedAnalyses.contains('Net Sales'))
+                              Expanded(
+                                  child: _buildNetSalesCard(
+                                      data['netSales'] ?? 0.0,
+                                      currencyFormat,
+                                      screenWidth)),
+                            if (selectedAnalyses.contains('Net Sales') &&
+                                selectedAnalyses.contains('Net Profit'))
+                              SizedBox(width: screenWidth * 0.03),
+                            if (selectedAnalyses.contains('Net Profit'))
+                              Expanded(
+                                  child: _buildNetProfitCard(
+                                      data['netProfit'] ?? 0.0,
+                                      currencyFormat,
+                                      screenWidth)),
+                          ],
+                        ),
+                        SizedBox(height: screenHeight * 0.03),
+                        Card(
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: SizedBox(
+                              height: screenHeight * 0.35,
+                              child: _buildLineChart(
+                                  dailyRevenues,
+                                  dailyProfits,
+                                  screenWidth,
+                                  screenHeight,
+                                  currencyFormat),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.03),
+                        ...selectedAnalyses
+                            .where((analysis) =>
+                                analysis != 'Net Sales' &&
+                                analysis != 'Net Profit')
+                            .map((analysis) {
+                          return Padding(
+                            padding:
+                                EdgeInsets.only(bottom: screenHeight * 0.02),
+                            child: _buildAnalysisCard(
+                              analysis,
+                              data,
+                              menuItems,
+                              itemQuantities,
+                              itemRevenues,
+                              itemProfits,
+                              trendingItems,
+                              currencyFormat,
+                              screenWidth,
+                              screenHeight,
+                            ),
+                          );
+                        }).toList(),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  ...selectedAnalyses
-                      .where((analysis) =>
-                          analysis != 'Net Sales' && analysis != 'Net Profit')
-                      .map((analysis) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                      child: _buildAnalysisCard(
-                        analysis,
-                        data,
-                        menuItems,
-                        itemQuantities,
-                        itemRevenues,
-                        itemProfits,
-                        trendingItems,
-                        currencyFormat,
-                        screenWidth,
-                        screenHeight,
-                      ),
-                    );
-                  }).toList(),
-                ],
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -291,21 +334,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               ),
             ),
             SizedBox(height: screenWidth * 0.02),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    currencyFormat.format(netSales),
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.045,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade900,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            Text(
+              currencyFormat.format(netSales),
+              style: TextStyle(
+                fontSize: screenWidth * 0.045,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+              ),
+              softWrap: true,
             ),
           ],
         ),
@@ -368,41 +404,136 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       double screenWidth,
       double screenHeight,
       NumberFormat currencyFormat) {
-    final minDay = dailyRevenues.keys.isNotEmpty
-        ? dailyRevenues.keys.reduce((a, b) => a < b ? a : b)
-        : 0;
-    final maxDay = dailyRevenues.keys.isNotEmpty
-        ? dailyRevenues.keys.reduce((a, b) => a > b ? a : b)
-        : 0;
-    final range = maxDay - minDay + 1;
+    if (dailyRevenues.isEmpty || dailyProfits.isEmpty) {
+      return const Center(child: Text("No data available"));
+    }
 
-    List<ChartData> revenueData = List.generate(range, (index) {
-      final day = minDay + index;
-      return ChartData(
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
-            .toString(),
-        dailyRevenues[day] ?? 0.0,
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
-      );
-    });
+    final minDay = dailyRevenues.keys.reduce((a, b) => a < b ? a : b);
+    final maxDay = dailyRevenues.keys.reduce((a, b) => a > b ? a : b);
+    final rangeDays = maxDay - minDay + 1;
 
-    List<ChartData> profitData = List.generate(range, (index) {
-      final day = minDay + index;
-      return ChartData(
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
-            .toString(),
-        dailyProfits[day] ?? 0.0,
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
-      );
-    });
+    DateTimeIntervalType intervalType;
+    int interval;
+    List<ChartData> revenueData = [];
+    List<ChartData> profitData = [];
+
+    if (rangeDays > 365) {
+      intervalType = DateTimeIntervalType.months;
+      interval = 1;
+
+      final startDate =
+          DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
+      final endDate =
+          DateTime.fromMillisecondsSinceEpoch(maxDay * 24 * 60 * 60 * 1000);
+      final months = (endDate.year - startDate.year) * 12 +
+          endDate.month -
+          startDate.month +
+          1;
+
+      Map<DateTime, double> monthlyRevenues = {};
+      Map<DateTime, double> monthlyProfits = {};
+
+      dailyRevenues.forEach((day, revenue) {
+        final date =
+            DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+        final monthStart = DateTime(date.year, date.month, 1);
+        monthlyRevenues[monthStart] =
+            (monthlyRevenues[monthStart] ?? 0) + revenue;
+      });
+
+      dailyProfits.forEach((day, profit) {
+        final date =
+            DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+        final monthStart = DateTime(date.year, date.month, 1);
+        monthlyProfits[monthStart] = (monthlyProfits[monthStart] ?? 0) + profit;
+      });
+
+      for (int i = 0; i < months; i++) {
+        final date = DateTime(startDate.year, startDate.month + i, 1);
+        revenueData.add(ChartData(
+          DateFormat('MMM yyyy').format(date),
+          monthlyRevenues[date] ?? 0.0,
+          date,
+        ));
+        profitData.add(ChartData(
+          DateFormat('MMM yyyy').format(date),
+          monthlyProfits[date] ?? 0.0,
+          date,
+        ));
+      }
+    } else if (rangeDays > 60) {
+      intervalType = DateTimeIntervalType.days;
+      interval = 7;
+
+      final startDate =
+          DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
+      final weeks = (rangeDays / 7).ceil();
+
+      Map<DateTime, double> weeklyRevenues = {};
+      Map<DateTime, double> weeklyProfits = {};
+
+      dailyRevenues.forEach((day, revenue) {
+        final date =
+            DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+        final weekStart = date.subtract(Duration(days: date.weekday - 1));
+        weeklyRevenues[weekStart] = (weeklyRevenues[weekStart] ?? 0) + revenue;
+      });
+
+      dailyProfits.forEach((day, profit) {
+        final date =
+            DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+        final weekStart = date.subtract(Duration(days: date.weekday - 1));
+        weeklyProfits[weekStart] = (weeklyProfits[weekStart] ?? 0) + profit;
+      });
+
+      for (int i = 0; i < weeks; i++) {
+        final date = startDate.add(Duration(days: i * 7));
+        revenueData.add(ChartData(
+          DateFormat('MMM d').format(date),
+          weeklyRevenues[date] ?? 0.0,
+          date,
+        ));
+        profitData.add(ChartData(
+          DateFormat('MMM d').format(date),
+          weeklyProfits[date] ?? 0.0,
+          date,
+        ));
+      }
+    } else {
+      intervalType = DateTimeIntervalType.days;
+      interval = rangeDays > 30 ? 7 : (rangeDays > 10 ? 2 : 1);
+
+      revenueData = List.generate(rangeDays, (index) {
+        final day = minDay + index;
+        return ChartData(
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
+              .toString(),
+          dailyRevenues[day] ?? 0.0,
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
+        );
+      });
+
+      profitData = List.generate(rangeDays, (index) {
+        final day = minDay + index;
+        return ChartData(
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
+              .toString(),
+          dailyProfits[day] ?? 0.0,
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
+        );
+      });
+    }
 
     return SfCartesianChart(
       primaryXAxis: DateTimeAxis(
-        intervalType: DateTimeIntervalType.days,
-        interval: 5,
+        intervalType: intervalType,
+        interval: interval.toDouble(),
         majorGridLines: const MajorGridLines(width: 0),
         labelStyle: TextStyle(
             fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
+        dateFormat: intervalType == DateTimeIntervalType.months
+            ? DateFormat('MMM yyyy')
+            : DateFormat('MMM d'),
       ),
       primaryYAxis: NumericAxis(
         numberFormat: currencyFormat,
@@ -854,7 +985,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       'Most Profitable Item',
       'Top 3 Items Revenue Share'
     ];
-    String? selectedAnalysis;
+    Map<String, bool> checkboxStates = Map.fromIterable(
+      availableAnalyses,
+      key: (analysis) => analysis as String,
+      value: (analysis) => selectedAnalyses.contains(analysis),
+    );
 
     showModalBottomSheet(
       context: context,
@@ -870,43 +1005,43 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    "Add New Analysis",
+                    "Select Analyses",
                     style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: Colors.green.shade700),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      labelText: "Select Analysis",
-                      labelStyle: TextStyle(color: Colors.grey.shade700),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Expanded(
+                    child: ListView(
+                      children: availableAnalyses.map((analysis) {
+                        return CheckboxListTile(
+                          title: Text(
+                            analysis,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          value: checkboxStates[analysis],
+                          onChanged: (bool? value) {
+                            setModalState(() {
+                              checkboxStates[analysis] = value ?? false;
+                            });
+                          },
+                          activeColor: Colors.green.shade700,
+                          controlAffinity: ListTileControlAffinity.leading,
+                        );
+                      }).toList(),
                     ),
-                    items: availableAnalyses
-                        .where(
-                            (analysis) => !selectedAnalyses.contains(analysis))
-                        .map((analysis) {
-                      return DropdownMenuItem(
-                          value: analysis,
-                          child: Text(analysis,
-                              style: const TextStyle(fontSize: 16)));
-                    }).toList(),
-                    onChanged: (value) =>
-                        setModalState(() => selectedAnalysis = value),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.03),
                   ElevatedButton(
                     onPressed: () {
-                      if (selectedAnalysis != null) {
-                        setState(() => selectedAnalyses.add(selectedAnalysis!));
-                        Navigator.pop(context);
-                      }
+                      setState(() {
+                        selectedAnalyses = checkboxStates.entries
+                            .where((entry) => entry.value)
+                            .map((entry) => entry.key)
+                            .toList();
+                      });
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade700,
@@ -916,11 +1051,13 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                           horizontal: 30, vertical: 12),
                       elevation: 4,
                     ),
-                    child: const Text("Add Analysis",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "Apply",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -928,6 +1065,234 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           },
         );
       },
+    );
+  }
+}
+
+class DateRangeSection extends StatefulWidget {
+  final double screenWidth;
+  final Function(DateTime?, DateTime?, {String? range}) onDateRangeChanged;
+  final String? selectedRange;
+
+  const DateRangeSection({
+    required this.screenWidth,
+    required this.onDateRangeChanged,
+    this.selectedRange,
+  });
+
+  @override
+  _DateRangeSectionState createState() => _DateRangeSectionState();
+}
+
+class _DateRangeSectionState extends State<DateRangeSection> {
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  Future<void> _selectDate(BuildContext context, bool isStart) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.green,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _startDate = picked;
+        } else {
+          _endDate = picked;
+        }
+      });
+      widget.onDateRangeChanged(_startDate, _endDate);
+    }
+  }
+
+  void _selectPredefinedRange(String range) {
+    final now = DateTime.now();
+    DateTime? start;
+    DateTime? end = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    switch (range) {
+      case 'Today':
+        start = now.subtract(Duration(days: 1));
+        break;
+      case 'Past 2 Days':
+        start = now.subtract(Duration(days: 2));
+        break;
+      case 'This Week':
+        start = now.subtract(Duration(days: now.weekday - 1));
+        break;
+      case 'This Month':
+        start = DateTime(now.year, now.month, 1);
+        break;
+      case 'All':
+        start = null;
+        end = null;
+        break;
+    }
+
+    setState(() {
+      _startDate = start;
+      _endDate = end;
+    });
+    widget.onDateRangeChanged(start, end, range: range);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: widget.screenWidth * 0.03,
+        horizontal: widget.screenWidth * 0.04,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildDateField(
+                  context: context,
+                  label: 'From',
+                  date: _startDate,
+                  onTap: () => _selectDate(context, true),
+                ),
+              ),
+              SizedBox(width: widget.screenWidth * 0.03),
+              Expanded(
+                child: _buildDateField(
+                  context: context,
+                  label: 'To',
+                  date: _endDate,
+                  onTap: () => _selectDate(context, false),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: widget.screenWidth * 0.03),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildRangeChip('Today'),
+                SizedBox(width: widget.screenWidth * 0.02),
+                _buildRangeChip('Past 2 Days'),
+                SizedBox(width: widget.screenWidth * 0.02),
+                _buildRangeChip('This Week'),
+                SizedBox(width: widget.screenWidth * 0.02),
+                _buildRangeChip('This Month'),
+                SizedBox(width: widget.screenWidth * 0.02),
+                _buildRangeChip('All'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateField({
+    required BuildContext context,
+    required String label,
+    required DateTime? date,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: widget.screenWidth * 0.03,
+          horizontal: widget.screenWidth * 0.03,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.grey.shade50,
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.calendar_today,
+                size: widget.screenWidth * 0.045, color: Colors.green),
+            SizedBox(width: widget.screenWidth * 0.02),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: widget.screenWidth * 0.035,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  Text(
+                    date == null
+                        ? 'Select Date'
+                        : '${date.day}/${date.month}/${date.year}',
+                    style: TextStyle(
+                      fontSize: widget.screenWidth * 0.04,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRangeChip(String range) {
+    final isSelected = widget.selectedRange == range;
+    return GestureDetector(
+      onTap: () => _selectPredefinedRange(range),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: widget.screenWidth * 0.04,
+          vertical: widget.screenWidth * 0.02,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.green : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.green : Colors.grey.shade300,
+          ),
+        ),
+        child: Text(
+          range,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.black87,
+            fontSize: widget.screenWidth * 0.035,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
     );
   }
 }
