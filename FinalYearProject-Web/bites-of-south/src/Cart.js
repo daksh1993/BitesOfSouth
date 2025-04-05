@@ -4,6 +4,32 @@ import { db, auth } from './firebase';
 import { collection, addDoc, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import './Cart.css';
 
+const fetchRewards = async () => {
+  try {
+    const rewardsRef = collection(db, "rewards");
+    const snapshot = await getDocs(rewardsRef);
+    const rewardsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    rewardsData.forEach(data => {
+      if (!Array.isArray(data.menuItemId)) {
+        console.warn(`menuItemId is not an array for reward ${data.id}, converting to array`);
+        data.menuItemId = data.menuItemId ? [data.menuItemId] : [];
+      }
+    });
+
+    const processedRewards = rewardsData.map(data => ({
+      ...data,
+      menuItems: data.menuItemId.map(id => ({ id })),
+    }));
+
+    console.log("Fetched rewards:", processedRewards);
+    return processedRewards;
+  } catch (error) {
+    console.error("Error fetching rewards:", error);
+    throw error;
+  }
+};
+
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -140,8 +166,6 @@ const Cart = () => {
         throw new Error("No items in cart to save.");
       }
 
-<<<<<<< HEAD
-=======
       cartItems.forEach(item => {
         if (!item.id || !item.title) {
           throw new Error(`Invalid cart item: ${JSON.stringify(item)}`);
@@ -168,7 +192,6 @@ const Cart = () => {
         }
       }
 
->>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
       const orderData = {
         userId: userId,
         items: cartItems.map(item => ({
@@ -178,7 +201,7 @@ const Cart = () => {
           price: item.price,
           makingTime: Math.round((item.makingTime || 15) / totalQuantity),
           isRedeemed: item.isRedeemed || false,
-          requiredPoints: item.isRedeemed ? item.requiredPoints : 0, // Track points for rewards
+          requiredPoints: item.isRedeemed ? item.requiredPoints : 0,
         })),
         totalAmount: totalPrice,
         orderStatus: "Pending",
@@ -205,16 +228,6 @@ const Cart = () => {
         }
       };
 
-<<<<<<< HEAD
-      const docRef = await addDoc(collection(db, "orders"), orderData); // Fixed to "orders"
-      console.log("Order saved with ID:", docRef.id);
-
-      // No points addition here since rewards deduct points at redeem time
-      return docRef.id;
-    } catch (error) {
-      console.error("Error saving order:", error.message);
-      return null;
-=======
       const docRef = await addDoc(collection(db, "orders"), orderData);
       console.log("Order saved with ID:", docRef.id);
 
@@ -229,7 +242,6 @@ const Cart = () => {
     } catch (error) {
       console.error("Error saving order:", error.message);
       throw error;
->>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
     }
   };
 
@@ -245,7 +257,7 @@ const Cart = () => {
 
     if (!window.Razorpay) {
       console.error("Razorpay SDK not loaded.");
-      alert("Payment service is unavailable.");
+      alert("Payment service is unavailable. Please try again later.");
       return;
     }
 
@@ -257,15 +269,28 @@ const Cart = () => {
       description: "Order Payment",
       image: "https://firebasestorage.googleapis.com/v0/b/bitesofsouth-a38f4.firebasestorage.app/o/round_logo.png?alt=media&token=57af3ab9-1836-46a9-a1c9-130275ef1bec",
       handler: async function (response) {
-        const orderId = await saveOrderToFirestore(cartItems, response);
-        if (orderId) {
-          localStorage.removeItem("cart");
-          setCartItems([]);
-          navigate("/order-details", {
-            state: { orderId, cartItems, tableNumber, totalAmount: totalPrice, couponCode, discount }
-          });
-        } else {
-          alert("Failed to save order.");
+        try {
+          const orderId = await saveOrderToFirestore(cartItems, response);
+          if (orderId) {
+            localStorage.removeItem("cart");
+            setCartItems([]);
+            navigate("/order-details", {
+              state: { orderId, cartItems, tableNumber, totalAmount: totalPrice, couponCode, discount }
+            });
+          } else {
+            alert("Failed to save order. Please contact support.");
+          }
+        } catch (error) {
+          console.error("Payment handler error:", error);
+          if (error.message === "Insufficient points for redemption.") {
+            alert("You don’t have enough points to redeem these items.");
+          } else if (error.code === "PERMISSION_DENIED") {
+            alert("Permission denied. Please ensure you’re logged in and try again.");
+          } else if (error.message.includes("network")) {
+            alert("Network error occurred. Please check your connection and try again.");
+          } else {
+            alert(`Payment failed: ${error.message || "Unknown error"}. Please try again.`);
+          }
         }
       },
       prefill: {
@@ -278,10 +303,6 @@ const Cart = () => {
       },
     };
 
-<<<<<<< HEAD
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-=======
     try {
       console.log("Payment amount (paise):", Math.round(totalPrice * 100));
       const rzp = new window.Razorpay(options);
@@ -294,7 +315,6 @@ const Cart = () => {
       console.error("Error opening Razorpay:", error);
       alert("Failed to initiate payment. Please try again.");
     }
->>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
   };
 
   const handleBack = () => {
