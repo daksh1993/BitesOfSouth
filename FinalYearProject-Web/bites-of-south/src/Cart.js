@@ -85,7 +85,7 @@ const Cart = () => {
       const updatedCart = prevCart
         .map(item => {
           if (item.id === id) {
-            if (item.isRedeemed) return item; // No change for rewards
+            if (item.isRedeemed) return item;
             let newQuantity = item.quantity + change;
             return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
           }
@@ -140,6 +140,35 @@ const Cart = () => {
         throw new Error("No items in cart to save.");
       }
 
+<<<<<<< HEAD
+=======
+      cartItems.forEach(item => {
+        if (!item.id || !item.title) {
+          throw new Error(`Invalid cart item: ${JSON.stringify(item)}`);
+        }
+      });
+
+      const redeemedItems = cartItems.filter(item => item.isRedeemed);
+      const totalPointsToDeduct = redeemedItems.reduce((sum, item) => {
+        return sum + (item.requiredPoints * item.quantity);
+      }, 0);
+
+      let userRef, currentPoints;
+      if (totalPointsToDeduct > 0 && userId !== "guest") {
+        userRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+          currentPoints = userDoc.data().rewardPoints || 0;
+          if (currentPoints < totalPointsToDeduct) {
+            throw new Error("Insufficient points for redemption.");
+          }
+        } else {
+          console.warn(`User ${userId} not found in Firestore, skipping points deduction`);
+        }
+      }
+
+>>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
       const orderData = {
         userId: userId,
         items: cartItems.map(item => ({
@@ -164,7 +193,7 @@ const Cart = () => {
         discount: discount || 0,
         paymentDetails: {
           razorpayPaymentId: paymentResponse.razorpay_payment_id,
-          razorpayOrderId: paymentResponse.razorpay_order_id || "order_8B44YVu180hVun",
+          razorpayOrderId: paymentResponse.razorpay_order_id || "order_client_generated",
           amount: totalPrice * 100,
           currency: "INR",
           status: "captured",
@@ -176,6 +205,7 @@ const Cart = () => {
         }
       };
 
+<<<<<<< HEAD
       const docRef = await addDoc(collection(db, "orders"), orderData); // Fixed to "orders"
       console.log("Order saved with ID:", docRef.id);
 
@@ -184,6 +214,22 @@ const Cart = () => {
     } catch (error) {
       console.error("Error saving order:", error.message);
       return null;
+=======
+      const docRef = await addDoc(collection(db, "orders"), orderData);
+      console.log("Order saved with ID:", docRef.id);
+
+      if (totalPointsToDeduct > 0 && userId !== "guest" && userRef && currentPoints !== undefined) {
+        await updateDoc(userRef, {
+          rewardPoints: currentPoints - totalPointsToDeduct
+        });
+        console.log(`Deducted ${totalPointsToDeduct} points from user ${userId}`);
+      }
+
+      return docRef.id;
+    } catch (error) {
+      console.error("Error saving order:", error.message);
+      throw error;
+>>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
     }
   };
 
@@ -205,7 +251,7 @@ const Cart = () => {
 
     const options = {
       key: "rzp_test_CkutVrejMBd1qG",
-      amount: totalPrice * 100,
+      amount: Math.round(totalPrice * 100),
       currency: "INR",
       name: "BitesOfSouth",
       description: "Order Payment",
@@ -232,8 +278,23 @@ const Cart = () => {
       },
     };
 
+<<<<<<< HEAD
     const rzp = new window.Razorpay(options);
     rzp.open();
+=======
+    try {
+      console.log("Payment amount (paise):", Math.round(totalPrice * 100));
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        console.error("Razorpay payment failed:", response.error);
+        alert(`Payment failed: ${response.error.description || "Unknown error"}. Please try again.`);
+      });
+      rzp.open();
+    } catch (error) {
+      console.error("Error opening Razorpay:", error);
+      alert("Failed to initiate payment. Please try again.");
+    }
+>>>>>>> cbb84ae (Merge conflict fix and Cart Payment Done)
   };
 
   const handleBack = () => {
