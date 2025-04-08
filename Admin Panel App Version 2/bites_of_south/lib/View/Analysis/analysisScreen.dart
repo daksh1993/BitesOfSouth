@@ -150,16 +150,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.green,
         foregroundColor: Colors.white,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.green.shade400],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
         title: const Text(
           "Analysis Dashboard",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -973,8 +965,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
   void _showAddAnalysisBottomSheet(BuildContext context) {
     final availableAnalyses = [
-      'Net Sales',
-      'Net Profit',
       'Top Selling Item',
       'Highest Revenue Item',
       'Least Selling Item',
@@ -985,11 +975,12 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       'Most Profitable Item',
       'Top 3 Items Revenue Share'
     ];
-    Map<String, bool> checkboxStates = Map.fromIterable(
-      availableAnalyses,
-      key: (analysis) => analysis as String,
-      value: (analysis) => selectedAnalyses.contains(analysis),
-    );
+
+    // Initialize checkbox states based on current selectedAnalyses
+    Map<String, bool> checkboxStates = {
+      for (var analysis in availableAnalyses)
+        analysis: selectedAnalyses.contains(analysis)
+    };
 
     showModalBottomSheet(
       context: context,
@@ -1040,8 +1031,17 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                             .where((entry) => entry.value)
                             .map((entry) => entry.key)
                             .toList();
+                        // Ensure Net Sales and Net Profit are always included if they were initially
+                        if (!selectedAnalyses.contains('Net Sales')) {
+                          selectedAnalyses.add('Net Sales');
+                        }
+                        if (!selectedAnalyses.contains('Net Profit')) {
+                          selectedAnalyses.add('Net Profit');
+                        }
                       });
                       Navigator.pop(context);
+                      // Refresh data after selection
+                      _analysisData = _fetchAnalysisData();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade700,
@@ -1127,16 +1127,26 @@ class _DateRangeSectionState extends State<DateRangeSection> {
 
     switch (range) {
       case 'Today':
-        start = now.subtract(Duration(days: 1));
+        start = now.subtract(
+            Duration(days: 1)); // 6 days before today + today = 7 days
+
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
+        end = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
       case 'Past 2 Days':
         start = now.subtract(Duration(days: 2));
         break;
       case 'This Week':
-        start = now.subtract(Duration(days: now.weekday - 1));
+        // Past 7 days including today
+        start = now.subtract(
+            Duration(days: 6)); // 6 days before today + today = 7 days
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
         break;
       case 'This Month':
-        start = DateTime(now.year, now.month, 1);
+        // Past 30 days including today
+        start = now.subtract(
+            Duration(days: 29)); // 29 days before today + today = 30 days
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
         break;
       case 'All':
         start = null;
