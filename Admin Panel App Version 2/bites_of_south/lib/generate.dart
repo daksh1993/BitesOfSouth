@@ -58,7 +58,6 @@ class OrderGenerator {
   final List<String> userIds = [
     "HRCALPvnTYNjX5zQ7BWfLebxRZ03",
     "CQIdIBhOhvQmqsC3uGNeo8zi67o2",
-    "CQIdIBhOhvQmqsC3uGNeo8zi67o2", // Note: This appears twice as per your input
     "e6B9bMQbZ9Pr9ZbjF4xpWgkHRpB2",
     "mGdss1mIKnPWE9mDsh7rXyJbcxE3",
   ];
@@ -66,7 +65,7 @@ class OrderGenerator {
   Future<void> generateOrdersForLastYear() async {
     try {
       // Get timestamp for one year ago
-      DateTime oneYearAgo = DateTime.now().subtract(Duration(days: 365));
+      DateTime oneYearAgo = DateTime.now().subtract(Duration(days: 1));
       DateTime currentDate = oneYearAgo;
 
       // Generate orders for each month
