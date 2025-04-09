@@ -1,4 +1,3 @@
-// src/Orders.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase';
@@ -33,47 +32,22 @@ const Orders = () => {
       console.error("Error fetching orders:", error.message);
     });
 
-    // Set up a live timer for all orders
-    const timer = setInterval(() => {
-      setPastOrders((prevOrders) =>
-        prevOrders.map((order) => {
-          const { isInProgress, timeRemaining, progress } = getOrderStatus(order);
-          return { ...order, isInProgress, timeRemaining, progress };
-        })
-      );
-    }, 1000);
-
-    return () => {
-      unsubscribeOrders();
-      clearInterval(timer); // Cleanup timer
-    };
+    return () => unsubscribeOrders();
   }, [user]);
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   const getOrderStatus = (order) => {
-    const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
-    const adjustedMakingTime = order.makingTime + ((totalQuantity - 1) * 5);
-    const totalTime = adjustedMakingTime * 60;
-    const timeElapsed = (Date.now() - order.timestamp) / 1000;
-    const remaining = Math.max(0, totalTime - timeElapsed);
+    const pendingStatus = parseInt(order.pendingStatus, 10); // Convert string to number
+    const progress = Math.min(100, Math.max(0, pendingStatus)); // Ensure progress is between 0 and 100
 
-    if (remaining > 0) {
-      const progress = Math.min(100, ((totalTime - remaining) / totalTime) * 100);
+    if (progress < 100) {
       return {
         isInProgress: true,
-        timeRemaining: Math.floor(remaining),
         progress,
         message: order.dineIn ? "Cooking in Progress" : "Packing Your Order"
       };
     }
     return {
       isInProgress: false,
-      timeRemaining: 0,
       progress: 100,
       message: order.dineIn ? "Delivered to Table" : "Order Delivered"
     };
@@ -96,7 +70,7 @@ const Orders = () => {
           <p className="no-orders">No orders found. Start ordering now! (UID: {user.uid})</p>
         ) : (
           pastOrders.map((order) => {
-            const { isInProgress, timeRemaining, progress, message } = getOrderStatus(order);
+            const { isInProgress, progress, message } = getOrderStatus(order);
             const itemTotal = order.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
             const gst = itemTotal * 0.10;
             const serviceCharge = itemTotal * 0.05;
@@ -117,8 +91,7 @@ const Orders = () => {
                         <div className="progress-fill" style={{ width: `${progress}%` }}></div>
                       </div>
                       <div className="progress-details">
-                        <span>{formatTime(timeRemaining)}</span>
-                        <span>Est. Time: {order.makingTime} min</span>
+                        <span>Progress: {progress}%</span>
                       </div>
                     </div>
                   )}

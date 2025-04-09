@@ -26,6 +26,7 @@
   }
   
   .status {
+    margin-top: 8px;
     font-size: 16px;
     color: #1ba672;
     font-weight: 500;

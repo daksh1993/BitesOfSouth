@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase';
-import { doc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import './reward.css';
 
 const Reward = () => {
@@ -28,8 +28,10 @@ const Reward = () => {
         const rewardsList = await Promise.all(
           rewardsSnapshot.docs.map(async (rewardDoc) => {
             const data = rewardDoc.data();
+            // Ensure menuItemId is an array; fallback to empty array if not
+            const menuItemIds = Array.isArray(data.menuItemId) ? data.menuItemId : [];
             const menuItems = await Promise.all(
-              data.menuItemId.map(async (id) => {
+              menuItemIds.map(async (id) => {
                 const menuItemRef = doc(db, "menu", id);
                 const menuItemDoc = await getDoc(menuItemRef);
                 if (menuItemDoc.exists()) {
@@ -46,7 +48,8 @@ const Reward = () => {
             };
           })
         );
-        setRedeemableItems(rewardsList);
+        // Filter out rewards with no valid menu items if needed
+        setRedeemableItems(rewardsList.filter(reward => reward.menuItems.length > 0));
       } catch (error) {
         console.error("Error fetching rewards:", error);
       }
@@ -60,7 +63,7 @@ const Reward = () => {
     navigate(-1);
   };
 
-  const handleRedeem = async (item) => {
+  const handleRedeem = (item) => {
     const user = auth.currentUser;
     if (!user) {
       alert("Please log in to redeem rewards.");
@@ -80,32 +83,20 @@ const Reward = () => {
       return;
     }
 
-    // Deduct points immediately
-    const userRef = doc(db, "users", user.uid);
-    const newPoints = userPoints - requiredPoints;
-    try {
-      await updateDoc(userRef, { rewardPoints: newPoints });
-      setUserPoints(newPoints); // Update UI instantly
-      console.log(`Deducted ${requiredPoints} points. New total: ${newPoints}`);
-
-      // Add to cart
-      const cartItem = {
-        id: item.id,
-        title: item.name,
-        price: 0,
-        quantity: 1,
-        image: item.menuItems[0]?.image || "",
-        makingTime: Math.max(...item.menuItems.map(m => m.makingTime || 15)),
-        isRedeemed: true,
-        requiredPoints: requiredPoints,
-      };
-      const updatedCart = [...currentCart, cartItem];
-      localStorage.setItem('cart', JSON.stringify(updatedCart));
-      navigate('/cart');
-    } catch (error) {
-      console.error("Error deducting points:", error);
-      alert("Failed to redeem reward. Please try again.");
-    }
+    // Add to cart without deducting points here
+    const cartItem = {
+      id: item.id,
+      title: item.name,
+      price: 0,
+      quantity: 1,
+      image: item.menuItems[0]?.image || "",
+      makingTime: Math.max(...item.menuItems.map(m => m.makingTime || 15)),
+      isRedeemed: true,
+      requiredPoints: requiredPoints,
+    };
+    const updatedCart = [...currentCart, cartItem];
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    navigate('/cart');
   };
 
   return (
@@ -177,7 +168,7 @@ const Reward = () => {
               </div>
             ))
           ) : (
-            <p>Loading rewards...</p>
+            <p>No rewards available or loading...</p>
           )}
         </div>
       </section>

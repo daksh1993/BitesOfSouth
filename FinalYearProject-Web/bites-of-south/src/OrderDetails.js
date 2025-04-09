@@ -1,4 +1,3 @@
-// src/OrderDetails.js
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { db } from './firebase';
@@ -10,7 +9,6 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const { orderId, cartItems: initialItems, tableNumber, totalAmount } = location.state || {};
   const [orderData, setOrderData] = useState(null);
-  const [timeRemaining, setTimeRemaining] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -24,22 +22,9 @@ const OrderDetails = () => {
         const data = docSnap.data();
         setOrderData(data);
 
-        const totalQuantity = data.items.reduce((sum, item) => sum + item.quantity, 0);
-        const adjustedMakingTime = data.makingTime + ((totalQuantity - 1) * 5);
-        const totalTime = adjustedMakingTime * 60;
-
-        const updateTimer = () => {
-          const timeElapsed = (Date.now() - data.timestamp) / 1000;
-          const remaining = Math.max(0, totalTime - timeElapsed);
-          const progressPercent = Math.min(100, ((totalTime - remaining) / totalTime) * 100);
-
-          setTimeRemaining(Math.floor(remaining));
-          setProgress(progressPercent);
-        };
-
-        updateTimer();
-        const timer = setInterval(updateTimer, 1000);
-        return () => clearInterval(timer);
+        // Use pendingStatus from the database to set progress
+        const pendingStatus = parseInt(data.pendingStatus, 10); // Convert string to number
+        setProgress(Math.min(100, Math.max(0, pendingStatus))); // Ensure progress is between 0 and 100
       } else {
         console.error("Order not found");
         navigate('/cart');
@@ -51,12 +36,6 @@ const OrderDetails = () => {
 
     return () => unsubscribe();
   }, [orderId, navigate]);
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const getStatusMessage = () => {
     if (!orderData) return "Preparing...";
@@ -82,7 +61,7 @@ const OrderDetails = () => {
     <section className={`order-details ${progress === 100 ? 'order-delivered' : ''}`}>
       <div className="order-header">
         <h1>Order #{orderId.slice(0, 8)}</h1>
-        <p className="status">{getStatusMessage()}</p>
+        
       </div>
 
       <div className="order-progress">
@@ -95,6 +74,7 @@ const OrderDetails = () => {
             )}
           </div>
         </div>
+        <p className="status">{getStatusMessage()}</p>
         <div className="progress-container">
           <div className="progress-bar">
             <div 
@@ -103,8 +83,7 @@ const OrderDetails = () => {
             ></div>
           </div>
           <div className="time-info">
-            <span>{formatTime(timeRemaining)}</span>
-            <span>Est. Time: {orderData.makingTime + ((orderData.items.reduce((sum, item) => sum + item.quantity, 0) - 1) * 5)} min</span>
+            <span>Progress: {progress}%</span>
           </div>
         </div>
       </div>
