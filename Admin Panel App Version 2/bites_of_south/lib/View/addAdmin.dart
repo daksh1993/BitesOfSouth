@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:lottie/lottie.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 
@@ -17,7 +18,7 @@ class _AddAdminScreenState extends State<AddAdminScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
+  String? _selectedRole; // To store dropdown value
   bool isLoading = false;
 
   String _generateRandomPassword(int length) {
@@ -56,15 +57,17 @@ BitesOfSouth Team''';
 
     try {
       await send(message, smtpServer);
-      print(message.text);
-      print("mail Sent");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-                Text("Email sent to $email, Please check Spam folder also")),
+          content: Text("Email sent to $email, please check spam folder"),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       print('Failed to send email: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to send email")),
+      );
     }
   }
 
@@ -72,14 +75,14 @@ BitesOfSouth Team''';
     String email = _emailController.text.trim();
     String phone = _phoneController.text.trim();
     String name = _nameController.text.trim();
-    String role = _roleController.text.trim();
 
     if (!EmailValidator.validate(email) ||
         phone.isEmpty ||
         name.isEmpty ||
-        role.isEmpty) {
+        _selectedRole == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please fill all fields correctly")));
+        SnackBar(content: Text("Please fill all fields correctly")),
+      );
       return;
     }
 
@@ -87,23 +90,34 @@ BitesOfSouth Team''';
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Confirm Admin Details"),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Text("Confirm Details",
+              style: TextStyle(color: Colors.green[800])),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Name: $name"),
-              Text("Email: $email"),
-              Text("Phone: +91$phone"),
-              Text("Role: $role"),
+              Text("Name: $name", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text("Email: $email", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text("Phone: +91$phone", style: TextStyle(fontSize: 16)),
+              SizedBox(height: 8),
+              Text("Role: $_selectedRole", style: TextStyle(fontSize: 16)),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
+              child: Text("Cancel", style: TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
               onPressed: () {
                 Navigator.pop(context);
                 _addAdmin();
@@ -121,20 +135,18 @@ BitesOfSouth Team''';
     String email = _emailController.text.trim();
     String phone = _phoneController.text.trim();
     String name = _nameController.text.trim();
-    String role = _roleController.text.trim();
     String password = _generateRandomPassword(8);
 
     if (!EmailValidator.validate(email) ||
         phone.isEmpty ||
         name.isEmpty ||
-        role.isEmpty) {
+        _selectedRole == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please fill all fields correctly")),
       );
       setState(() => isLoading = false);
       return;
     }
-    print(password);
 
     try {
       UserCredential userCredential =
@@ -146,7 +158,7 @@ BitesOfSouth Team''';
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
         'email': email,
         'phone': "+91" + phone,
-        'role': role,
+        'role': _selectedRole,
         'name': name,
         'createdAt': FieldValue.serverTimestamp(),
         'phoneVerified': false,
@@ -157,7 +169,10 @@ BitesOfSouth Team''';
       await _sendEmail(email, name, phone, password);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Admin added successfully")),
+        SnackBar(
+          content: Text("Admin added successfully"),
+          backgroundColor: Colors.green,
+        ),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -172,60 +187,165 @@ BitesOfSouth Team''';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add New Admin")),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: "Name",
-                  border: OutlineInputBorder(),
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        title: Text("Add New Admin",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.green[700],
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.green[50]!, Colors.white],
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 16),
+                Text(
+                  "Create Admin Account",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
+                SizedBox(height: 24),
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: "Full Name",
+                    hintText: "Enter name",
+                    prefixIcon: Icon(Icons.person, color: Colors.green),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  prefix: Text("+91 "),
-                  labelText: "Phone Number",
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16),
+                TextField(
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    labelText: "Email Address",
+                    hintText: "Enter email",
+                    prefixIcon: Icon(Icons.email, color: Colors.green),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 20),
-              TextField(
-                controller: _roleController,
-                decoration: InputDecoration(
-                  labelText: "Role",
-                  border: OutlineInputBorder(),
+                SizedBox(height: 16),
+                TextField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    labelText: "Phone Number",
+                    hintText: "Enter phone number",
+                    prefixIcon: Icon(Icons.phone, color: Colors.green),
+                    prefixText: "+91 ",
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: isLoading ? null : _confirmAdminDetails,
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50),
+                SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _selectedRole,
+                  decoration: InputDecoration(
+                    labelText: "Role",
+                    prefixIcon: Icon(Icons.work, color: Colors.green),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                  ),
+                  hint: Text("Select role"),
+                  items: ['admin', 'cook'].map((String role) {
+                    return DropdownMenuItem<String>(
+                      value: role,
+                      child: Text(role.capitalize()),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedRole = value;
+                    });
+                  },
                 ),
-                child: isLoading
-                    ? CircularProgressIndicator(color: Colors.white)
-                    : Text("Add Admin"),
-              ),
-            ],
+                SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: isLoading ? null : _confirmAdminDetails,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    minimumSize: Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 5,
+                  ),
+                  child: isLoading
+                      ? Lottie.asset(
+                          'assets/loadin.json',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.fill,
+                        )
+                      : Text(
+                          "Add Admin",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+// Extension to capitalize strings
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }
