@@ -6,10 +6,11 @@ class ItemDetailsModal {
   String price;
   String description;
   String makingTime;
+  double makingPrice;
   String category;
   String rating;
   String imageUrl;
-  bool isAvailable; // New Field
+  bool isAvailable;
 
   ItemDetailsModal({
     this.id = '',
@@ -17,24 +18,26 @@ class ItemDetailsModal {
     required this.price,
     required this.description,
     required this.makingTime,
+    required this.makingPrice,
     required this.category,
     required this.rating,
     required this.imageUrl,
-    this.isAvailable = true, // Default to true (Available)
+    this.isAvailable = true,
   });
 
   factory ItemDetailsModal.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+    Map data = doc.data() as Map<String, dynamic>? ?? {};
     return ItemDetailsModal(
       id: doc.id,
-      title: data['title'],
-      price: data['price'],
-      description: data['description'],
-      makingTime: data['makingTime'],
-      category: data['category'],
-      imageUrl: data['image'],
-      rating: data['rating'],
-      isAvailable: data.containsKey('isAvailable') ? data['isAvailable'] : true,
+      title: data['title'] as String? ?? '',
+      price: data['price'] as String? ?? '0.0',
+      description: data['description'] as String? ?? '',
+      makingTime: data['makingTime'] as String? ?? '0',
+      makingPrice: data['makingPrice'] as double? ?? 0.0,
+      category: data['category'] as String? ?? 'Uncategorized',
+      imageUrl: data['image'] as String? ?? '',
+      rating: data['rating'] as String? ?? '0.0',
+      isAvailable: data['isAvailable'] as bool? ?? true,
     );
   }
 
@@ -44,10 +47,11 @@ class ItemDetailsModal {
       'price': price,
       'description': description,
       'makingTime': makingTime,
+      'makingPrice': makingPrice,
       'category': category,
       'image': imageUrl,
       'rating': rating,
-      'isAvailable': isAvailable, // Add to Firestore
+      'isAvailable': isAvailable,
     };
   }
 }

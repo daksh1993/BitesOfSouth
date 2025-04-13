@@ -20,7 +20,8 @@ class MenuLoadAuth with ChangeNotifier {
 
     try {
       print('Fetching menu items from Firestore');
-      final snapshot = await FirebaseFirestore.instance.collection('menu').get();
+      final snapshot =
+          await FirebaseFirestore.instance.collection('menu').get();
       _itemDetails = snapshot.docs
           .map((doc) => ItemDetailsModal.fromFirestore(doc))
           .toList();
@@ -80,7 +81,10 @@ class MenuLoadAuth with ChangeNotifier {
     try {
       for (String itemId in selectedItems) {
         print('Deleting item with ID: $itemId');
-        await FirebaseFirestore.instance.collection('menu').doc(itemId).delete();
+        await FirebaseFirestore.instance
+            .collection('menu')
+            .doc(itemId)
+            .delete();
       }
       print('Items deleted successfully');
       await fetchMenuItems(); // Refresh after deletion

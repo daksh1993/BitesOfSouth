@@ -2,6 +2,7 @@ import 'package:bites_of_south/Controller/Menu/item_detail_auth_provider.dart';
 import 'package:bites_of_south/Modal/item_details_modal.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 class ItemDetail extends StatefulWidget {
@@ -44,11 +45,12 @@ class _ItemDetailState extends State<ItemDetail> {
                           borderRadius: BorderRadius.circular(10),
                           child: CachedNetworkImage(
                             imageUrl: itemData.imageUrl,
-                            height: MediaQuery.of(context).size.height * 0.35,
+                            height: MediaQuery.of(context).size.height * 0.29,
                             width: double.infinity,
                             fit: BoxFit.cover,
                             placeholder: (context, url) => Center(
-                              child: CircularProgressIndicator(),
+                              child: Lottie.asset("assets/loadin.json",
+                                  height: 100, width: 100, fit: BoxFit.cover),
                             ),
                             errorWidget: (context, url, error) => Container(
                               height: MediaQuery.of(context).size.height * 0.45,
@@ -61,12 +63,14 @@ class _ItemDetailState extends State<ItemDetail> {
                       : Container(
                           height: 200,
                           color: Colors.grey[300],
-                          child: const Center(child: Text("No Image Available")),
+                          child:
+                              const Center(child: Text("No Image Available")),
                         ),
                   const SizedBox(height: 16),
                   Text(
                     itemData.title,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -86,6 +90,11 @@ class _ItemDetailState extends State<ItemDetail> {
                   const SizedBox(height: 8),
                   Text(
                     "Making Time: ${itemData.makingTime}",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Making Price: ${itemData.makingPrice}",
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 8),
@@ -240,7 +249,8 @@ class _ItemDetailState extends State<ItemDetail> {
                   'rating': ratingController.text,
                 };
 
-                await Provider.of<ItemDetailAuthProvider>(context, listen: false)
+                await Provider.of<ItemDetailAuthProvider>(context,
+                        listen: false)
                     .updateItemDetails(
                   itemId: itemData.id,
                   updatedItem: updatedItem,
@@ -249,7 +259,8 @@ class _ItemDetailState extends State<ItemDetail> {
                     setState(() {
                       itemData.title = updatedData['title'] as String;
                       itemData.price = updatedData['price'] as String;
-                      itemData.description = updatedData['description'] as String;
+                      itemData.description =
+                          updatedData['description'] as String;
                       itemData.category = updatedData['category'] as String;
                       itemData.makingTime = updatedData['makingTime'] as String;
                       itemData.rating = updatedData['rating'] as String;
