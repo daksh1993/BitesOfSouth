@@ -46,7 +46,11 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
         _pointsController.text.isEmpty ||
         selectedItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Please fill all fields and select an item")));
+        SnackBar(
+          content: Text("Please fill all fields and select an item"),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -61,8 +65,12 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
       "menuItemId": isCombo ? selectedItems : selectedItems[0],
     });
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Reward added successfully!")));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Reward added successfully!"),
+        backgroundColor: Color(0xFF4CAF50),
+      ),
+    );
 
     _nameController.clear();
     _pointsController.clear();
@@ -74,64 +82,99 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Add Reward")),
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        title: Text(
+          "Add Reward",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Color(0xFF4CAF50),
+        elevation: 0,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: "Reward Name")),
-            TextField(
-                controller: _pointsController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: "Points Required")),
-            DropdownButton<String>(
-              value: discountType,
-              items: ["free"].map((type) {
-                return DropdownMenuItem(
-                    enabled: type == "free",
-                    value: type,
-                    child: Text(type.toUpperCase()));
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  discountType = value!;
-                });
-              },
+            // Side-by-side Reward Name and Points Required
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextField(
+                    controller: _nameController,
+                    label: "Reward Name",
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: _buildTextField(
+                    controller: _pointsController,
+                    label: "Points Required",
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
             ),
+            SizedBox(height: 12),
+            // Discount Type Dropdown
+            _buildDropdown(),
+            SizedBox(height: 12),
+            // Discount % (if applicable)
             if (discountType == "percentage")
-              TextField(
-                  controller: _discountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: "Discount %")),
-            SwitchListTile(
-              title: Text("Is Combo?"),
-              value: isCombo,
-              onChanged: (value) {
-                setState(() {
-                  isCombo = value;
-                  if (!isCombo && selectedItems.length > 1) {
-                    selectedItems = [selectedItems.first]; // Keep only one
-                  }
-                });
-              },
+              _buildTextField(
+                controller: _discountController,
+                label: "Discount %",
+                keyboardType: TextInputType.number,
+              ),
+            if (discountType == "percentage") SizedBox(height: 12),
+            // Is Combo Switch
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: SwitchListTile(
+                title: Text(
+                  "Is Combo?",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                value: isCombo,
+                activeColor: Color(0xFF4CAF50),
+                onChanged: (value) {
+                  setState(() {
+                    isCombo = value;
+                    if (!isCombo && selectedItems.length > 1) {
+                      selectedItems = [selectedItems.first];
+                    }
+                  });
+                },
+              ),
             ),
-            SizedBox(height: 10),
-            TextField(
+            SizedBox(height: 12),
+            // Search Bar
+            _buildTextField(
               controller: _searchController,
-              decoration: InputDecoration(
-                  labelText: "Search Menu Items",
-                  prefixIcon: Icon(Icons.search)),
-              onChanged: (query) {
-                setState(() {});
-              },
+              label: "Search Menu Items",
+              prefixIcon: Icon(Icons.search, color: Color(0xFF4CAF50)),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear, color: Color(0xFF4CAF50)),
+                      onPressed: () {
+                        setState(() {
+                          _searchController.clear();
+                        });
+                      },
+                    )
+                  : null,
             ),
+            SizedBox(height: 12),
+            // Menu Items
             Expanded(
               child: categorizedMenu.isEmpty
-                  ? Center(child: Text("No items found"))
-                  : ListView(
-                      children: categorizedMenu.keys.map((category) {
+                  ? _buildEmptyState()
+                  : ListView.builder(
+                      itemCount: categorizedMenu.keys.length,
+                      itemBuilder: (context, index) {
+                        String category = categorizedMenu.keys.elementAt(index);
                         List<QueryDocumentSnapshot> items =
                             categorizedMenu[category]!;
                         List<QueryDocumentSnapshot> filteredItems =
@@ -143,44 +186,198 @@ class _AddRewardScreenState extends State<AddRewardScreen> {
 
                         if (filteredItems.isEmpty) return SizedBox.shrink();
 
-                        return ExpansionTile(
-                          title: Text(category,
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          children: filteredItems.map((item) {
-                            String itemId = item.id;
-                            String itemName = item["title"];
-
-                            return CheckboxListTile(
-                              title: Text(itemName),
-                              subtitle: Text("₹${item["price"]}"),
-                              value: selectedItems.contains(itemId),
-                              onChanged: (bool? selected) {
-                                setState(() {
-                                  if (isCombo) {
-                                    if (selected!) {
-                                      selectedItems.add(itemId);
-                                    } else {
-                                      selectedItems.remove(itemId);
-                                    }
-                                  } else {
-                                    selectedItems.clear();
-                                    if (selected!) {
-                                      selectedItems.add(itemId);
-                                    }
-                                  }
-                                });
-                              },
-                            );
-                          }).toList(),
-                        );
-                      }).toList(),
+                        return _buildCategoryCard(category, filteredItems);
+                      },
                     ),
             ),
-            ElevatedButton(
-              onPressed: () => _saveReward(),
-              child: Text("Publish Reward"),
-            )
           ],
+        ),
+      ),
+      // Sticky Publish Button
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.all(16),
+        child: _buildPublishButton(),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    Icon? prefixIcon,
+    Widget? suffixIcon,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Color(0xFF388E3C)),
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Color(0xFF4CAF50)),
+        ),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+      ),
+      onChanged:
+          controller == _searchController ? (value) => setState(() {}) : null,
+    );
+  }
+
+  Widget _buildDropdown() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: DropdownButton<String>(
+          value: discountType,
+          isExpanded: true,
+          underline: SizedBox(),
+          items: ["free"].map((type) {
+            return DropdownMenuItem(
+              enabled: type == "free",
+              value: type,
+              child: Text(
+                type.toUpperCase(),
+                style: TextStyle(
+                  color: type == "free" ? Color(0xFF4CAF50) : Colors.grey,
+                  fontWeight:
+                      type == "free" ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              discountType = value!;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(
+      String category, List<QueryDocumentSnapshot> items) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      margin: EdgeInsets.only(bottom: 12),
+      child: ExpansionTile(
+        title: Text(
+          category,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF388E3C),
+          ),
+        ),
+        iconColor: Color(0xFF4CAF50),
+        children: items.map((item) {
+          String itemId = item.id;
+          String itemName = item["title"];
+          double price =
+              double.tryParse(item["price"]?.toString() ?? "0.0") ?? 0.0;
+
+          return Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: CheckboxListTile(
+              title: Text(
+                itemName,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              subtitle: Text(
+                "₹${price.toStringAsFixed(2)}",
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+              value: selectedItems.contains(itemId),
+              activeColor: Color(0xFF4CAF50),
+              onChanged: (bool? selected) {
+                setState(() {
+                  if (isCombo) {
+                    if (selected!) {
+                      selectedItems.add(itemId);
+                    } else {
+                      selectedItems.remove(itemId);
+                    }
+                  } else {
+                    selectedItems.clear();
+                    if (selected!) {
+                      selectedItems.add(itemId);
+                    }
+                  }
+                });
+              },
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            "No items found",
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPublishButton() {
+    return GestureDetector(
+      onTapDown: (_) => setState(() {}),
+      onTapUp: (_) => setState(() {}),
+      child: AnimatedScale(
+        scale: 1.0,
+        duration: Duration(milliseconds: 100),
+        child: ElevatedButton(
+          onPressed: _saveReward,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF4CAF50),
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 4,
+            shadowColor: Colors.black26,
+          ),
+          child: Text(
+            "Publish Reward",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );

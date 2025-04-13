@@ -1,5 +1,4 @@
 import 'package:bites_of_south/View/Rewards/coupons.dart';
-import 'package:bites_of_south/View/Rewards/offers.dart';
 import 'package:bites_of_south/View/Rewards/rewardsTab.dart';
 import 'package:bites_of_south/View/Rewards/rewardsAdd.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class RewardScreen extends StatefulWidget {
+  const RewardScreen({super.key});
+
   @override
   _RewardScreenState createState() => _RewardScreenState();
 }
@@ -27,10 +28,13 @@ class _RewardScreenState extends State<RewardScreen> {
         .get();
 
     if (doc.exists && doc.data() != null) {
-      setState(() {
-        rupeesPerPoint =
-            (doc.data() as Map<String, dynamic>)['rupeesPerPoint']?.toDouble();
-      });
+      if (mounted) {
+        setState(() {
+          rupeesPerPoint =
+              (doc.data() as Map<String, dynamic>)['rupeesPerPoint']
+                  ?.toDouble();
+        });
+      }
     }
   }
 
@@ -39,12 +43,16 @@ class _RewardScreenState extends State<RewardScreen> {
         .collection('settings')
         .doc('rewards')
         .set({'rupeesPerPoint': value});
-    setState(() {
-      rupeesPerPoint = value;
-    });
+    if (mounted) {
+      setState(() {
+        rupeesPerPoint = value;
+      });
+    }
   }
 
   void showSettingsDialog(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final spacing = screenWidth * 0.03;
     TextEditingController controller = TextEditingController(
       text: rupeesPerPoint != null ? rupeesPerPoint.toString() : '',
     );
@@ -52,6 +60,10 @@ class _RewardScreenState extends State<RewardScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
       builder: (context) => Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -61,39 +73,78 @@ class _RewardScreenState extends State<RewardScreen> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Set Rupees Per Point',
-                style: Theme.of(context).textTheme.titleLarge),
-            SizedBox(height: 16),
+            Text(
+              'Set Rupees Per Point',
+              style: TextStyle(
+                fontSize: screenWidth * 0.06,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
+            SizedBox(height: spacing),
             TextField(
               controller: controller,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                hintText: 'Enter rupees per point',
-                border: OutlineInputBorder(),
+                hintText: 'Enter rupees per point (e.g., 0.5)',
+                filled: true,
+                fillColor: Colors.green[50],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.green, width: 2),
+                ),
+                prefixIcon: Icon(Icons.currency_rupee, color: Colors.green),
               ),
             ),
-            SizedBox(height: 16),
+            SizedBox(height: spacing * 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
-                SizedBox(width: 8),
+                SizedBox(width: spacing),
                 ElevatedButton(
                   onPressed: () {
                     double? value = double.tryParse(controller.text);
-                    if (value != null) {
+                    if (value != null && value > 0) {
                       updateRewardSettings(value);
                       Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Rupees per point updated'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Enter a valid positive number'),
+                        ),
+                      );
                     }
                   },
-                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text('Save'),
                 ),
               ],
             ),
+            SizedBox(height: spacing),
           ],
         ),
       ),
@@ -102,16 +153,41 @@ class _RewardScreenState extends State<RewardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Reward Management'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Coupons'),
-              Tab(text: 'Rewards'),
-            ],
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.green[700],
+          elevation: 0,
+          title: Text(
+            'Reward Management',
+            style: TextStyle(
+              fontSize: screenWidth * 0.06,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: Container(
+              color: Colors.green[700],
+              child: TabBar(
+                indicatorColor: Colors.white,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.green[100],
+                labelStyle: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  fontWeight: FontWeight.w600,
+                ),
+                tabs: [
+                  Tab(text: 'Coupons'),
+                  Tab(text: 'Rewards'),
+                ],
+              ),
+            ),
           ),
         ),
         body: TabBarView(
@@ -124,7 +200,8 @@ class _RewardScreenState extends State<RewardScreen> {
           builder: (BuildContext fabContext) {
             return FloatingActionButton(
               onPressed: () => _showAddBottomSheet(fabContext),
-              child: Icon(Icons.add),
+              backgroundColor: Colors.green,
+              child: Icon(Icons.add, color: Colors.white),
             );
           },
         ),
@@ -133,7 +210,7 @@ class _RewardScreenState extends State<RewardScreen> {
   }
 
   void _showAddBottomSheet(BuildContext context) {
-    final tabIndex = DefaultTabController.of(context)!.index;
+    final tabIndex = DefaultTabController.of(context).index;
     if (tabIndex == 0) {
       _showAddCouponBottomSheet(context);
     } else {
@@ -144,154 +221,9 @@ class _RewardScreenState extends State<RewardScreen> {
     }
   }
 
-  // void _showAddOfferBottomSheet(BuildContext context) {
-  //   final nameController = TextEditingController();
-  //   final multiplierController = TextEditingController();
-  //   final minAmountController = TextEditingController();
-  //   final usesTillValidController = TextEditingController();
-  //   DateTime? startDate;
-  //   DateTime? endDate;
-
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     builder: (context) => StatefulBuilder(
-  //       builder: (context, setState) => Padding(
-  //         padding: EdgeInsets.only(
-  //           bottom: MediaQuery.of(context).viewInsets.bottom,
-  //           left: 16,
-  //           right: 16,
-  //           top: 16,
-  //         ),
-  //         child: SingleChildScrollView(
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             children: [
-  //               Text('Add New Offer',
-  //                   style: Theme.of(context).textTheme.titleLarge),
-  //               SizedBox(height: 16),
-  //               TextField(
-  //                 controller: nameController,
-  //                 decoration: InputDecoration(
-  //                   labelText: 'Offer Name',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //               ),
-  //               SizedBox(height: 8),
-  //               TextField(
-  //                 controller: multiplierController,
-  //                 decoration: InputDecoration(
-  //                   labelText: 'Points Multiplier (e.g., 2 for 2x)',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 keyboardType: TextInputType.number,
-  //               ),
-  //               SizedBox(height: 8),
-  //               TextField(
-  //                 controller: minAmountController,
-  //                 decoration: InputDecoration(
-  //                   labelText: 'Min Order Amount (₹)',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 keyboardType: TextInputType.number,
-  //               ),
-  //               SizedBox(height: 8),
-  //               TextField(
-  //                 controller: usesTillValidController,
-  //                 decoration: InputDecoration(
-  //                   labelText: 'Uses Till Valid (per user)',
-  //                   border: OutlineInputBorder(),
-  //                 ),
-  //                 keyboardType: TextInputType.number,
-  //               ),
-  //               SizedBox(height: 8),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(startDate == null
-  //                       ? 'Start Date: Not Set'
-  //                       : 'Start: ${DateFormat.yMMMd().format(startDate!)}'),
-  //                   TextButton(
-  //                     onPressed: () async {
-  //                       startDate = await showDatePicker(
-  //                         context: context,
-  //                         initialDate: DateTime.now(),
-  //                         firstDate: DateTime.now(),
-  //                         lastDate: DateTime(2026),
-  //                       );
-  //                       setState(() {});
-  //                     },
-  //                     child: Text('Pick Start Date'),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   Text(endDate == null
-  //                       ? 'End Date: Not Set'
-  //                       : 'End: ${DateFormat.yMMMd().format(endDate!)}'),
-  //                   TextButton(
-  //                     onPressed: () async {
-  //                       endDate = await showDatePicker(
-  //                         context: context,
-  //                         initialDate: DateTime.now(),
-  //                         firstDate: DateTime.now(),
-  //                         lastDate: DateTime(2026),
-  //                       );
-  //                       setState(() {});
-  //                     },
-  //                     child: Text('Pick End Date'),
-  //                   ),
-  //                 ],
-  //               ),
-  //               SizedBox(height: 16),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.end,
-  //                 children: [
-  //                   TextButton(
-  //                     onPressed: () => Navigator.pop(context),
-  //                     child: Text('Cancel'),
-  //                   ),
-  //                   SizedBox(width: 8),
-  //                   ElevatedButton(
-  //                     onPressed: () {
-  //                       if (nameController.text.isEmpty ||
-  //                           multiplierController.text.isEmpty ||
-  //                           minAmountController.text.isEmpty ||
-  //                           usesTillValidController.text.isEmpty ||
-  //                           startDate == null ||
-  //                           endDate == null) {
-  //                         ScaffoldMessenger.of(context).showSnackBar(
-  //                           SnackBar(content: Text('All fields are required')),
-  //                         );
-  //                         return;
-  //                       }
-  //                       FirebaseFirestore.instance.collection('offers').add({
-  //                         'name': nameController.text,
-  //                         'multiplier': double.parse(multiplierController.text),
-  //                         'minAmount': double.parse(minAmountController.text),
-  //                         'usesTillValid':
-  //                             int.parse(usesTillValidController.text),
-  //                         'startDate': startDate,
-  //                         'endDate': endDate,
-  //                         'usedBy': {},
-  //                       });
-  //                       Navigator.pop(context);
-  //                     },
-  //                     child: Text('Save'),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void _showAddCouponBottomSheet(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final spacing = screenWidth * 0.03;
     final codeController = TextEditingController();
     final valueController = TextEditingController();
     final usesTillValidController = TextEditingController();
@@ -301,6 +233,10 @@ class _RewardScreenState extends State<RewardScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      backgroundColor: Colors.white,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Padding(
           padding: EdgeInsets.only(
@@ -312,55 +248,119 @@ class _RewardScreenState extends State<RewardScreen> {
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Add New Coupon',
-                    style: Theme.of(context).textTheme.titleLarge),
-                SizedBox(height: 16),
+                Text(
+                  'Add New Coupon',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.06,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
+                  ),
+                ),
+                SizedBox(height: spacing),
                 TextField(
                   controller: codeController,
                   decoration: InputDecoration(
                     labelText: 'Coupon Code (e.g., DOSA20)',
-                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                    prefixIcon: Icon(Icons.local_offer, color: Colors.green),
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: spacing),
                 DropdownButtonFormField<String>(
                   value: discountType,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    labelText: 'Discount Type',
+                    filled: true,
+                    fillColor: Colors.green[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                    prefixIcon: Icon(Icons.discount, color: Colors.green),
                   ),
                   items: [
                     DropdownMenuItem(
-                        value: 'percent', child: Text('Percentage')),
-                    DropdownMenuItem(value: 'flat', child: Text('Flat Amount')),
+                      value: 'percent',
+                      child: Text('Percentage'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'flat',
+                      child: Text('Flat Amount'),
+                    ),
                   ],
                   onChanged: (value) => setState(() => discountType = value!),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: spacing),
                 TextField(
                   controller: valueController,
                   decoration: InputDecoration(
                     labelText: 'Discount Value (e.g., 20 for 20%)',
-                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                    prefixIcon: Icon(
+                      discountType == 'percent'
+                          ? Icons.percent
+                          : Icons.currency_rupee,
+                      color: Colors.green,
+                    ),
                   ),
                   keyboardType: TextInputType.number,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: spacing),
                 TextField(
                   controller: usesTillValidController,
                   decoration: InputDecoration(
                     labelText: 'Uses Till Valid (per user)',
-                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.green[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.green, width: 2),
+                    ),
+                    prefixIcon: Icon(Icons.repeat, color: Colors.green),
                   ),
                   keyboardType: TextInputType.number,
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: spacing),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(expiryDate == null
-                        ? 'Expiry: Not Set'
-                        : 'Expiry: ${DateFormat.yMMMd().format(expiryDate!)}'),
+                    Text(
+                      expiryDate == null
+                          ? 'Expiry: Not Set'
+                          : 'Expiry: ${DateFormat.yMMMd().format(expiryDate!)}',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        color: Colors.green[800],
+                      ),
+                    ),
                     TextButton(
                       onPressed: () async {
                         expiryDate = await showDatePicker(
@@ -368,22 +368,37 @@ class _RewardScreenState extends State<RewardScreen> {
                           initialDate: DateTime.now(),
                           firstDate: DateTime.now(),
                           lastDate: DateTime(2026),
+                          builder: (context, child) => Theme(
+                            data: ThemeData.light().copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Colors.green,
+                                onPrimary: Colors.white,
+                              ),
+                            ),
+                            child: child!,
+                          ),
                         );
                         setState(() {});
                       },
-                      child: Text('Pick Expiry Date'),
+                      child: Text(
+                        'Pick Expiry Date',
+                        style: TextStyle(color: Colors.green),
+                      ),
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: spacing * 2),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('Cancel'),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.grey),
+                      ),
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: spacing),
                     ElevatedButton(
                       onPressed: () {
                         if (codeController.text.isEmpty ||
@@ -391,7 +406,10 @@ class _RewardScreenState extends State<RewardScreen> {
                             usesTillValidController.text.isEmpty ||
                             expiryDate == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('All fields are required')),
+                            SnackBar(
+                              content: Text('All fields are required'),
+                              backgroundColor: Colors.red[400],
+                            ),
                           );
                           return;
                         }
@@ -410,11 +428,24 @@ class _RewardScreenState extends State<RewardScreen> {
                           'usedBy': {},
                         });
                         Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Coupon added successfully'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                       child: Text('Save'),
                     ),
                   ],
                 ),
+                SizedBox(height: spacing),
               ],
             ),
           ),
