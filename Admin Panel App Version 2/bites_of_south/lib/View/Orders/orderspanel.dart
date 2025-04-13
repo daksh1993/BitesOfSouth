@@ -3,6 +3,7 @@ import 'package:bites_of_south/View/UserProfile/profileScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
@@ -436,7 +437,7 @@ class _CookOrderScreenState extends State<CookOrderScreen>
   Widget _buildBody(double screenWidth, double screenHeight) {
     if (_isLoading) {
       print('DEBUG: Showing loading indicator');
-      return const Center(child: CircularProgressIndicator());
+      return Center(child: Lottie.asset('assets/loadin.json'));
     }
     if (_errorMessage != null) {
       print('DEBUG: Showing error: $_errorMessage');
@@ -461,7 +462,7 @@ class _CookOrderScreenState extends State<CookOrderScreen>
                 }
               });
             }
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: Lottie.asset('assets/loadin.json'));
           } else {
             if (_connectionTimer != null) {
               print('DEBUG: Canceling connection timer');
