@@ -179,21 +179,27 @@ class PaymentDetails {
     return PaymentDetails(
       razorpayPaymentId: toStringOrNull(data['razorpayPaymentId']) ?? '',
       razorpayOrderId: toStringOrNull(data['razorpayOrderId']) ?? '',
-      amount: (data['amount'] is String
-              ? int.tryParse(data['amount'] as String) ?? 0
-              : data['amount'] as int?) ??
+      amount: (data['amount'] is num
+              ? (data['amount'] as num).toInt()
+              : data['amount'] is String
+                  ? int.tryParse(data['amount'] as String) ?? 0
+                  : 0) ??
           0,
       currency: toStringOrNull(data['currency']) ?? 'INR',
       status: toStringOrNull(data['status']) ?? 'unknown',
-      amountRefunded: (data['amountRefunded'] is String
-              ? int.tryParse(data['amountRefunded'] as String) ?? 0
-              : data['amountRefunded'] as int?) ??
+      amountRefunded: (data['amountRefunded'] is num
+              ? (data['amountRefunded'] as num).toInt()
+              : data['amountRefunded'] is String
+                  ? int.tryParse(data['amountRefunded'] as String) ?? 0
+                  : 0) ??
           0,
       refundStatus: toStringOrNull(data['refundStatus']),
       captured: data['captured'] as bool? ?? false,
-      paymentTimestamp: (data['paymentTimestamp'] is String
-              ? int.tryParse(data['paymentTimestamp'] as String) ?? 0
-              : data['paymentTimestamp'] as int?) ??
+      paymentTimestamp: (data['paymentTimestamp'] is num
+              ? (data['paymentTimestamp'] as num).toInt()
+              : data['paymentTimestamp'] is String
+                  ? int.tryParse(data['paymentTimestamp'] as String) ?? 0
+                  : 0) ??
           0,
       testMode: data['testMode'] as bool? ?? false,
     );

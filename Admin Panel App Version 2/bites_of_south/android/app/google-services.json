@@ -13,7 +13,20 @@
           "package_name": "com.example.bites_of_south"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "65231955877-6u3fpauo9clqur54j8j60199sigj54co.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bites_of_south",
+            "certificate_hash": "b2bad2937c26dbb40ab6bb0950b0527dfcbec0b4"
+          }
+        },
+        {
+          "client_id": "65231955877-a776f1q00s970hu577uir7e0qv7ccr75.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDpPMpAF7VbibnTYC7SxJ8VRX9BEGJl2AU"
@@ -21,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "65231955877-a776f1q00s970hu577uir7e0qv7ccr75.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "65231955877-0ervm40ajlc8i6vv742kginaqr37jkgc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bitesOfSouth"
+              }
+            }
+          ]
         }
       }
     }

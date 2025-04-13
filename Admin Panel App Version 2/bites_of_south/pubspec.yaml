@@ -54,6 +54,10 @@ dependencies:
   syncfusion_flutter_charts: ^29.1.35
   pdf: ^3.11.3
   printing: ^5.14.2
+  file_picker: ^10.0.0
+  share_plus: ^10.1.4
+  flutter_pdfview: ^1.4.0
+  audioplayers: ^6.4.0
   
 
 dev_dependencies:
@@ -96,6 +100,7 @@ flutter:
   assets:
     - assets/
     - assets/fonts/NotoSans-Regular.ttf
+    - assets/sounds/notification.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

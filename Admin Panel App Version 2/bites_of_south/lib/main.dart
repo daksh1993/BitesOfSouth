@@ -51,6 +51,8 @@ class MyApp extends StatelessWidget {
       // initialRoute: '/mainPage', // Set initial route to login
       initialRoute: '/login', // Set initial route to login
       // initialRoute: '/generate', // Set initial route to login
+      // initialRoute: '/cookPage', // Set initial route to login
+
       routes: {
         '/login': (context) => LoginScreen(),
         '/dashboard': (context) => DashboardScreen(),
