@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-// Shows a bottom sheet for selecting analyses
-void showAddAnalysisBottomSheet(
-    BuildContext context, List<String> selectedAnalyses, Function(List<String>) onApply) {
+void showAddAnalysisBottomSheet(BuildContext context,
+    List<String> selectedAnalyses, Function(List<String>) onApply) {
   final availableAnalyses = [
     'Top Selling Item',
     'Highest Revenue Item',
@@ -16,50 +15,61 @@ void showAddAnalysisBottomSheet(
   ];
 
   Map<String, bool> checkboxStates = {
-    for (var analysis in availableAnalyses) analysis: selectedAnalyses.contains(analysis)
+    for (var analysis in availableAnalyses)
+      analysis: selectedAnalyses.contains(analysis)
   };
-  print('BottomSheet: Showing analysis selection - Initial selections: $selectedAnalyses');
 
   showModalBottomSheet(
     context: context,
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
     backgroundColor: Colors.white,
     builder: (context) {
+      final screenWidth = MediaQuery.of(context).size.width;
+      final spacing = screenWidth * 0.04;
+
       return StatefulBuilder(
         builder: (context, setModalState) {
           return Padding(
-            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+            padding: EdgeInsets.all(spacing),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   "Select Analyses",
                   style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700),
+                    fontSize: screenWidth * 0.06,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[800],
+                  ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                SizedBox(height: spacing),
                 Expanded(
                   child: ListView(
                     children: availableAnalyses.map((analysis) {
                       return CheckboxListTile(
-                        title: Text(analysis, style: const TextStyle(fontSize: 16)),
+                        title: Text(
+                          analysis,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.045,
+                            color: Colors.grey[800],
+                          ),
+                        ),
                         value: checkboxStates[analysis],
                         onChanged: (bool? value) {
                           setModalState(() {
                             checkboxStates[analysis] = value ?? false;
-                            print('BottomSheet: Checkbox changed - $analysis: ${checkboxStates[analysis]}');
                           });
                         },
-                        activeColor: Colors.green.shade700,
+                        activeColor: Colors.green[700],
+                        checkColor: Colors.white,
                         controlAffinity: ListTileControlAffinity.leading,
                       );
                     }).toList(),
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                SizedBox(height: spacing),
                 ElevatedButton(
                   onPressed: () {
                     final newAnalyses = checkboxStates.entries
@@ -72,21 +82,32 @@ void showAddAnalysisBottomSheet(
                     if (!newAnalyses.contains('Net Profit')) {
                       newAnalyses.add('Net Profit');
                     }
-                    print('BottomSheet: Apply pressed - New analyses: $newAnalyses');
                     onApply(newAnalyses);
                     Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Analyses updated successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    backgroundColor: Colors.green[700],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing * 2,
+                      vertical: spacing,
+                    ),
                     elevation: 4,
+                    textStyle: TextStyle(
+                      fontSize: screenWidth * 0.045,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: const Text(
-                    "Apply",
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: Text("Apply"),
                 ),
               ],
             ),
@@ -96,6 +117,3 @@ void showAddAnalysisBottomSheet(
     },
   );
 }
-
-// Explanation:
-// This file defines a utility function to show a bottom sheet for selecting analysis types. It uses a StatefulBuilder to manage checkbox states dynamically and ensures 'Net Sales' and 'Net Profit' are always included in the final selection. The selected analyses are passed back to the parent via a callback. Debugging statements track checkbox changes and final selections.

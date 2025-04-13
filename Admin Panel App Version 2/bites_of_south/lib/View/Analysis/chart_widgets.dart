@@ -4,9 +4,14 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'models.dart';
 
 // Builds a line chart for daily revenues and profits
-Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProfits,
-    double screenWidth, double screenHeight, NumberFormat currencyFormat) {
-  print('ChartWidgets: Building line chart - Revenues: ${dailyRevenues.length}, Profits: ${dailyProfits.length}');
+Widget buildLineChart(
+    Map<int, double> dailyRevenues,
+    Map<int, double> dailyProfits,
+    double screenWidth,
+    double screenHeight,
+    NumberFormat currencyFormat) {
+  print(
+      'ChartWidgets: Building line chart - Revenues: ${dailyRevenues.length}, Profits: ${dailyProfits.length}');
 
   if (dailyRevenues.isEmpty || dailyProfits.isEmpty) {
     print('ChartWidgets: No data for line chart');
@@ -16,7 +21,8 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
   final minDay = dailyRevenues.keys.reduce((a, b) => a < b ? a : b);
   final maxDay = dailyRevenues.keys.reduce((a, b) => a > b ? a : b);
   final rangeDays = maxDay - minDay + 1;
-  print('ChartWidgets: Line chart range - Min: $minDay, Max: $maxDay, Days: $rangeDays');
+  print(
+      'ChartWidgets: Line chart range - Min: $minDay, Max: $maxDay, Days: $rangeDays');
 
   DateTimeIntervalType intervalType;
   int interval;
@@ -27,8 +33,10 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
     intervalType = DateTimeIntervalType.months;
     interval = 1;
 
-    final startDate = DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
-    final endDate = DateTime.fromMillisecondsSinceEpoch(maxDay * 24 * 60 * 60 * 1000);
+    final startDate =
+        DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
+    final endDate =
+        DateTime.fromMillisecondsSinceEpoch(maxDay * 24 * 60 * 60 * 1000);
     final months = (endDate.year - startDate.year) * 12 +
         endDate.month -
         startDate.month +
@@ -38,13 +46,16 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
     Map<DateTime, double> monthlyProfits = {};
 
     dailyRevenues.forEach((day, revenue) {
-      final date = DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+      final date =
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
       final monthStart = DateTime(date.year, date.month, 1);
-      monthlyRevenues[monthStart] = (monthlyRevenues[monthStart] ?? 0) + revenue;
+      monthlyRevenues[monthStart] =
+          (monthlyRevenues[monthStart] ?? 0) + revenue;
     });
 
     dailyProfits.forEach((day, profit) {
-      final date = DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+      final date =
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
       final monthStart = DateTime(date.year, date.month, 1);
       monthlyProfits[monthStart] = (monthlyProfits[monthStart] ?? 0) + profit;
     });
@@ -66,20 +77,23 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
     intervalType = DateTimeIntervalType.days;
     interval = 7;
 
-    final startDate = DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
+    final startDate =
+        DateTime.fromMillisecondsSinceEpoch(minDay * 24 * 60 * 60 * 1000);
     final weeks = (rangeDays / 7).ceil();
 
     Map<DateTime, double> weeklyRevenues = {};
     Map<DateTime, double> weeklyProfits = {};
 
     dailyRevenues.forEach((day, revenue) {
-      final date = DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+      final date =
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
       final weekStart = date.subtract(Duration(days: date.weekday - 1));
       weeklyRevenues[weekStart] = (weeklyRevenues[weekStart] ?? 0) + revenue;
     });
 
     dailyProfits.forEach((day, profit) {
-      final date = DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
+      final date =
+          DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000);
       final weekStart = date.subtract(Duration(days: date.weekday - 1));
       weeklyProfits[weekStart] = (weeklyProfits[weekStart] ?? 0) + profit;
     });
@@ -104,7 +118,8 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
     revenueData = List.generate(rangeDays, (index) {
       final day = minDay + index;
       return ChartData(
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000).toString(),
+        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
+            .toString(),
         dailyRevenues[day] ?? 0.0,
         DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
       );
@@ -113,7 +128,8 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
     profitData = List.generate(rangeDays, (index) {
       final day = minDay + index;
       return ChartData(
-        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000).toString(),
+        DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000)
+            .toString(),
         dailyProfits[day] ?? 0.0,
         DateTime.fromMillisecondsSinceEpoch(day * 24 * 60 * 60 * 1000),
       );
@@ -125,19 +141,22 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
       intervalType: intervalType,
       interval: interval.toDouble(),
       majorGridLines: const MajorGridLines(width: 0),
-      labelStyle: TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
       dateFormat: intervalType == DateTimeIntervalType.months
           ? DateFormat('MMM yyyy')
           : DateFormat('MMM d'),
     ),
     primaryYAxis: NumericAxis(
       numberFormat: currencyFormat,
-      labelStyle: TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
     ),
     legend: Legend(
       isVisible: true,
       position: LegendPosition.bottom,
-      textStyle: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
+      textStyle:
+          TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
     ),
     tooltipBehavior: TooltipBehavior(
       enable: true,
@@ -171,18 +190,21 @@ Widget buildLineChart(Map<int, double> dailyRevenues, Map<int, double> dailyProf
 }
 
 // Builds a bar chart for analysis data
-Widget buildBarChart(List<ChartData> data, Color color, double screenWidth,
-    double screenHeight, [NumberFormat? format]) {
+Widget buildBarChart(
+    List<ChartData> data, Color color, double screenWidth, double screenHeight,
+    [NumberFormat? format]) {
   print('ChartWidgets: Building bar chart - Data length: ${data.length}');
 
   return SfCartesianChart(
     primaryXAxis: CategoryAxis(
-      labelStyle: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
       majorGridLines: const MajorGridLines(width: 0),
     ),
     primaryYAxis: NumericAxis(
       numberFormat: format,
-      labelStyle: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade700),
     ),
     tooltipBehavior: TooltipBehavior(
         enable: true, format: 'point.x: point.y', color: Colors.grey.shade800),
@@ -198,7 +220,8 @@ Widget buildBarChart(List<ChartData> data, Color color, double screenWidth,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
         dataLabelSettings: const DataLabelSettings(
             isVisible: true,
-            textStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            textStyle:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     ],
   );
@@ -207,19 +230,23 @@ Widget buildBarChart(List<ChartData> data, Color color, double screenWidth,
 // Builds a line chart with dots for trending or profit data
 Widget buildLineChartWithDots(List<ChartData> data, double screenWidth,
     double screenHeight, String yAxisTitle, Color lineColor) {
-  print('ChartWidgets: Building line chart with dots - Data length: ${data.length}');
+  print(
+      'ChartWidgets: Building line chart with dots - Data length: ${data.length}');
 
   return SfCartesianChart(
     primaryXAxis: CategoryAxis(
-      labelStyle: TextStyle(fontSize: screenWidth * 0.015, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.015, color: Colors.grey.shade700),
       majorGridLines: const MajorGridLines(width: 0),
       labelRotation: 45,
     ),
     primaryYAxis: NumericAxis(
-      labelStyle: TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
+      labelStyle:
+          TextStyle(fontSize: screenWidth * 0.03, color: Colors.grey.shade700),
       title: AxisTitle(
           text: yAxisTitle,
-          textStyle: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade800)),
+          textStyle: TextStyle(
+              fontSize: screenWidth * 0.035, color: Colors.grey.shade800)),
     ),
     tooltipBehavior: TooltipBehavior(
         enable: true, format: 'point.x: point.y', color: Colors.grey.shade800),
@@ -240,7 +267,8 @@ Widget buildLineChartWithDots(List<ChartData> data, double screenWidth,
         ),
         dataLabelSettings: const DataLabelSettings(
           isVisible: true,
-          textStyle: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+          textStyle: TextStyle(
+              color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
         ),
       ),
     ],
@@ -248,15 +276,16 @@ Widget buildLineChartWithDots(List<ChartData> data, double screenWidth,
 }
 
 // Builds a pie chart for revenue share
-Widget buildPieChart(List<ChartData> data, double screenWidth, double screenHeight,
-    NumberFormat currencyFormat) {
+Widget buildPieChart(List<ChartData> data, double screenWidth,
+    double screenHeight, NumberFormat currencyFormat) {
   print('ChartWidgets: Building pie chart - Data length: ${data.length}');
 
   return SfCircularChart(
     legend: Legend(
       isVisible: true,
       position: LegendPosition.bottom,
-      textStyle: TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
+      textStyle:
+          TextStyle(fontSize: screenWidth * 0.035, color: Colors.grey.shade800),
     ),
     tooltipBehavior: TooltipBehavior(
         enable: true, format: 'point.x: point.y', color: Colors.grey.shade800),
@@ -271,7 +300,8 @@ Widget buildPieChart(List<ChartData> data, double screenWidth, double screenHeig
         explodeIndex: 0,
         dataLabelSettings: const DataLabelSettings(
             isVisible: true,
-            textStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            textStyle:
+                TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     ],
   );

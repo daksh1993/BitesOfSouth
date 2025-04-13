@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// Widget for selecting date range
 class DateRangeSection extends StatefulWidget {
-  final double screenWidth; // Screen width for responsive design
-  final Function(DateTime?, DateTime?, {String? range})
-      onDateRangeChanged; // Callback for date range changes
-  final String? selectedRange; // Currently selected predefined range
+  final double screenWidth;
+  final Function(DateTime?, DateTime?, {String? range}) onDateRangeChanged;
+  final String? selectedRange;
 
   const DateRangeSection({
     required this.screenWidth,
     required this.onDateRangeChanged,
     this.selectedRange,
+    super.key,
   });
 
   @override
@@ -19,10 +18,9 @@ class DateRangeSection extends StatefulWidget {
 }
 
 class _DateRangeSectionState extends State<DateRangeSection> {
-  DateTime? _startDate; // Selected start date
-  DateTime? _endDate; // Selected end date
+  DateTime? _startDate;
+  DateTime? _endDate;
 
-  // Shows date picker and updates state
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -35,7 +33,6 @@ class _DateRangeSectionState extends State<DateRangeSection> {
             colorScheme: ColorScheme.light(
               primary: Colors.green,
               onPrimary: Colors.white,
-              surface: Colors.white,
             ),
             dialogBackgroundColor: Colors.white,
           ),
@@ -50,14 +47,11 @@ class _DateRangeSectionState extends State<DateRangeSection> {
         } else {
           _endDate = picked;
         }
-        print(
-            'DateRangeSection: Date selected - Start: $_startDate, End: $_endDate');
       });
       widget.onDateRangeChanged(_startDate, _endDate);
     }
   }
 
-  // Applies predefined date range
   void _selectPredefinedRange(String range) {
     final now = DateTime.now();
     DateTime? start;
@@ -70,7 +64,7 @@ class _DateRangeSectionState extends State<DateRangeSection> {
         end = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
       case 'Past 2 Days':
-        start = now.subtract(Duration(days: 2));
+        start = now.subtract(Duration(days: 3));
         break;
       case 'This Week':
         start = now.subtract(Duration(days: 6));
@@ -97,40 +91,46 @@ class _DateRangeSectionState extends State<DateRangeSection> {
 
   @override
   Widget build(BuildContext context) {
-    print('DateRangeSection: Building widget');
+    final spacing = widget.screenWidth * 0.03;
 
     return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: widget.screenWidth * 0.03,
-        horizontal: widget.screenWidth * 0.04,
-      ),
+      padding: EdgeInsets.all(spacing),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.green.withOpacity(0.2),
             spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 2),
+            blurRadius: 8,
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Filter by Date',
+            style: TextStyle(
+              fontSize: widget.screenWidth * 0.05,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+          ),
+          SizedBox(height: spacing),
           Row(
             children: [
               Expanded(
-                child: _buildDateField(
+                child: _buildDateButton(
                   context: context,
                   label: 'From',
                   date: _startDate,
                   onTap: () => _selectDate(context, true),
                 ),
               ),
-              SizedBox(width: widget.screenWidth * 0.03),
+              SizedBox(width: spacing),
               Expanded(
-                child: _buildDateField(
+                child: _buildDateButton(
                   context: context,
                   label: 'To',
                   date: _endDate,
@@ -139,19 +139,19 @@ class _DateRangeSectionState extends State<DateRangeSection> {
               ),
             ],
           ),
-          SizedBox(height: widget.screenWidth * 0.03),
+          SizedBox(height: spacing),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 _buildRangeChip('Today'),
-                SizedBox(width: widget.screenWidth * 0.02),
+                SizedBox(width: spacing * 0.5),
                 _buildRangeChip('Past 2 Days'),
-                SizedBox(width: widget.screenWidth * 0.02),
+                SizedBox(width: spacing * 0.5),
                 _buildRangeChip('This Week'),
-                SizedBox(width: widget.screenWidth * 0.02),
+                SizedBox(width: spacing * 0.5),
                 _buildRangeChip('This Month'),
-                SizedBox(width: widget.screenWidth * 0.02),
+                SizedBox(width: spacing * 0.5),
                 _buildRangeChip('All'),
               ],
             ),
@@ -161,61 +161,63 @@ class _DateRangeSectionState extends State<DateRangeSection> {
     );
   }
 
-  // Builds a date field widget
-  Widget _buildDateField({
+  Widget _buildDateButton({
     required BuildContext context,
     required String label,
     required DateTime? date,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.green[100],
+        foregroundColor: Colors.green[800],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
         padding: EdgeInsets.symmetric(
           vertical: widget.screenWidth * 0.03,
           horizontal: widget.screenWidth * 0.03,
         ),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.grey.shade50,
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.calendar_today,
-                size: widget.screenWidth * 0.045, color: Colors.green),
-            SizedBox(width: widget.screenWidth * 0.02),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: widget.screenWidth * 0.035,
-                      color: Colors.grey.shade600,
-                    ),
+        elevation: 0,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.calendar_today,
+            size: widget.screenWidth * 0.045,
+            color: Colors.green[700],
+          ),
+          SizedBox(width: widget.screenWidth * 0.02),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: widget.screenWidth * 0.035,
+                    color: Colors.green[700],
                   ),
-                  Text(
-                    date == null
-                        ? 'Select Date'
-                        : '${date.day}/${date.month}/${date.year}',
-                    style: TextStyle(
-                      fontSize: widget.screenWidth * 0.04,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
-                    ),
+                ),
+                Text(
+                  date == null
+                      ? 'Select Date'
+                      : DateFormat.yMMMd().format(date),
+                  style: TextStyle(
+                    fontSize: widget.screenWidth * 0.04,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green[800],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // Builds a range chip widget
   Widget _buildRangeChip(String range) {
     final isSelected = widget.selectedRange == range;
     return GestureDetector(
@@ -223,27 +225,24 @@ class _DateRangeSectionState extends State<DateRangeSection> {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: widget.screenWidth * 0.04,
-          vertical: widget.screenWidth * 0.02,
+          vertical: widget.screenWidth * 0.025,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.green : Colors.grey.shade100,
+          color: isSelected ? Colors.green : Colors.green[50],
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? Colors.green : Colors.grey.shade300,
+            color: isSelected ? Colors.green[700]! : Colors.green[200]!,
           ),
         ),
         child: Text(
           range,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected ? Colors.white : Colors.green[800],
             fontSize: widget.screenWidth * 0.035,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
     );
   }
 }
-
-// Explanation:
-// This file defines the DateRangeSection widget, a standalone component for selecting date ranges. It includes a custom date picker for manual selection and predefined range chips (e.g., Today, This Week). The widget updates its state and notifies the parent via a callback when the range changes. Debugging statements track date selections and range changes for troubleshooting.

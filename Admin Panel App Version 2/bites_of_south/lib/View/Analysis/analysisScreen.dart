@@ -5,11 +5,14 @@ import 'package:bites_of_south/View/Analysis/card_widgets.dart';
 import 'package:bites_of_south/View/Analysis/chart_widgets.dart';
 import 'package:bites_of_south/View/Analysis/data_fetcher.dart';
 import 'package:bites_of_south/View/Analysis/date_range_section.dart';
-import 'package:bites_of_south/View/Analysis/pdf_generator.dart'; // Importing PDF utilities
+import 'package:bites_of_south/View/Analysis/pdf_generator.dart';
+import 'package:bites_of_south/View/Analysis/pdf_viewer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:intl/intl.dart'; // For currency formatting
-import 'dart:ui' as ui; // For image rendering
+import 'package:intl/intl.dart';
+import 'dart:ui' as ui;
+
+import 'package:lottie/lottie.dart';
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({super.key});
@@ -37,7 +40,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   DateTime? _endDate;
   String? _selectedRange;
 
-  // Global keys for chart widgets
   final GlobalKey _dailyChartKey = GlobalKey();
   final Map<String, GlobalKey> _analysisChartKeys = {
     'Top Selling Item': GlobalKey(),
@@ -53,7 +55,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   void initState() {
     super.initState();
     _analysisData = fetchAnalysisData(_startDate, _endDate);
-    print('AnalysisScreen initState: Fetching initial data');
   }
 
   void _updateDateRange(DateTime? start, DateTime? end, {String? range}) {
@@ -62,23 +63,135 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       _endDate = end;
       _selectedRange = range;
       _analysisData = fetchAnalysisData(_startDate, _endDate);
-      print(
-          'AnalysisScreen: Date range updated - Start: $_startDate, End: $_endDate, Range: $_selectedRange');
     });
   }
 
-  // Method to capture chart as image
   Future<Uint8List?> _captureChart(GlobalKey key) async {
     try {
       RenderRepaintBoundary boundary =
           key.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      var image = await boundary.toImage(pixelRatio: 2.0); // Higher resolution
+      var image = await boundary.toImage(pixelRatio: 2.0);
       ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       return byteData?.buffer.asUint8List();
     } catch (e) {
-      print('AnalysisScreen: Error capturing chart - $e');
       return null;
+    }
+  }
+
+  void _showLoadingDialog(BuildContext context) async {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final ValueNotifier<String> status = ValueNotifier('Fetching data...');
+    bool hasError = false;
+    String? errorMessage;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        backgroundColor: Colors.white,
+        content: ValueListenableBuilder<String>(
+          valueListenable: status,
+          builder: (context, value, child) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset(
+                'assets/loadin.json',
+                width: screenWidth * 0.2,
+                height: screenWidth * 0.2,
+              ),
+              SizedBox(height: screenWidth * 0.04),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  color: Colors.green[800],
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (hasError) ...[
+                SizedBox(height: screenWidth * 0.04),
+                Text(
+                  errorMessage ?? 'An error occurred',
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.04,
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(height: screenWidth * 0.04),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[700],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Close',
+                    style: TextStyle(fontSize: screenWidth * 0.04),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      status.value = 'Fetching analysis data...';
+      final data = await _analysisData;
+
+      status.value = 'Capturing charts...';
+      Map<String, Uint8List> chartImages = {};
+      if (data['dailyRevenues']?.isNotEmpty == true) {
+        final chartImage = await _captureChart(_dailyChartKey);
+        if (chartImage != null) {
+          chartImages['dailyChart'] = chartImage;
+        }
+      }
+      for (var analysis in selectedAnalyses
+          .where((a) => a != 'Net Sales' && a != 'Net Profit')) {
+        if (_analysisChartKeys[analysis] != null &&
+            data['itemQuantities']?.isNotEmpty == true) {
+          final chartImage = await _captureChart(_analysisChartKeys[analysis]!);
+          if (chartImage != null) {
+            chartImages['${analysis.toLowerCase().replaceAll(' ', '')}Chart'] =
+                chartImage;
+          }
+        }
+      }
+
+      status.value = 'Generating PDF report...';
+      final pdfBytes = await generatePdf(
+        data,
+        startDate: _startDate,
+        endDate: _endDate,
+        selectedAnalyses: selectedAnalyses,
+        chartImages: chartImages,
+      );
+
+      status.value = 'Saving PDF...';
+      final pdfPath = await savePdfToTemp(pdfBytes);
+
+      status.value = 'Opening PDF viewer...';
+      await Future.delayed(Duration(milliseconds: 500)); // Brief pause for UX
+      Navigator.pop(context); // Close dialog
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PDFViewerScreen(pdfPath: pdfPath),
+        ),
+      );
+    } catch (e) {
+      hasError = true;
+      errorMessage = 'Failed to generate PDF: $e';
+      status.value = 'Error occurred';
     }
   }
 
@@ -86,62 +199,32 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    print(
-        'AnalysisScreen build: Building UI with screenWidth: $screenWidth, screenHeight: $screenHeight');
+    final spacing = screenWidth * 0.03;
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green[700],
         foregroundColor: Colors.white,
-        title: const Text(
+        title: Text(
           "Analysis Dashboard",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: screenWidth * 0.06,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.print),
-            onPressed: () async {
-              final data = await _analysisData;
-              print('AnalysisScreen: Print button pressed, capturing charts');
-
-              // Capture all chart images
-              Map<String, Uint8List> chartImages = {};
-              if (data['dailyRevenues']?.isNotEmpty == true) {
-                chartImages['dailyChart'] =
-                    (await _captureChart(_dailyChartKey))!;
-              }
-              for (var analysis in selectedAnalyses
-                  .where((a) => a != 'Net Sales' && a != 'Net Profit')) {
-                if (_analysisChartKeys[analysis] != null &&
-                    data['itemQuantities']?.isNotEmpty == true) {
-                  final chartImage =
-                      await _captureChart(_analysisChartKeys[analysis]!);
-                  if (chartImage != null) {
-                    chartImages[
-                            '${analysis.toLowerCase().replaceAll(' ', '')}Chart'] =
-                        chartImage;
-                  }
-                }
-              }
-
-              showPdfViewer(
-                context,
-                data,
-                _startDate,
-                _endDate,
-                selectedAnalyses,
-              );
-            },
+            icon: Icon(Icons.print, size: screenWidth * 0.06),
+            onPressed: () => _showLoadingDialog(context),
           ),
         ],
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.grey.shade100, Colors.white],
+            colors: [Colors.green[50]!, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -158,22 +241,47 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 future: _analysisData,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                        child: CircularProgressIndicator(color: Colors.green));
+                    return Center(
+                      child: Lottie.asset(
+                        'assets/loadin.json',
+                        width: screenWidth * 0.2,
+                        height: screenWidth * 0.2,
+                      ),
+                    );
                   }
                   if (snapshot.hasError) {
-                    print(
-                        'AnalysisScreen: Error fetching data - ${snapshot.error}');
                     return Center(
-                        child: Text("Error: ${snapshot.error}",
-                            style: const TextStyle(
-                                color: Colors.red, fontSize: 18)));
+                      child: Text(
+                        "Error loading data",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          color: Colors.red,
+                        ),
+                      ),
+                    );
                   }
-                  if (!snapshot.hasData) {
-                    return const Center(
-                        child: Text("No data available",
-                            style:
-                                TextStyle(fontSize: 18, color: Colors.grey)));
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.analytics,
+                            size: screenWidth * 0.15,
+                            color: Colors.green[300],
+                          ),
+                          SizedBox(height: spacing),
+                          Text(
+                            "No analysis data available",
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.05,
+                              color: Colors.green[800],
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   final data = snapshot.data!;
@@ -196,7 +304,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                       NumberFormat.currency(locale: 'en_IN', symbol: '₹');
 
                   return SingleChildScrollView(
-                    padding: EdgeInsets.all(screenWidth * 0.05),
+                    padding: EdgeInsets.all(spacing),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -205,51 +313,63 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                           children: [
                             if (selectedAnalyses.contains('Net Sales'))
                               Expanded(
-                                  child: buildNetSalesCard(
-                                      data['netSales'] ?? 0.0,
-                                      currencyFormat,
-                                      screenWidth)),
+                                child: buildNetSalesCard(
+                                  data['netSales'] ?? 0.0,
+                                  currencyFormat,
+                                  screenWidth,
+                                ),
+                              ),
                             if (selectedAnalyses.contains('Net Sales') &&
                                 selectedAnalyses.contains('Net Profit'))
-                              SizedBox(width: screenWidth * 0.03),
+                              SizedBox(width: spacing),
                             if (selectedAnalyses.contains('Net Profit'))
                               Expanded(
-                                  child: buildNetProfitCard(
-                                      data['netProfit'] ?? 0.0,
-                                      currencyFormat,
-                                      screenWidth)),
+                                child: buildNetProfitCard(
+                                  data['netProfit'] ?? 0.0,
+                                  currencyFormat,
+                                  screenWidth,
+                                ),
+                              ),
                           ],
                         ),
-                        SizedBox(height: screenHeight * 0.03),
-                        Card(
-                          elevation: 8,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                        SizedBox(height: spacing),
+                        if (dailyRevenues.isNotEmpty || dailyProfits.isNotEmpty)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green.withOpacity(0.2),
+                                  spreadRadius: 2,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.all(spacing),
                             child: RepaintBoundary(
                               key: _dailyChartKey,
                               child: SizedBox(
                                 height: screenHeight * 0.35,
                                 child: buildLineChart(
-                                    dailyRevenues,
-                                    dailyProfits,
-                                    screenWidth,
-                                    screenHeight,
-                                    currencyFormat),
+                                  dailyRevenues,
+                                  dailyProfits,
+                                  screenWidth,
+                                  screenHeight,
+                                  currencyFormat,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: screenHeight * 0.03),
+                        SizedBox(height: spacing),
                         ...selectedAnalyses
                             .where((analysis) =>
                                 analysis != 'Net Sales' &&
                                 analysis != 'Net Profit')
                             .map((analysis) {
                           return Padding(
-                            padding:
-                                EdgeInsets.only(bottom: screenHeight * 0.02),
+                            padding: EdgeInsets.only(bottom: spacing),
                             child: RepaintBoundary(
                               key: _analysisChartKeys[analysis],
                               child: buildAnalysisCard(
@@ -278,24 +398,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print('AnalysisScreen: FAB pressed, showing bottom sheet');
           showAddAnalysisBottomSheet(context, selectedAnalyses, (newAnalyses) {
             setState(() {
               selectedAnalyses = newAnalyses;
               _analysisData = fetchAnalysisData(_startDate, _endDate);
-              print(
-                  'AnalysisScreen: Selected analyses updated - $selectedAnalyses');
             });
           });
         },
-        backgroundColor: Colors.green.shade700,
-        elevation: 6,
+        backgroundColor: Colors.green[700],
+        elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const Icon(Icons.add, size: 28, color: Colors.white),
+        child: Icon(Icons.add, size: screenWidth * 0.07, color: Colors.white),
       ),
     );
   }
 }
-
-// Explanation:
-// This file defines the main AnalysisScreen widget and its state management. It serves as the entry point for the analysis dashboard, handling the UI layout, state updates, and interactions like date range changes and PDF generation. It uses FutureBuilder to display data fetched from Firestore, renders cards and charts based on selected analyses, and provides a floating action button to modify analysis options. The file imports utilities from other modules to keep the code modular and focused on UI and state logic.
