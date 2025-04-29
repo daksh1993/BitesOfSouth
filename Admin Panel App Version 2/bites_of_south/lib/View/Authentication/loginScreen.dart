@@ -31,6 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
       } else {
+        prefs.setString("docId", "RWK4WxjFx3ojXoDCDnBB");
+        print("docId: ${prefs.getString("docId")}");
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CookOrderScreen()),
@@ -255,8 +258,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     .text
                                                     .trim(),
                                                 context: context,
-                                                onPhoneVerification:
-                                                    (docId, maskedPhone, user) {
+                                                onPhoneVerification: (docId,
+                                                    maskedPhone, user) async {
+                                                
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(

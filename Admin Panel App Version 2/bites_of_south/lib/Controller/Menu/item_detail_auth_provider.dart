@@ -1,11 +1,9 @@
-// item_detail_auth_provider.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ItemDetailAuthProvider with ChangeNotifier {
   bool isLoading = false;
 
-  // Update item availability in Firestore
   Future<void> updateAvailability({
     required String itemId,
     required bool newValue,
@@ -42,7 +40,6 @@ class ItemDetailAuthProvider with ChangeNotifier {
     }
   }
 
-  // Update item details in Firestore
   Future<void> updateItemDetails({
     required String itemId,
     required Map<String, dynamic> updatedItem,

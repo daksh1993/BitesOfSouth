@@ -49,9 +49,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // initialRoute: '/mainPage', // Set initial route to login
-      initialRoute: '/login', // Set initial route to login
+      // initialRoute: '/login', // Set initial route to login
       // initialRoute: '/generate', // Set initial route to login
-      // initialRoute: '/cookPage', // Set initial route to login
+      initialRoute: '/cookPage', // Set initial route to login
 
       routes: {
         '/login': (context) => LoginScreen(),
@@ -78,13 +78,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+
 
   Future<void> updateMenuMakingPrices() async {
     try {
@@ -153,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'You have pushed the button this many times:',
             ),
             Text(
-              '$_counter',
+              'Hello World',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],

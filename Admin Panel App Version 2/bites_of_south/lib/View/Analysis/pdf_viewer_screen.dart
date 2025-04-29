@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:share_plus/share_plus.dart';
@@ -30,7 +29,7 @@ class PDFViewerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final spacing = screenWidth * 0.03;
+    // final spacing = screenWidth * 0.03;
 
     return Scaffold(
       appBar: AppBar(

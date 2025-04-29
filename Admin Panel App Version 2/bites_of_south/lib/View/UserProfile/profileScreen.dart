@@ -10,10 +10,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String name = "Admin Test";
-  String email = "admintest@gmail.com";
-  String phone = "+91 1234567890";
-  String role = "admintest";
+  String name = "Hetal rathod ";
+  String email = "hetalbrathod2001t@gmail.com";
+  String phone = "+91 9967034954";
+  String role = "cookt";
   String lastLoginAt = "Not available";
   String lastLogoutAt = "Not available";
 

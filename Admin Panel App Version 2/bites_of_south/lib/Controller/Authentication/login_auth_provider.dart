@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:email_validator/email_validator.dart';
 
-class LoginAuthProvider with ChangeNotifier {  // Changed from AuthProvider
+class LoginAuthProvider with ChangeNotifier {
+  // Changed from AuthProvider
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  
+
   bool isLoading = false;
-  
+
   Future<bool> checkIfAlreadyLoggedIn() async {
     print('Checking if user is already logged in');
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -28,7 +29,7 @@ class LoginAuthProvider with ChangeNotifier {  // Changed from AuthProvider
       );
       return;
     }
-    
+
     try {
       print('Sending password reset email');
       await _auth.sendPasswordResetEmail(email: email);
@@ -82,7 +83,7 @@ class LoginAuthProvider with ChangeNotifier {  // Changed from AuthProvider
         String docId = adminQuery.docs.first.id;
         String maskedPhone = adminQuery.docs.first['phone']
             .substring(adminQuery.docs.first['phone'].length - 4);
-        
+
         onPhoneVerification(docId, maskedPhone, userCredential.user!);
       } else {
         print('Unauthorized access detected');
@@ -109,7 +110,7 @@ class LoginAuthProvider with ChangeNotifier {  // Changed from AuthProvider
         default:
           errorMessage = "Error: ${e.message}";
       }
-      
+
       print('Showing error message: $errorMessage');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),

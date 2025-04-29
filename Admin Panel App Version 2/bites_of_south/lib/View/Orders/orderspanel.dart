@@ -169,7 +169,7 @@ class _CookOrderScreenState extends State<CookOrderScreen>
       for (var change in snapshot.docChanges) {
         if (change.type == DocumentChangeType.added) {
           final orderId = change.doc.id;
-          final data = change.doc.data() as Map<String, dynamic>?;
+          final data = change.doc.data() ;
           print('DEBUG: Order detected: $orderId, data: $data');
           if (_processedOrders.contains(orderId)) {
             print('DEBUG: Order $orderId already processed, skipping');
@@ -361,7 +361,12 @@ class _CookOrderScreenState extends State<CookOrderScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cook Dashboard'),
+        foregroundColor: Colors.white,
+        title: const Text('Cook Dashboard',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            )),
         centerTitle: true,
         backgroundColor: Colors.green,
         leading: IconButton(
@@ -808,8 +813,8 @@ class _OrderCardState extends State<OrderCard> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      minimumSize: Size(widget.screenWidth * 0.25,
-                          widget.screenHeight * 0.06),
+                      minimumSize: Size(widget.screenWidth * 0.28,
+                          widget.screenHeight * 0.09),
                     ),
                   ),
                   SizedBox(width: widget.screenWidth * 0.03),
@@ -823,8 +828,8 @@ class _OrderCardState extends State<OrderCard> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      minimumSize: Size(widget.screenWidth * 0.25,
-                          widget.screenHeight * 0.06),
+                      minimumSize: Size(widget.screenWidth * 0.28,
+                          widget.screenHeight * 0.09),
                     ),
                   ),
                   SizedBox(width: widget.screenWidth * 0.03),
@@ -839,8 +844,8 @@ class _OrderCardState extends State<OrderCard> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      minimumSize: Size(widget.screenWidth * 0.25,
-                          widget.screenHeight * 0.06),
+                      minimumSize: Size(widget.screenWidth * 0.28,
+                          widget.screenHeight * 0.09),
                     ),
                   ),
                 ],
@@ -935,16 +940,24 @@ class _DateRangeSectionState extends State<DateRangeSection> {
 
     switch (range) {
       case 'Today':
-        start = DateTime(now.year, now.month, now.day);
+        start = now.subtract(Duration(days: 1));
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
+        end = DateTime(now.year, now.month, now.day, 23, 59, 59);
         break;
       case 'Past 2 Days':
-        start = now.subtract(const Duration(days: 2));
+        start = now.subtract(Duration(days: 3));
         break;
       case 'This Week':
-        start = now.subtract(Duration(days: now.weekday - 1));
+        start = now.subtract(Duration(days: 6));
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
         break;
       case 'This Month':
-        start = DateTime(now.year, now.month, 1);
+        start = now.subtract(Duration(days: 29));
+        start = DateTime(start.year, start.month, start.day, 0, 0, 0);
+        break;
+      case 'All':
+        start = null;
+        end = null;
         break;
     }
 

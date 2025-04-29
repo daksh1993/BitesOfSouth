@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:bites_of_south/Controller/database_services_menu.dart';
 import 'package:bites_of_south/Modal/menu_item.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -130,7 +130,7 @@ class _AddItemToMenuState extends State<AddItemToMenu> {
     return OrientationBuilder(
       builder: (context, orientation) {
         final isLandscape = orientation == Orientation.landscape;
-        final fieldWidth = isLandscape
+         isLandscape
             ? (screenWidth - padding * 4) / 2
             : screenWidth - padding * 2;
 

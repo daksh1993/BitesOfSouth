@@ -1,3 +1,6 @@
+
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:bites_of_south/Controller/Menu/item_detail_auth_provider.dart';
 import 'package:bites_of_south/Modal/item_details_modal.dart';
 import 'package:cached_network_image/cached_network_image.dart';
