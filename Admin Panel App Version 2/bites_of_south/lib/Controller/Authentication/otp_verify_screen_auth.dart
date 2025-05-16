@@ -156,6 +156,7 @@ class OTPVerifyScreenAuth with ChangeNotifier {
       if (role == 'admin') {
         await prefs.setBool("isAdmin", true);
       } else {
+        await prefs.setBool("iscook", true);
         await prefs.setBool("isAdmin", false);
       }
 

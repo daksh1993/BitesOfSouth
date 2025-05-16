@@ -26,6 +26,7 @@ class LoginAuthProvider with ChangeNotifier {
       print('Invalid email format');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please enter a valid email")),
+      
       );
       return;
     }

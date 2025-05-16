@@ -49,9 +49,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // initialRoute: '/mainPage', // Set initial route to login
-      // initialRoute: '/login', // Set initial route to login
+      initialRoute: '/login', // Set initial route to login
       // initialRoute: '/generate', // Set initial route to login
-      initialRoute: '/cookPage', // Set initial route to login
+      // initialRoute: '/cookPage', // Set initial route to login
 
       routes: {
         '/login': (context) => LoginScreen(),
@@ -78,9 +78,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-
-
   Future<void> updateMenuMakingPrices() async {
     try {
       // Get reference to the menu collection

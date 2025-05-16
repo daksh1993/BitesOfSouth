@@ -24,19 +24,25 @@ class _LoginScreenState extends State<LoginScreen> {
         listen: false); // Updated provider name
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isAdmin = prefs.getBool('isAdmin') ?? false;
+    bool isccok = prefs.getBool('iscook') ?? false;
+
     if (await authProvider.checkIfAlreadyLoggedIn()) {
       if (isAdmin) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => DashboardScreen()),
         );
+      } else if (isccok) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CookOrderScreen()),
+        );
       } else {
-        prefs.setString("docId", "RWK4WxjFx3ojXoDCDnBB");
         print("docId: ${prefs.getString("docId")}");
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => CookOrderScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       }
     }
@@ -260,7 +266,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 context: context,
                                                 onPhoneVerification: (docId,
                                                     maskedPhone, user) async {
-                                                
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
