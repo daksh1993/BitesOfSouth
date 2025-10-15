@@ -146,16 +146,41 @@ flutter run
 
 ---
 
-## 📸 Screenshots / Demo
-
 <p align="center">
-  <img src="https://dummyimage.com/600x350/000/fff.png&text=Customer+Web+App+Interface" width="45%"/>
-  <img src="https://dummyimage.com/600x350/555/fff.png&text=Admin+Panel+Mobile+Dashboard" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/home screen logged out.PNG" alt="Home Screen Logged Out" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/homepg ui.PNG" alt="Home Page UI" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/menu.PNG" alt="Menu Page" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/menu with cart.PNG" alt="Menu with Cart" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart1.PNG" alt="Cart View" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart dine1.PNG" alt="Cart Dine Option 1" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart dine 2.PNG" alt="Cart Dine Option 2" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/order placed.PNG" alt="Order Placed" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/your orders pg.PNG" alt="Your Orders Page" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/razorpay payment scces.PNG" alt="Razorpay Payment Success" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/orders page2.PNG" alt="Orders Page" width="45%"/>
+<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/order ready.PNG" alt="Order Ready" width="45%"/>
 </p>
 
-*(Replace placeholders with actual screenshots showing UI workflow.)*
+### 📱 Admin Panel Mobile Application
 
----
+<p align="center">
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-08.jpg" alt="Admin Dashboard" width="45%"/>
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-13.jpg" alt="Admin Orders" width="45%"/>
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-12.jpg" alt="Admin Orders 2" width="45%"/>
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-14.jpg" alt="Admin Orders 3" width="45%"/>
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-15.jpg" alt="Admin Orders 4" width="45%"/>
+<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-09.jpg" alt="Admin Orders 5" width="45%"/>
+</p>
+
+### 👨‍🍳 Chef's App
+
+<p align="center">
+<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/new order.png" alt="New Order" width="45%"/>
+<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/25 percent.png" alt="Order Progress 25%" width="45%"/>
+<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/50 percent.png" alt="Order Progress 50%" width="45%"/>
+<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/100 percent.png" alt="Order Progress 100%" width="45%"/>
+<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/Profile.png" alt="Chef's Profile" width="45%"/>
+</p>
 
 
 
