@@ -247,15 +247,6 @@ flutter run
 
 ---
 
-## 🧩 System Workflow
-
-flowchart TD
-A[Customer Places Order] --> B[React App Sends Data to Firestore]
-B --> C[Firebase Processes Payment & Auth]
-C --> D[Admin Panel (Flutter) Receives Order]
-D --> E[Admin Updates Order Status in Real-Time]
-E --> F[Customer Gets Live Updates]
-
 
 ---
 
