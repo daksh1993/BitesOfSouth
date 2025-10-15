@@ -146,43 +146,74 @@ flutter run
 
 ---
 
+## 📸 Screenshots / Demo
+
+### 🛍 Customer Web Application
+
 <p align="center">
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/home screen logged out.PNG" alt="Home Screen Logged Out" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/homepg ui.PNG" alt="Home Page UI" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/menu.PNG" alt="Menu Page" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/menu with cart.PNG" alt="Menu with Cart" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart1.PNG" alt="Cart View" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart dine1.PNG" alt="Cart Dine Option 1" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/cart dine 2.PNG" alt="Cart Dine Option 2" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/order placed.PNG" alt="Order Placed" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/your orders pg.PNG" alt="Your Orders Page" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/razorpay payment scces.PNG" alt="Razorpay Payment Success" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/orders page2.PNG" alt="Orders Page" width="45%"/>
-<img src="BOS PICS/BitesOfSouthWebsite ScreenShots/order ready.PNG" alt="Order Ready" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/home%20screen%20logged%20out.PNG" alt="Home Screen Logged Out" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/homepg%20ui.PNG" alt="Home Page UI" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/menu.PNG" alt="Menu Page" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/menu%20with%20cart.PNG" alt="Menu with Cart" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/menu%20category.PNG" alt="Menu Category" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/menu%20sort.PNG" alt="Menu Sort" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/cart1.PNG" alt="Cart View" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/cart%20offers.PNG" alt="Cart Offers" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/cart%20dine1.PNG" alt="Cart Dine Option 1" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/cart%20dine%202.PNG" alt="Cart Dine Option 2" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/rewards.PNG" alt="Rewards Page" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/reward%20to%20cart.PNG" alt="Add Reward to Cart" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/order%20placed.PNG" alt="Order Placed" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/your%20orders%20pg.PNG" alt="Your Orders Page" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/orders%20page2.PNG" alt="Order Page 2" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/order%20ready.PNG" alt="Order Ready" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/login.PNG" alt="Login Page" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/signup.PNG" alt="Signup Page" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/hs%20login.PNG" alt="Home Screen Login" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/side%20modal.PNG" alt="Side Modal" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/side%20modal%20edit.PNG" alt="Side Modal Edit" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/razorpay%20payment%20scces.PNG" alt="Razorpay Payment Success" width="45%"/>
 </p>
 
 ### 📱 Admin Panel Mobile Application
 
 <p align="center">
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-08.jpg" alt="Admin Dashboard" width="45%"/>
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-13.jpg" alt="Admin Orders" width="45%"/>
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-12.jpg" alt="Admin Orders 2" width="45%"/>
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-14.jpg" alt="Admin Orders 3" width="45%"/>
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-15.jpg" alt="Admin Orders 4" width="45%"/>
-<img src="BOS PICS/BitesOfSouth App ScreenShots/PHOTO-2025-04-14-01-11-09.jpg" alt="Admin Orders 5" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-08.jpg" alt="Admin Dashboard" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-09.jpg" alt="Admin Orders" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10.jpg" alt="Admin Orders 2" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11.jpg" alt="Admin Orders 3" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12.jpg" alt="Admin Orders 4" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13.jpg" alt="Admin Orders 5" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-14.jpg" alt="Admin Orders 6" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-15.jpg" alt="Admin Orders 7" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42.jpg" alt="Admin Orders 8" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%202.jpg" alt="Admin Orders 9" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%204.jpg" alt="Admin Orders 10" width="45%"/>
 </p>
 
 ### 👨‍🍳 Chef's App
 
 <p align="center">
-<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/new order.png" alt="New Order" width="45%"/>
-<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/25 percent.png" alt="Order Progress 25%" width="45%"/>
-<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/50 percent.png" alt="Order Progress 50%" width="45%"/>
-<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/100 percent.png" alt="Order Progress 100%" width="45%"/>
-<img src="BOS PICS/BitesOfSouth Cook App ScreenShots/Profile.png" alt="Chef's Profile" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/new%20order.png" alt="New Order" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/25%20percent.png" alt="Order Progress 25%" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/50%20percent.png" alt="Order Progress 50%" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/100%20percent.png" alt="Order Progress 100%" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/Profile.png" alt="Chef's Profile" width="45%"/>
 </p>
 
+---
 
+## 🧩 System Workflow
+
+flowchart TD
+A[Customer Places Order] --> B[React App Sends Data to Firestore]
+B --> C[Firebase Processes Payment & Auth]
+C --> D[Admin Panel (Flutter) Receives Order]
+D --> E[Admin Updates Order Status in Real-Time]
+E --> F[Customer Gets Live Updates]
+
+
+---
 
 ## 🧾 License
 
