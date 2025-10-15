@@ -146,6 +146,30 @@ flutter run
 
 ---
 
+📲 Launch on connected device or emulator.
+
+---
+
+## 👥 Collaborators
+
+| Name | Role | GitHub |
+|------|------|--------|
+| **Daksh Rathod** | Flutter & Firebase Developer | [@daksh1993](https://github.com/daksh1993) |
+| **Jeel Savaliya** | Web Developer |  |
+| **Nikshay Mehta** | UI/UX Design & QA |  |
+
+---
+
+## 🧠 Core Highlights
+
+- Real-time order management  
+- Dual-app system (React web + Flutter mobile)  
+- Integrated analytics & reporting system  
+- Secure authentication for users & admins  
+- Efficient image management via Firebase Storage  
+
+---
+
 ## 📸 Screenshots / Demo
 
 ### 🛍 Customer Web Application
@@ -172,26 +196,46 @@ flutter run
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/hs%20login.PNG" alt="Home Screen Login" width="45%"/>
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/side%20modal.PNG" alt="Side Modal" width="45%"/>
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/side%20modal%20edit.PNG" alt="Side Modal Edit" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouthWebsite%20ScreenShots/razorpay%20payment%20scces.PNG" alt="Razorpay Payment Success" width="45%"/>
 </p>
 
 ### 📱 Admin Panel Mobile Application
 
 <p align="center">
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-08.jpg" alt="Admin Dashboard" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-08%202.jpg" alt="Admin Dashboard 2" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-08%203.jpg" alt="Admin Dashboard 3" width="45%"/>
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-09.jpg" alt="Admin Orders" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10.jpg" alt="Admin Orders 2" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11.jpg" alt="Admin Orders 3" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12.jpg" alt="Admin Orders 4" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13.jpg" alt="Admin Orders 5" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-14.jpg" alt="Admin Orders 6" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-15.jpg" alt="Admin Orders 7" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42.jpg" alt="Admin Orders 8" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%202.jpg" alt="Admin Orders 9" width="45%"/>
-<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%204.jpg" alt="Admin Orders 10" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-09%202.jpg" alt="Admin Orders 2" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-09%203.jpg" alt="Admin Orders 3" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-09%204.jpg" alt="Admin Orders 4" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10.jpg" alt="Admin Orders 5" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10%202.jpg" alt="Admin Orders 6" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10%203.jpg" alt="Admin Orders 7" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10%204.jpg" alt="Admin Orders 8" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-10%205.jpg" alt="Admin Orders 9" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11.jpg" alt="Admin Orders 10" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11%202.jpg" alt="Admin Orders 11" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11%203.jpg" alt="Admin Orders 12" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-11%204.jpg" alt="Admin Orders 13" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12.jpg" alt="Admin Orders 14" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12%202.jpg" alt="Admin Orders 15" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12%203.jpg" alt="Admin Orders 16" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-12%204.jpg" alt="Admin Orders 17" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13.jpg" alt="Admin Orders 18" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13%202.jpg" alt="Admin Orders 19" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13%203.jpg" alt="Admin Orders 20" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-13%204.jpg" alt="Admin Orders 21" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-14.jpg" alt="Admin Orders 22" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-14%202.jpg" alt="Admin Orders 23" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-14%203.jpg" alt="Admin Orders 24" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-15.jpg" alt="Admin Orders 25" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-15%202.jpg" alt="Admin Orders 26" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-04-14-01-11-33.jpg" alt="Admin Orders 27" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42.jpg" alt="Admin Orders 28" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%202.jpg" alt="Admin Orders 29" width="45%"/>
+<img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20App%20ScreenShots/PHOTO-2025-02-21-22-30-42%204.jpg" alt="Admin Orders 30" width="45%"/>
 </p>
 
-### 👨‍🍳 Chef's App
 
 <p align="center">
 <img src="https://github.com/daksh1993/bitesofsouth/raw/main/BOS%20PICS/BitesOfSouth%20Cook%20App%20ScreenShots/new%20order.png" alt="New Order" width="45%"/>
